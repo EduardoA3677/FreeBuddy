@@ -1,11 +1,11 @@
 # Huawei MBB protocol
 As known from de-compilation (and some logs) of the [Huawei AI Life app](https://consumer.huawei.com/pl/campaign/ai-life-app/), "MBB" is the name of the protocol that they use to communicate with headphones.
 
-I did not found **ANY** information about this protocol/name *anywhere* - not on Github, nor on plain google search. Thus, all descriptions here will be very inconsistent, maybe unprofessional, and probably, biased because I only own one pair of FreeBuds 4i headphones - not pro's, or other versions.
+I did not found **ANY** information about this protocol/name *anywhere* - not on Github, nor on plain google search. Thus, all descriptions here will be very inconsistent, maybe unprofessional, and probably, biased because I only own one pair of FreeBuds Pro 3 headphones - not pro's, or other versions.
 
 However, I heaivliy tried to make everything as universal as I could. Enjoy!
 
-**UPDATE**: Turned out there is this cool guy called [@melianmiko](https://melianmiko.ru/en) who also made app called [OpenFreebuds](https://github.com/melianmiko/OpenFreebuds). He kindly published pretty detailed descriptions of his rev-eng, which showed me quite few things I missed ; this wiki is much clearer thanks to him 😇 You can check him out! https://melianmiko.ru/en/posts/freebuds-4i-proto/
+**UPDATE**: Turned out there is this cool guy called [@melianmiko](https://melianmiko.ru/en) who also made app called [OpenFreebuds](https://github.com/melianmiko/OpenFreebuds). He kindly published pretty detailed descriptions of his rev-eng, which showed me quite few things I missed ; this wiki is much clearer thanks to him 😇 You can check him out! https://melianmiko.ru/en/posts/freebuds-Pro3-proto/
 
 ## Messages structure
 All data is transported using classic bluetooth serial port ([SPP](https://en.wikipedia.org/wiki/List_of_Bluetooth_profiles#Serial_Port_Profile_(SPP))).
@@ -65,17 +65,19 @@ We can break down our "`[1, 1, 90, 2, 3, 90, 100, 15, 3, 3, 0, 0, 1]`" to:
 - `3`'rd arg, length `3` - `3, 3, 0` - left+right+case charging status
 
 #### Last two bytes
+
 <sub>With a sheer luck, I found out that...<sub>
 
-They are a CTC16-Xmodem checksum 🎉 Just take the *whole* message (besides those two bytes of course), run them through this algo and there you have them!
+They are a CTC16-Xmodem checksum 🎉 Just take the _whole_ message (besides those two bytes of course), run them through this algo and there you have them!
 
 > In my Dart code, I use [crclib](https://pub.dev/packages/crclib) package that provides a `Crc16Xmodem` class
 
 You can check it on [online calculator (where I actually found out about it)](https://www.lammertbies.nl/comm/info/crc-calculation)
 
 ## Typical behaviour of commands
+
 > When describing which service and command ids are used, I will write in "`(ServiceID:CommandID)`" format
-> 
+>
 > I will later refer to this pair as "command", because it's shorter and clearer
 
 > I will also describe data in format of TLV args, like `[(arg1byte1, arg1byte2), (arg2byte1), ...]` so it's shorter
@@ -85,21 +87,24 @@ Typically, for one property of headphones (anc mode, battery charge etc) there i
 Sometimes, there are more arguments in the data than we actually need - it is probably because we don't know the rest of them - but we often don't need to know 😉
 
 ### Querying data
-Usually, when you send the same command with empty data bytes, the headphones respond you with that command *with* the bytes - that's what I call that "you can **query** the data" 🚀 - so, if for example, you don't know the battery, just send them an empty battery command, and they will respond 😌
-> Usually, when *the original app* does that, it sends `[1, 0]` as data bytes - but it perfectly works without it 👌
+
+Usually, when you send the same command with empty data bytes, the headphones respond you with that command _with_ the bytes - that's what I call that "you can **query** the data" 🚀 - so, if for example, you don't know the battery, just send them an empty battery command, and they will respond 😌
+
+> Usually, when _the original app_ does that, it sends `[1, 0]` as data bytes - but it perfectly works without it 👌
 
 > There are some weird exceptions to those rules, which will be described
 
 ## Commands and data
+
 Below are descriptions of different commands and ways to get/send info and settings
 
 > Initially, I thought that same service id will group together similar stuff - but I find less ways to actually group them like that - so, below, all functionalities will be grouped in a human way, not "by service id" or something
 
-
 ### Battery
-`(1:39)` is a main juice that updates levels etc - but, headphones send it "when they wish so 💅" (probably when level changes etc). They will not send you this info when you just connect to them. 
 
-In order to query this (for example at app start), you need to use an empty `(1:8)` command - as I observed, it *usually* is *identical* to `(1:39)`, but *sometimes* it sends something irrelevant (3 args with 0 length, for example 🙃) - to protect and ignore that, just check if the length of data bytes
+`(1:39)` is a main juice that updates levels etc - but, headphones send it "when they wish so 💅" (probably when level changes etc). They will not send you this info when you just connect to them.
+
+In order to query this (for example at app start), you need to use an empty `(1:8)` command - as I observed, it _usually_ is _identical_ to `(1:39)`, but _sometimes_ it sends something irrelevant (3 args with 0 length, for example 🙃) - to protect and ignore that, just check if the length of data bytes
 
 While my headphones are 55%L, 65%R, 1%C, these are data args:
 
@@ -116,7 +121,7 @@ I assume 0 means null, because it shows up placeholder "-" in the app
 So we can assume arguments go like this:
 
 | Length | Data                                  |
-|--------|---------------------------------------|
+| ------ | ------------------------------------- |
 | 1      | Lowest charged bud                    |
 | 3      | left+right+case charge - in %         |
 | 3      | left+right+case charging status - 0/1 |
@@ -124,9 +129,11 @@ So we can assume arguments go like this:
 TODO: Check if i can show args sequentially like this or if i need to specify index
 
 ### ANC
+
 The command to change ANC mode to either on/off/transparency is `(43:4)`
 
 Data args look like this:
+
 - `[(1, 255)]` for noise-canceling
 - `[(0, 0)]` for off
 - `[(2, 255)]` for transparency
@@ -134,6 +141,7 @@ Data args look like this:
 I don't know what last `255`/`0` mean - maybe it's something like "strength" of the canceling? I tried to change them, but nothing changes... maybe it's something legacy/working on other headphones.
 
 BUT, headphones themselves report the current mode on separate command: `(43:42)`. Data args:
+
 - `[(4, 1)]` for noise-canceling
 - `[(0, 0)]` for off
 - `[(0, 2)]` for transparency
@@ -143,13 +151,16 @@ They send this when you hold them, pull them out of your ear, and they even echo
 Looks like second byte is the mode number, same as first one in CommandID=4. I don't know what first one does, but 🤷
 
 ### Smart wear setting
+
 > This is another setting that has weird exceptions and different commands for the same thing 👎
 
 To query it, use `(43:17)` with no args. I will respond (same command) with:
+
 - `[(1)]` - smart wear on
 - `[(0)]` - smart wear off
 
 Now, if you want to change it, it gets tricky. You use `(43:16)` (pretty much the same):
+
 - `[(1)]` - smart wear on
 - `[(0)]` - smart wear off
 
@@ -157,14 +168,16 @@ TODO: Examine this (weird TLV index byte):
 
 ...BUT, it always (at least for me) responds with "`[127, 4, 0, 1, 134, 160]`" - both for off and on
 
-So, to get consistent and certain info, I would suggest querying it *again* with `(43:17)` to check it 👍
+So, to get consistent and certain info, I would suggest querying it _again_ with `(43:17)` to check it 👍
 
 ### In-ear detection
+
 While observing random commands, I found how headphones report they were put in/out of the ear - this may be super useful!
 
 TODO: Examine this (weird TLV index byte):
 
 `(43:3)` sends you this:
+
 - `[9, 1, 1]` - right bud in ear
 - `[9, 1, 0]` - right bud out of ear
 - `[8, 1, 1]` - left bud in ear
@@ -173,9 +186,11 @@ TODO: Examine this (weird TLV index byte):
 ...so the `9` at first bud is for right, and `8` for left ; `1` at last one is for "in ear" and `0` for out 🎉
 
 > Fun fact: If you want to query this with empty bytes, it will respond with `[0, 0, 0]` 😿
-> > Actually, this *maybe* makes sense because this is "event command" (??) - it prints when it happens. Tho it could just print it again...
+>
+> > Actually, this _maybe_ makes sense because this is "event command" (??) - it prints when it happens. Tho it could just print it again...
 
 ### `(10:13)` - Party :tada:
+
 This seems to be some kind of party mode. Hear me out -t hose buds randomly start to span out shitload of those jsons:
 
 ```json
@@ -185,6 +200,7 @@ This seems to be some kind of party mode. Hear me out -t hose buds randomly star
 {"Type":"BTFT0001-000124|0x29|0x3eb","Time":0x630b17f2,"ID":0x4,"VID":0x16fe2498,"Ver":"1.9.0.198","Code":0x1,"SubCode":0xf}
 {"Type":"BTFT0001-000124|0x2a|0x3ec","Time":0x630b17f2,"ID":0x4,"VID":0x16fe2498,"Ver":"1.9.0.198","Code":0x2,"SubCode":0xa}
 ```
+
 (each one is separate payload)
 
 It's actually super annoying when I try to watch other commands

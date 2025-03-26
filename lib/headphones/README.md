@@ -43,9 +43,9 @@ So, I want to be careful with this, but for now adding their model and vendor na
 Folders named by vendor - `huawei/`, `samsung/` etc contain headphones base classes, their implementations and simulators
 
 ## Base classes
-Most basically named classes - f.e. `freebuds4i.dart` contain "blueprints/specifiactions" for headphones - have a look:
+Most basically named classes - f.e. `freebudsPro3.dart` contain "blueprints/specifiactions" for headphones - have a look:
 ```dart
-abstract base class HuaweiFreeBuds4i
+abstract base class HuaweiFreeBudsPro3
     implements BluetoothHeadphones, HeadphonesModelInfo, LRCBattery, Anc {...}
 ```
 
@@ -59,8 +59,8 @@ I don't have a better idea for where to put identifiers - that is, name regexes,
 ```dart
 // example pseudocode
 switch(device.btName) {
-  case HuaweiFreeBuds4i.btName:
-    return HuaweiFreeBuds4iImpl(device.rfComm);
+  case HuaweiFreeBudsPro3.btName:
+    return HuaweiFreeBudsPro3Impl(device.rfComm);
   // ... etc
 }
 ```
