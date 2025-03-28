@@ -66,9 +66,9 @@ android {
     signingConfigs {
         release {
             keyAlias 'upload'
-            keyPassword System.env.KEY_PWD ?: ''
+            keyPassword System.getenv("KEY_PWD") ?: ''
             storeFile file('../keystore.jks')
-            storePassword System.env.KEYSTORE_PWD ?: ''
+            storePassword System.getenv("KEYSTORE_PWD") ?: ''
         }
     }
 

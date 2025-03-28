@@ -39,6 +39,30 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3 {
       ),
     );
   }
+
+  @override
+  ValueStream<int> get batteryLevel => throw UnimplementedError();
+
+  @override
+  ValueStream<String> get bluetoothAlias => throw UnimplementedError();
+
+  @override
+  String get bluetoothName => throw UnimplementedError();
+
+  @override
+  String get macAddress => throw UnimplementedError();
+
+  @override
+  ValueStream<LRCBatteryLevels> get lrcBattery => throw UnimplementedError();
+
+  @override
+  ValueStream<AncMode> get ancMode => throw UnimplementedError();
+
+  @override
+  Future<void> setAncMode(AncMode mode) async => throw UnimplementedError();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 /// Class to use as placeholder for Disabled() widget
