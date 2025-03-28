@@ -48,7 +48,7 @@ dependencies:
   # Logic libs
   crclib: ^3.0.0
   ## These two conflict with, as always, flutter_test
-  collection: ^1.19.0
+  collection: ^1.18.0
   stream_channel: ^2.1.0
   flutter_bloc: ^8.1.0
   logger: ^2.5.0
