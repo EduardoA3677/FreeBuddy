@@ -4,7 +4,7 @@ import '../framework/anc.dart';
 import '../simulators/anc_sim.dart';
 import '../simulators/bluetooth_headphones_sim.dart';
 import '../simulators/lrc_battery_sim.dart';
-import '../framework/lrc_battery.dart'; // Asegúrate de que esta importación sea correcta.
+import '../framework/lrc_battery.dart';
 import 'freebudspro3.dart';
 import 'settings.dart';
 
