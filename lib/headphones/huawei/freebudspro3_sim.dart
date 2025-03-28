@@ -8,8 +8,6 @@ import 'freebudspro3.dart';
 import 'settings.dart';
 
 final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3 {
-  // ehhhhhh...
-
   final _settingsCtrl = BehaviorSubject<HuaweiFreeBudsPro3Settings>.seeded(
     const HuaweiFreeBudsPro3Settings(
       doubleTapLeft: DoubleTap.playPause,
@@ -65,12 +63,6 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3 {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-/// Class to use as placeholder for Disabled() widget
-// this is not done with mixins because we may want to fill it with
-// last-remembered values in future, and we will pretty much override
-// all of this
-//
-// ...or not. I just don't know yet 🤷
 final class HuaweiFreeBudsPro3SimPlaceholder extends HuaweiFreeBudsPro3
     with
         BluetoothHeadphonesSimPlaceholder,

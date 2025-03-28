@@ -36,8 +36,8 @@ class DoubleTapSection extends StatelessWidget {
                 final g = newVal ? DoubleTap.playPause : DoubleTap.nothing;
                 headphones.setSettings(
                   HuaweiFreeBudsPro3Settings(
-                    doubleTapLeft: g, 
-                    doubleTapRight: g
+                    doubleTapLeft: g,
+                    doubleTapRight: g,
                   ),
                 );
               },
