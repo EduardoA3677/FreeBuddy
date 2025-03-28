@@ -1,5 +1,6 @@
 name: flutter-test
 description: 'Runs flutter test'
+
 runs:
   using: "composite"
   steps:
