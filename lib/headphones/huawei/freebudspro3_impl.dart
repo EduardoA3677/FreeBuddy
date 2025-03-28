@@ -12,7 +12,7 @@ import 'freebudspro3.dart';
 import 'mbb.dart';
 import 'settings.dart';
 
-class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
+final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   final tlb.BluetoothDevice _bluetoothDevice;
 
   /// Bluetooth serial port that we communicate over
