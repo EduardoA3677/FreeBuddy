@@ -65,7 +65,7 @@ android {
 
     signingConfigs {
         release {
-            keyAlias 'netzpolitik'
+            keyAlias 'upload'
             keyPassword System.env.KEY_PWD ?: ''
             storeFile file('../keystore.jks')
             storePassword System.env.KEYSTORE_PWD ?: ''
