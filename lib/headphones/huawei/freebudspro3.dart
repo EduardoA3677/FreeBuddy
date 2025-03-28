@@ -13,12 +13,7 @@ import 'settings.dart';
 /// It makes both a solid ground for actual implementation (by defining what
 /// features they implement), and some basic info for easy simulation
 abstract base class HuaweiFreeBudsPro3
-    implements
-        BluetoothHeadphones,
-        HeadphonesModelInfo,
-        LRCBattery,
-        Anc,
-        HeadphonesSettings<HuaweiFreeBudsPro3Settings> {
+    implements BluetoothHeadphones, HeadphonesModelInfo, LRCBattery, Anc {
   const HuaweiFreeBudsPro3();
 
   @override

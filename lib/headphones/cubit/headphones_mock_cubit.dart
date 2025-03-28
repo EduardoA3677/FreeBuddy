@@ -10,8 +10,7 @@ class HeadphonesMockCubit extends Cubit<HeadphonesConnectionState>
     implements HeadphonesConnectionCubit {
   HeadphonesMockCubit()
       : super(const HeadphonesDisconnected(HuaweiFreeBudsPro3SimPlaceholder())) {
-    // i do this because otherwise initial data isn't even emitted and
-    // [BlocListener]s don't work >:(
+    // Emit initial data to ensure [BlocListener]s work correctly.
     Future.microtask(
         () => emit(HeadphonesConnectedOpen(HuaweiFreeBudsPro3Sim())));
   }

@@ -7,8 +7,7 @@ import '../simulators/lrc_battery_sim.dart';
 import 'freebudspro3.dart';
 import 'settings.dart';
 
-final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
-    with BluetoothHeadphonesSim, LRCBatteryAlwaysFullSim, AncSim {
+final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3 {
   // ehhhhhh...
 
   final _settingsCtrl = BehaviorSubject<HuaweiFreeBudsPro3Settings>.seeded(
