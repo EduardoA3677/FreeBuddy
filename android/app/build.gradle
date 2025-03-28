@@ -65,26 +65,16 @@ android {
 
     signingConfigs {
         release {
-            keyAlias 'eduardoa3677'
+            keyAlias 'netzpolitik'
             keyPassword System.env.KEY_PWD ?: ''
             storeFile file('../keystore.jks')
             storePassword System.env.KEYSTORE_PWD ?: ''
         }
     }
+
     buildTypes {
         release {
-            if (keystorePropertiesFile.exists()) {
-                signingConfig signingConfigs.release
-            } else {
-                println "No key.properties found - Signing with debug keys"
-                signingConfig signingConfigs.debug
-            }
-        }
-        debug {
-            applicationIdSuffix ".debug"
-        }
-        profile {
-            applicationIdSuffix ".profile"
+            signingConfig signingConfigs.release
         }
     }
 }
