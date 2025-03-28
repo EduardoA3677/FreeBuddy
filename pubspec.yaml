@@ -80,7 +80,7 @@ dev_dependencies:
 
   flutter_lints: ^5.0.0
   icon_font_generator: ^4.0.0
-  build_runner: ^1.7.0
+  build_runner: ^2.4.15
 
 # Run with:
 # $ flutter pub run icon_font_generator:generator
