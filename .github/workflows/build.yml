@@ -75,7 +75,9 @@ jobs:
 
       # Obtener el changelog asociado al tag
       - name: Get changelog
-        run: python scripts/get_changelog.py --version ${{ env.tag }} > ./body-file.txt
+        run: |
+          echo "Debug: Using tag ${{ env.tag }}"
+          python scripts/get_changelog.py --version ${{ env.tag }} > ./body-file.txt
       
       # Crear la release en GitHub
       - name: Create GitHub Release
