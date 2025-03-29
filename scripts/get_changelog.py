@@ -8,8 +8,8 @@ args = p.parse_args()
 
 version = args.version.strip().replace('v', '')
 if not version:
-    version = os.getenv('tag', '').strip().replace('v', '')
-if not re.match(r'\d+.\d+.\d+', version):
+    version = os.getenv('tag', '').strip()
+if not re.match(r'\d+\.\d+\.\d+', version):
     raise ValueError('Invalid version')
 
 with open("CHANGELOG.md", 'r') as f:

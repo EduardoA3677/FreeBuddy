@@ -25,7 +25,6 @@ on:
 env:
   flutter_channel: 'any'
   GH_TOKEN: ${{ secrets.GH_PAT }}
-  tag: ${{ github.event.inputs.tag }}
 
 jobs:
   build:
@@ -37,11 +36,7 @@ jobs:
       - name: Set tag
         id: set_tag
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            TAG="${{ github.ref_name }}"
-          else
-            TAG="${{ github.event.inputs.tag }}"
-          fi
+          TAG="${{ github.event.inputs.tag }}"
 
           # Remove 'v' prefix if present
           CLEAN_TAG=$(echo "$TAG" | sed 's/^v//')
@@ -60,12 +55,6 @@ jobs:
         with:
           path: /opt/hostedtoolcache/flutter
           key: ${{ runner.OS }}-flutter-install-cache-${{ steps.flutter_version.outputs.version }}-any
-
-      # Install Flutter
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ steps.flutter_version.outputs.version }}
-          channel: 'any'
 
       # Build APK & AAB
       - name: Build APK & AAB with signing
