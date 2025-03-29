@@ -25,6 +25,7 @@ on:
 env:
   flutter_channel: 'any'
   GH_TOKEN: ${{ secrets.GH_PAT }}
+  tag: ${{ github.event.inputs.tag }}
 
 jobs:
   build:
