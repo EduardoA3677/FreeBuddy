@@ -1,11 +1,9 @@
-name: Build and publish new release on version tag
-
 on:
   push:
     branches:
-      - 'master'  # Ejecutar al hacer un commit en la rama master
+      - 'master'
     tags:
-      - 'v[0-9]+\.[0-9]+\.[0-9]+'  # Trigger para tags de versión
+      - 'v[0-9]+\.[0-9]+\.[0-9]+' 
   workflow_dispatch:
     inputs:
       tag:
@@ -56,7 +54,7 @@ jobs:
           flutter-version: ${{ env.flutter_version }}
           channel: ${{ env.flutter_channel }}
       
-      # Construir APK y/o AAB con firma
+      # Construir APK y AAB
       - name: Build APK & AAB with signing
         uses: NiklasLehnfeld/flutter-android-build-action@v2
         id: android-build
@@ -65,17 +63,12 @@ jobs:
           keystore: ${{ secrets.KEYSTORE }}
           keystore-pwd: "${{ secrets.KEYSTORE_PWD }}"
           key-pwd: "${{ secrets.KEY_PWD }}"
-          build-type: ${{ github.event.inputs.build_format }}  # Usar 'build-type' en lugar de 'build-format'
-      
+
       # Renombrar los archivos APK y AAB
       - name: Rename APK & AAB
         run: |
-          if [[ "${{ github.event.inputs.build_format }}" == "apk" || "${{ github.event.inputs.build_format }}" == "both" ]]; then
-            mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ env.tag }}.apk
-          fi
-          if [[ "${{ github.event.inputs.build_format }}" == "aab" || "${{ github.event.inputs.build_format }}" == "both" ]]; then
-            mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ env.tag }}.aab
-          fi
+          mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ env.tag }}.apk
+          mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ env.tag }}.aab
 
       # Obtener el changelog asociado al tag
       - name: Get changelog
@@ -87,6 +80,8 @@ jobs:
         with:
           body_path: ./body-file.txt
           files: |
-            ./FreeBuddy-${{ env.tag }}.apk
-            ./FreeBuddy-${{ env.tag }}.aab
+            ${{ github.event.inputs.build_format == 'apk' && './FreeBuddy-${{ env.tag }}.apk' || '' }}
+            ${{ github.event.inputs.build_format == 'aab' && './FreeBuddy-${{ env.tag }}.aab' || '' }}
+            ${{ github.event.inputs.build_format == 'both' && './FreeBuddy-${{ env.tag }}.apk' || '' }}
+            ${{ github.event.inputs.build_format == 'both' && './FreeBuddy-${{ env.tag }}.aab' || '' }}
           fail_on_unmatched_files: true
