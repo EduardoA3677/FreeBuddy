@@ -142,7 +142,6 @@ class MbbCommand {
       while (offset < dataBytes.length) {
         final argId = dataBytes[offset];
         final argLength = dataBytes[offset + 1];
-        // TODO: Check if argLength is valid and not too big
         final argData = dataBytes.sublist(offset + 2, offset + 2 + argLength);
         offset += 2 + argLength;
         args[argId] = argData;

@@ -23,5 +23,4 @@ enum WindowSizeClass {
         // 🤷
         _ => WindowSizeClass.compact,
       };
-  // TODO: @override compareTo
 }

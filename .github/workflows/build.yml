@@ -13,81 +13,108 @@ on:
         required: true
         default: 'v0.2.0'
       build_format:
-        description: 'Choose the build format (APK, AAB, or both)'
+        description: 'Choose the build format'
         required: true
         default: 'both'
+        type: choice
         options:
           - 'apk'
           - 'aab'
           - 'both'
 
 env:
-  flutter_channel: "any"
-  GH_TOKEN: ${{ secrets.GH_PAT }}  # Cambié a GH_PAT en lugar de GITHUB_TOKEN
+  flutter_channel: 'any'
+  GH_TOKEN: ${{ secrets.GH_PAT }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      # Limpiar el nombre del tag y extraerlo de las entradas
-      - name: Clean tag name
-        id: clean_tag
-        run: |
-          TAG="${{ github.event.inputs.tag }}"
-          # Eliminar el prefijo "v" si existe
-          CLEAN_TAG=$(echo "$TAG" | sed 's/^v//')
-          echo "tag=$CLEAN_TAG" >> $GITHUB_ENV
-      
-      # Parsear fvm para obtener la versión de flutter
-      - name: Parse fvm to set flutter version
-        run: echo "flutter_version=$(cat .fvm/fvm_config.json | jq -r .flutterSdkVersion)" >> $GITHUB_ENV
 
-      # Cache de Flutter
+      # Determine tag from either trigger or input
+      - name: Set tag
+        id: set_tag
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="${{ github.event.inputs.tag }}"
+          fi
+
+          # Remove 'v' prefix if present
+          CLEAN_TAG=$(echo "$TAG" | sed 's/^v//')
+          echo "tag=$CLEAN_TAG" >> $GITHUB_OUTPUT
+
+      # Parse fvm to set flutter version
+      - name: Parse fvm config
+        id: flutter_version
+        run: |
+          FLUTTER_VERSION=$(cat .fvm/fvm_config.json | jq -r .flutterSdkVersion)
+          echo "version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+
+      # Cache Flutter
       - name: Cache Flutter
         uses: actions/cache@v3
         with:
           path: /opt/hostedtoolcache/flutter
-          key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}-${{ env.flutter_channel }}
-      
-      # Instalar Flutter
+          key: ${{ runner.OS }}-flutter-install-cache-${{ steps.flutter_version.outputs.version }}-any
+
+      # Install Flutter
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ env.flutter_version }}
-          channel: ${{ env.flutter_channel }}
-      
-      # Construir APK y AAB
+          flutter-version: ${{ steps.flutter_version.outputs.version }}
+          channel: 'any'
+
+      # Build APK & AAB
       - name: Build APK & AAB with signing
         uses: NiklasLehnfeld/flutter-android-build-action@v2
         id: android-build
         with:
           release: true
           keystore: ${{ secrets.KEYSTORE }}
-          keystore-pwd: "${{ secrets.KEYSTORE_PWD }}"
-          key-pwd: "${{ secrets.KEY_PWD }}"
+          keystore-pwd: ${{ secrets.KEYSTORE_PWD }}
+          key-pwd: ${{ secrets.KEY_PWD }}
 
-      # Renombrar los archivos APK y AAB
-      - name: Rename APK & AAB
+      # Rename and prepare artifacts based on build format
+      - name: Process build artifacts
+        id: artifacts
         run: |
-          mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ env.tag }}.apk
-          mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ env.tag }}.aab
+          BUILD_FORMAT="${{ github.event.inputs.build_format }}"
+          if [[ -z "$BUILD_FORMAT" ]]; then
+            BUILD_FORMAT="both"  # Default if not provided
+          fi
 
-      # Obtener el changelog asociado al tag
+          # Create empty file list
+          echo "files=" >> $GITHUB_OUTPUT
+
+          # Handle APK
+          if [[ "$BUILD_FORMAT" == "apk" || "$BUILD_FORMAT" == "both" ]]; then
+            mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk
+            echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk" >> $GITHUB_OUTPUT
+          fi
+
+          # Handle AAB
+          if [[ "$BUILD_FORMAT" == "aab" || "$BUILD_FORMAT" == "both" ]]; then
+            mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab
+            if [[ "$BUILD_FORMAT" == "both" ]]; then
+              echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk,./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab" >> $GITHUB_OUTPUT
+            else
+              echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      # Get changelog
       - name: Get changelog
         run: |
-          echo "Debug: Using tag ${{ env.tag }}"
-          python scripts/get_changelog.py --version ${{ env.tag }} > ./body-file.txt
-      
-      # Crear la release en GitHub
+          python scripts/get_changelog.py --version ${{ steps.set_tag.outputs.tag }} > ./body-file.txt
+
+      # Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          token: ${{ secrets.GH_PAT }}  # Usando GH_PAT para autenticación
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ steps.set_tag.outputs.tag }}
           body_path: ./body-file.txt
-          files: |
-            ${{ github.event.inputs.build_format == 'apk' && './FreeBuddy-${{ env.tag }}.apk' || '' }}
-            ${{ github.event.inputs.build_format == 'aab' && './FreeBuddy-${{ env.tag }}.aab' || '' }}
-            ${{ github.event.inputs.build_format == 'both' && './FreeBuddy-${{ env.tag }}.apk' || '' }}
-            ${{ github.event.inputs.build_format == 'both' && './FreeBuddy-${{ env.tag }}.aab' || '' }}
-          fail_on_unmatched_files: true
+          files: ${{ steps.artifacts.outputs.files }}
+          fail_on_unmatched_files: false

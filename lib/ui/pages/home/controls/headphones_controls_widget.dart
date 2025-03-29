@@ -29,7 +29,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context);
     final tt = t.textTheme;
-    // TODO here:
     // - [ ] Make this clearer - this padding shouldn't be here?
     // - [ ] De-duplicate responsive stuff
     // - [ ] Think what to put when we have no image, or generally not many
@@ -49,7 +48,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
                 if (headphones is HeadphonesModelInfo)
                   HeadphonesImage(headphones as HeadphonesModelInfo)
                 else
-                  // TODO: This is ugly. Very
                   const Expanded(child: Icon(Icons.headphones, size: 64)),
                 if (headphones is HeadphonesSettings)
                   const Align(
@@ -77,7 +75,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
                       if (headphones is HeadphonesModelInfo)
                         HeadphonesImage(headphones as HeadphonesModelInfo)
                       else
-                        // TODO: This is ugly. Very
                         const Expanded(child: Icon(Icons.headphones, size: 64)),
                     ],
                   ),
@@ -114,7 +111,6 @@ class _HeadphonesSettingsButton extends StatelessWidget {
     final t = Theme.of(context);
     final l = AppLocalizations.of(context)!;
     return Padding(
-      // TODO: Move this to theme stuff some day
       padding: t.cardTheme.margin ?? const EdgeInsets.all(4.0),
       child: OutlinedButton(
         onPressed: () => Navigator.pushNamed(context, '/headphones_settings'),

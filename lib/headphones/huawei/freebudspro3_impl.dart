@@ -14,8 +14,11 @@ import 'settings.dart';
 
 final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   final tlb.BluetoothDevice _bluetoothDevice;
+
+  /// Bluetooth serial port that we communicate over
   final StreamChannel<MbbCommand> _mbb;
 
+  // * stream controllers
   final _batteryLevelCtrl = BehaviorSubject<int>();
   final _bluetoothAliasCtrl = BehaviorSubject<String>();
   final _bluetoothNameCtrl = BehaviorSubject<String>();
@@ -23,9 +26,13 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   final _ancModeCtrl = BehaviorSubject<AncMode>();
   final _settingsCtrl = BehaviorSubject<HuaweiFreeBudsPro3Settings>();
 
+  // stream controllers *
+
+  /// This watches if we are still missing any info and re-requests it
   late StreamSubscription _watchdogStreamSub;
 
   HuaweiFreeBudsPro3Impl(this._mbb, this._bluetoothDevice) {
+    // hope this will nicely play with closing, idk honestly
     final aliasStreamSub = _bluetoothDevice.alias
         .listen((alias) => _bluetoothAliasCtrl.add(alias));
     _bluetoothAliasCtrl.onCancel = () => aliasStreamSub.cancel();
@@ -41,6 +48,8 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
       onError: logg.onError,
       onDone: () {
         _watchdogStreamSub.cancel();
+
+        // close all streams
         _batteryLevelCtrl.close();
         _bluetoothAliasCtrl.close();
         _bluetoothNameCtrl.close();
@@ -54,6 +63,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         Stream.periodic(const Duration(seconds: 3)).listen((_) {
       if ([
         batteryLevel.valueOrNull,
+        // no alias because it's okay to be null 👍
         lrcBattery.valueOrNull,
         ancMode.valueOrNull,
         settings.valueOrNull,
@@ -67,11 +77,13 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
     final lastSettings =
         _settingsCtrl.valueOrNull ?? const HuaweiFreeBudsPro3Settings();
     switch (cmd.args) {
+      // # AncMode
       case {1: [_, var ancModeCode, ...]} when cmd.isAbout(_Cmd.getAnc):
         final mode =
             AncMode.values.firstWhereOrNull((e) => e.mbbCode == ancModeCode);
         if (mode != null) _ancModeCtrl.add(mode);
         break;
+      // # BatteryLevels
       case {2: var level, 3: var status}
           when cmd.serviceId == 1 &&
               (cmd.commandId == 39 || cmd.commandId == 8):
@@ -84,9 +96,11 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
           status[2] == 1,
         ));
         break;
+      // # Settings(autoPause)
       case {1: [var autoPauseCode, ...]} when cmd.isAbout(_Cmd.getAutoPause):
         _settingsCtrl.add(lastSettings.copyWith(autoPause: autoPauseCode == 1));
         break;
+      // # Settings(gestureDoubleTap)
       case {1: [var leftCode, ...], 2: [var rightCode, ...]}
           when cmd.isAbout(_Cmd.getGestureDoubleTap):
         _settingsCtrl.add(
@@ -98,6 +112,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
           ),
         );
         break;
+      // # Settings(hold)
       case {1: [var holdCode, ...]} when cmd.isAbout(_Cmd.getGestureHold):
         _settingsCtrl.add(
           lastSettings.copyWith(
@@ -106,6 +121,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
           ),
         );
         break;
+      // # Settings(holdModes)
       case {1: [var modesCode, ...]}
           when cmd.isAbout(_Cmd.getGestureHoldToggledAncModes):
         _settingsCtrl.add(
@@ -130,9 +146,13 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   @override
   ValueStream<int> get batteryLevel => _bluetoothDevice.battery;
 
+  // i could pass btDevice.alias directly here, but Headphones take care
+  // of closing everything
   @override
   ValueStream<String> get bluetoothAlias => _bluetoothAliasCtrl.stream;
 
+  // huh, my past self thought that names will not change... and my future
+  // (implementing TLB) thought otherwise 🤷🤷
   @override
   String get bluetoothName => _bluetoothDevice.name.valueOrNull ?? "Unknown";
 
@@ -153,7 +173,12 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
 
   @override
   Future<void> setSettings(newSettings) async {
-    final prev = _settingsCtrl.valueOrNull ?? const HuaweiFreeBudsPro3Settings();
+    final prev =
+        _settingsCtrl.valueOrNull ?? const HuaweiFreeBudsPro3Settings();
+    // this is VERY much a boilerplate
+    // ...and, bloat...
+    // and i don't think there is a need to export it somewhere else 🤷,
+    // or make some other abstraction for it - maybe some day
     if ((newSettings.doubleTapLeft ?? prev.doubleTapLeft) !=
         prev.doubleTapLeft) {
       _mbb.sink.add(_Cmd.gestureDoubleTap(left: newSettings.doubleTapLeft!));
@@ -183,8 +208,15 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   }
 }
 
+/// This is just a holder for magic numbers
+/// This isn't very pretty, or eliminates all of the boilerplate... but i
+/// feel like nothing will so let's love it as it is <3
+///
+/// All elements names plainly like "noiseCancel" or "and" mean "set..X",
+/// and getters actually have "get" in their names
 abstract class _Cmd {
   static const getBattery = MbbCommand(1, 8);
+
   static const getAnc = MbbCommand(43, 42);
 
   static MbbCommand anc(AncMode mode) => MbbCommand(43, 4, {
@@ -220,6 +252,7 @@ abstract class _Cmd {
   static MbbCommand gestureHoldToggledAncModes(Set<AncMode> toggledModes) {
     int? mbbValue;
     const se = SetEquality();
+    // can't really do that with pattern matching because it's a Set
     if (se.equals(toggledModes, {AncMode.off, AncMode.noiseCancelling})) {
       mbbValue = 1;
     }

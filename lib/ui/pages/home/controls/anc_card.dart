@@ -56,7 +56,6 @@ class AncCard extends StatelessWidget {
 
 /// Button for switching anc mode
 ///
-/// TODO: Make this prettier (splash animation at least :/ )
 class _AncButton extends StatelessWidget {
   final IconData icon;
   final bool isSelected;
