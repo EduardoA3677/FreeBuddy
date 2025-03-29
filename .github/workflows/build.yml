@@ -11,7 +11,7 @@ on:
       tag:
         description: 'Version tag'
         required: true
-        default: 'v2.0.0'
+        default: 'v0.2.0'
       build_format:
         description: 'Choose the build format (APK, AAB, or both)'
         required: true
