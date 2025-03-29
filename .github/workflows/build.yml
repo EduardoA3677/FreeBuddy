@@ -3,7 +3,7 @@ name: Build and publish new release on version tag
 on:
   push:
     branches:
-      - 'master'  # Ejecutar al hacer un commit en la rama main
+      - 'main'  # Ejecutar al hacer un commit en la rama main
     tags:
       - 'v[0-9]+\.[0-9]+\.[0-9]+'  # Trigger for version tags
   workflow_dispatch:
@@ -51,7 +51,7 @@ jobs:
           keystore: ${{ secrets.KEYSTORE }}
           keystore-pwd: "${{ secrets.KEYSTORE_PWD }}"
           key-pwd: "${{ secrets.KEY_PWD }}"
-          build-format: ${{ github.event.inputs.build_format }}
+          build-type: ${{ github.event.inputs.build_format }}  # Use 'build-type' instead of 'build-format'
       - name: Rename APK & AAB
         run: |
           if [[ "${{ github.event.inputs.build_format }}" == "apk" || "${{ github.event.inputs.build_format }}" == "both" ]]; then
