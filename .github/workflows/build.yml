@@ -1,65 +1,55 @@
-name: Analyze - Test - Build
+name: Build and publish new release on version tag
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'v[0-9]+\.[0-9]+\.[0-9]+'
   workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  flutter_channel: "any"
 
 jobs:
-  test:
-    name: test
+  build:
     runs-on: ubuntu-latest
-    container: ghcr.io/cirruslabs/flutter:stable # Usar la última versión estable de Flutter
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/flutter-test # Llamar a la acción compuesta flutter-test
-
-  android-release-build:
-    name: android-release-build
-    runs-on: ubuntu-latest
-    needs: [test]
-    container: ghcr.io/cirruslabs/flutter:stable # Usar la última versión estable de Flutter
     steps:
       - uses: actions/checkout@v4
-      - uses: NiklasLehnfeld/flutter-android-build-action@v2
+      - name: Clean tag name
+        id: clean_tag
+        run: echo "tag=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')" >> $GITHUB_ENV
+      - name: Parse fvm to set flutter version
+        run: echo "flutter_version=$(cat .fvm/fvm_config.json | jq -r .flutterSdkVersion)" >> $GITHUB_ENV
+      - name: Cache Flutter
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/flutter
+          key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}-${{ env.flutter_channel }}
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.flutter_version }}
+          channel: ${{ env.flutter_channel }}
+      - name: Build APK & AAB with signing
+        uses: NiklasLehnfeld/flutter-android-build-action@v2
         id: android-build
         with:
           release: true
           keystore: ${{ secrets.KEYSTORE }}
           keystore-pwd: "${{ secrets.KEYSTORE_PWD }}"
           key-pwd: "${{ secrets.KEY_PWD }}"
-      - name: Archive APK
-        uses: actions/upload-artifact@v4
+      - name: Rename APK & AAB
+        run: |
+          mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ env.tag }}.apk
+          mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ env.tag }}.aab
+      - name: Get changelog
+        run: python scripts/get_changelog.py --version ${{ env.tag }} > ./body-file.txt
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: release-apk
-          path: ${{ steps.android-build.outputs.apk-path }}
-      - name: Archive AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-aab
-          path: ${{ steps.android-build.outputs.aab-path }}
-
-  create-github-release:
-    name: create-github-release
-    runs-on: ubuntu-latest
-    needs: [android-release-build]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-apk
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-aab
-      - id: version
-        uses: NiklasLehnfeld/flutter-version-number-action@v2
-      - uses: marvinpinto/action-automatic-releases@latest
-          with:
-            repo_token: ${{ secrets.GH_PAT }}  # Usar el token personal en lugar de GITHUB_TOKEN
-            prerelease: false
-            automatic_release_tag: ${{ steps.version.outputs.version-number }}
-            title: ${{ steps.version.outputs.version-number }}
-            files: |
-              *.apk
-              *.aab
+          body_path: ./body-file.txt
+          files: |
+            ./FreeBuddy-${{ env.tag }}.apk
+            ./FreeBuddy-${{ env.tag }}.aab
+          fail_on_unmatched_files: true
