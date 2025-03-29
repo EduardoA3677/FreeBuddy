@@ -23,7 +23,6 @@ on:
           - 'both'
 
 env:
-  flutter_channel: 'any'
   GH_TOKEN: ${{ secrets.GH_PAT }}
 
 jobs:
@@ -41,20 +40,6 @@ jobs:
           # Remove 'v' prefix if present
           CLEAN_TAG=$(echo "$TAG" | sed 's/^v//')
           echo "tag=$CLEAN_TAG" >> $GITHUB_OUTPUT
-
-      # Parse fvm to set flutter version
-      - name: Parse fvm config
-        id: flutter_version
-        run: |
-          FLUTTER_VERSION=$(cat .fvm/fvm_config.json | jq -r .flutterSdkVersion)
-          echo "version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
-
-      # Cache Flutter
-      - name: Cache Flutter
-        uses: actions/cache@v3
-        with:
-          path: /opt/hostedtoolcache/flutter
-          key: ${{ runner.OS }}-flutter-install-cache-${{ steps.flutter_version.outputs.version }}-any
 
       # Build APK & AAB
       - name: Build APK & AAB with signing
