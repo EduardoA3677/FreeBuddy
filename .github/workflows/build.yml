@@ -22,9 +22,6 @@ on:
           - 'aab'
           - 'both'
 
-env:
-  GH_TOKEN: ${{ secrets.GH_PAT }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
