@@ -37,12 +37,15 @@ jobs:
         id: set_tag
         run: |
           TAG="${{ github.event.inputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="${{ github.ref_name }}"
+          fi
 
           # Remove 'v' prefix if present
           CLEAN_TAG=$(echo "$TAG" | sed 's/^v//')
           echo "tag=$CLEAN_TAG" >> $GITHUB_OUTPUT
 
-      # Build APK & AAB
+      # Build APK & AAB with signing
       - name: Build APK & AAB with signing
         uses: NiklasLehnfeld/flutter-android-build-action@v2
         id: android-build
