@@ -11,17 +11,26 @@ version = args.version.strip().replace('v', '')
 if not re.match(r'\d+\.\d+\.\d+', version):
     raise ValueError('Invalid version')
 
+# Debugging statement
+print(f'Debug: Looking for changelog version {version}')
+
 # Abrir el archivo CHANGELOG.md
 with open("CHANGELOG.md", 'r') as f:
     lines = f.read()
 
 # Buscar la versión correspondiente
-start = lines.index(f'## {version}')
-start = lines.index('\n', start) + 1
 try:
-    end = lines.index('\n## ', start)
-except ValueError:
-    end = -1
+    start = lines.index(f'## {version}')
+    start = lines.index('\n', start) + 1
+    try:
+        end = lines.index('\n## ', start)
+    except ValueError:
+        end = len(lines)
 
-# Imprimir el changelog de la versión
-print(lines[start:end].strip())
+    # Debugging statement
+    print(f'Debug: Start index: {start}, End index: {end}')
+    
+    # Imprimir el changelog de la versión
+    print(lines[start:end].strip())
+except ValueError:
+    print(f'Error: Version {version} not found in CHANGELOG.md')
