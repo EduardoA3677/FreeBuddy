@@ -3,7 +3,7 @@ on:
     branches:
       - 'master'
     tags:
-      - 'v[0-9]+\.[0-9]+\.[0-9]+' 
+      - 'v[0-9]+\.[0-9]+\.[0-9]+'
   workflow_dispatch:
     inputs:
       tag:
@@ -21,6 +21,7 @@ on:
 
 env:
   flutter_channel: "any"
+  GH_TOKEN: ${{ secrets.GH_PAT }}  # Cambié a GH_PAT en lugar de GITHUB_TOKEN
 
 jobs:
   build:
@@ -78,6 +79,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
+          token: ${{ secrets.GH_PAT }}  # Usando GH_PAT para autenticación
           body_path: ./body-file.txt
           files: |
             ${{ github.event.inputs.build_format == 'apk' && './FreeBuddy-${{ env.tag }}.apk' || '' }}
