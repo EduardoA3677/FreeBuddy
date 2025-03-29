@@ -32,6 +32,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Install Python
+      - name: Install Python
+        run: |
+          apt-get update
+          apt-get install -y python3 python3-pip
+          ln -s /usr/bin/python3 /usr/bin/python
+
       # Determine tag from either trigger or input
       - name: Set tag
         id: set_tag
@@ -60,7 +67,7 @@ jobs:
         id: artifacts
         run: |
           BUILD_FORMAT="${{ github.event.inputs.build_format }}"
-          if [[ -z "$BUILD_FORMAT" ]]; then
+          if [ -z "$BUILD_FORMAT" ]; then
             BUILD_FORMAT="both"  # Default if not provided
           fi
 
@@ -68,15 +75,15 @@ jobs:
           echo "files=" >> $GITHUB_OUTPUT
 
           # Handle APK
-          if [[ "$BUILD_FORMAT" == "apk" || "$BUILD_FORMAT" == "both" ]]; then
+          if [ "$BUILD_FORMAT" = "apk" ] || [ "$BUILD_FORMAT" = "both" ]; then
             mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk
             echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk" >> $GITHUB_OUTPUT
           fi
 
           # Handle AAB
-          if [[ "$BUILD_FORMAT" == "aab" || "$BUILD_FORMAT" == "both" ]]; then
+          if [ "$BUILD_FORMAT" = "aab" ] || [ "$BUILD_FORMAT" = "both" ]; then
             mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab
-            if [[ "$BUILD_FORMAT" == "both" ]]; then
+            if [ "$BUILD_FORMAT" = "both" ]; then
               echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk,./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab" >> $GITHUB_OUTPUT
             else
               echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab" >> $GITHUB_OUTPUT
