@@ -2,12 +2,24 @@ name: Build and publish new release on version tag
 
 on:
   push:
-    tags:
-      - 'v[0-9]+\.[0-9]+\.[0-9]+'
-  workflow_dispatch:
-  push:
     branches:
-      - main
+      - 'master'  # Ejecutar al hacer un commit en la rama main
+    tags:
+      - 'v[0-9]+\.[0-9]+\.[0-9]+'  # Trigger for version tags
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag'
+        required: true
+        default: 'v2.0.0'
+      build_format:
+        description: 'Choose the build format (APK, AAB, or both)'
+        required: true
+        default: 'both'
+        options:
+          - 'apk'
+          - 'aab'
+          - 'both'
 
 env:
   flutter_channel: "any"
@@ -19,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Clean tag name
         id: clean_tag
-        run: echo "tag=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')" >> $GITHUB_ENV
+        run: echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
       - name: Parse fvm to set flutter version
         run: echo "flutter_version=$(cat .fvm/fvm_config.json | jq -r .flutterSdkVersion)" >> $GITHUB_ENV
       - name: Cache Flutter
@@ -39,10 +51,15 @@ jobs:
           keystore: ${{ secrets.KEYSTORE }}
           keystore-pwd: "${{ secrets.KEYSTORE_PWD }}"
           key-pwd: "${{ secrets.KEY_PWD }}"
+          build-format: ${{ github.event.inputs.build_format }}
       - name: Rename APK & AAB
         run: |
-          mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ env.tag }}.apk
-          mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ env.tag }}.aab
+          if [[ "${{ github.event.inputs.build_format }}" == "apk" || "${{ github.event.inputs.build_format }}" == "both" ]]; then
+            mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ env.tag }}.apk
+          fi
+          if [[ "${{ github.event.inputs.build_format }}" == "aab" || "${{ github.event.inputs.build_format }}" == "both" ]]; then
+            mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ env.tag }}.aab
+          fi
       - name: Get changelog
         run: python scripts/get_changelog.py --version ${{ env.tag }} > ./body-file.txt
       - name: Create GitHub Release
