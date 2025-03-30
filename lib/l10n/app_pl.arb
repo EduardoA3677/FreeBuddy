@@ -26,6 +26,10 @@
   "pageHomeConnectedClosedConnect": "Połącz ze słuchawkami",
   "autoPause": "Auto pauza ⏸",
   "autoPauseDesc": "Muzyka automatycznie się zatrzyma kiedy ściągniesz słuchawki",
+  "ldac": "LDAC 🎵",
+  "ldacDesc": "Wysokiej jakości kodek audio",
+  "lowLatency": "Niskie opóźnienie 🎮",
+  "lowLatencyDesc": "Zmniejsza opóźnienie dźwięku, lepsze do gier i wideo",
 
   "pageHeadphonesSettingsTitle": "Ustawienia słuchawek 🔧",
   "pageHeadphonesSettingsDoubleTap": "Dwukrotny tap",

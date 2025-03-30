@@ -7,6 +7,8 @@ import '../../common/headphones_connection_ensuring_overlay.dart';
 import 'huawei/auto_pause_section.dart';
 import 'huawei/double_tap_section.dart';
 import 'huawei/hold_section.dart';
+import 'huawei/ldac_section.dart';
+import 'huawei/low_latency_section.dart';
 
 class HeadphonesSettingsPage extends StatelessWidget {
   const HeadphonesSettingsPage({super.key});
@@ -33,6 +35,10 @@ List<Widget> widgetsForModel(HeadphonesSettings settings) {
   if (settings is HeadphonesSettings<HuaweiFreeBudsPro3Settings>) {
     return [
       AutoPauseSection(settings),
+      const Divider(indent: 16, endIndent: 16),
+      LdacSection(settings),
+      const Divider(indent: 16, endIndent: 16),
+      LowLatencySection(settings),
       const Divider(indent: 16, endIndent: 16),
       DoubleTapSection(settings),
       const Divider(indent: 16, endIndent: 16),

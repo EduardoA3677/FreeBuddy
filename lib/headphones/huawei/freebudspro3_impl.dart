@@ -100,6 +100,14 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
       case {1: [var autoPauseCode, ...]} when cmd.isAbout(_Cmd.getAutoPause):
         _settingsCtrl.add(lastSettings.copyWith(autoPause: autoPauseCode == 1));
         break;
+      // # Settings(ldac)
+      case {1: [var ldacCode, ...]} when cmd.isAbout(_Cmd.getLdac):
+        _settingsCtrl.add(lastSettings.copyWith(ldac: ldacCode == 1));
+        break;
+      // # Settings(lowLatency)
+      case {1: [var lowLatencyCode, ...]} when cmd.isAbout(_Cmd.getLowLatency):
+        _settingsCtrl.add(lastSettings.copyWith(lowLatency: lowLatencyCode == 1));
+        break;
       // # Settings(gestureDoubleTap)
       case {1: [var leftCode, ...], 2: [var rightCode, ...]}
           when cmd.isAbout(_Cmd.getGestureDoubleTap):
@@ -138,6 +146,8 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
     _mbb.sink.add(_Cmd.getBattery);
     _mbb.sink.add(_Cmd.getAnc);
     _mbb.sink.add(_Cmd.getAutoPause);
+    _mbb.sink.add(_Cmd.getLdac);
+    _mbb.sink.add(_Cmd.getLowLatency);
     _mbb.sink.add(_Cmd.getGestureDoubleTap);
     _mbb.sink.add(_Cmd.getGestureHold);
     _mbb.sink.add(_Cmd.getGestureHoldToggledAncModes);
@@ -204,6 +214,14 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
     if ((newSettings.autoPause ?? prev.autoPause) != prev.autoPause) {
       _mbb.sink.add(_Cmd.autoPause(newSettings.autoPause!));
       _mbb.sink.add(_Cmd.getAutoPause);
+    }
+    if ((newSettings.ldac ?? prev.ldac) != prev.ldac) {
+      _mbb.sink.add(_Cmd.ldac(newSettings.ldac!));
+      _mbb.sink.add(_Cmd.getLdac);
+    }
+    if ((newSettings.lowLatency ?? prev.lowLatency) != prev.lowLatency) {
+      _mbb.sink.add(_Cmd.lowLatency(newSettings.lowLatency!));
+      _mbb.sink.add(_Cmd.getLowLatency);
     }
   }
 }
@@ -278,6 +296,18 @@ abstract class _Cmd {
   static const getAutoPause = MbbCommand(43, 17);
 
   static MbbCommand autoPause(bool enabled) => MbbCommand(43, 16, {
+        1: [enabled ? 1 : 0]
+      });
+
+  static const getLdac = MbbCommand(43, 163);
+  
+  static MbbCommand ldac(bool enabled) => MbbCommand(43, 162, {
+        1: [enabled ? 1 : 0]
+      });
+
+  static const getLowLatency = MbbCommand(43, 108);
+  
+  static MbbCommand lowLatency(bool enabled) => MbbCommand(43, 108, {
         1: [enabled ? 1 : 0]
       });
 }
