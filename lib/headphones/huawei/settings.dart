@@ -56,7 +56,7 @@ class HuaweiFreeBuds3iSettings {
 
   // They do have auto-pause... but it's not settable from app 🤷
   // but we may find it some day! That's why I'm commenting it out
-  // final bool? autoPause;
+            // final bool? autoPause;
 
   const HuaweiFreeBuds3iSettings({
     this.doubleTapLeft,

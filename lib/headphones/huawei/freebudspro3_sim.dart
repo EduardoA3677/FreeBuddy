@@ -22,13 +22,10 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
         AncMode.transparency,
       },
       autoPause: true,
-      ldac: false,
-      lowLatency: false
+      ldac: true,
+      lowLatency: true
     ),
   );
-
-  final _ldacEnabledCtrl = BehaviorSubject<bool>.seeded(false);
-  final _lowLatencyEnabledCtrl = BehaviorSubject<bool>.seeded(false);
 
   @override
   ValueStream<HuaweiFreeBudsPro3Settings> get settings => _settingsCtrl.stream;
@@ -46,32 +43,8 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
         lowLatency: newSettings.lowLatency,
       ),
     );
-    if (newSettings.ldac != null) {
-        _ldacEnabledCtrl.add(newSettings.ldac!);
-    }
-      if (newSettings.lowLatency != null) {
-        _lowLatencyEnabledCtrl.add(newSettings.lowLatency!);
-      }
-    }
-  
-    @override
-    ValueStream<bool> get ldacEnabled => _ldacEnabledCtrl.stream;
-  
-    @override
-    Future<void> setLdacEnabled(bool enabled) async {
-      _ldacEnabledCtrl.add(enabled);
-      _settingsCtrl.add(_settingsCtrl.value.copyWith(ldac: enabled));
-    }
-  
-    @override
-    ValueStream<bool> get lowLatencyEnabled => _lowLatencyEnabledCtrl.stream;
-  
-    @override
-    Future<void> setLowLatencyEnabled(bool enabled) async {
-      _lowLatencyEnabledCtrl.add(enabled);
-      _settingsCtrl.add(_settingsCtrl.value.copyWith(lowLatency: enabled));
-    }
   }
+}
 // Classo use as placeholder for Disabled() widget
 // this is not done with mixins because we may want to fill it with
 // last-remembered values in future, and we will pretty much override
@@ -88,18 +61,6 @@ final class HuaweiFreeBudsPro3SimPlaceholder extends HuaweiFreeBudsPro3
   @override
   ValueStream<HuaweiFreeBudsPro3Settings> get settings => BehaviorSubject();
   
-  @override
-  ValueStream<bool> get ldacEnabled => BehaviorSubject();
-  
-  @override
-  Future<void> setLdacEnabled(bool enabled) async {}
-  
-  @override
-  ValueStream<bool> get lowLatencyEnabled => BehaviorSubject();
-  
-  @override
-  Future<void> setLowLatencyEnabled(bool enabled) async {}
-
   @override
   Future<void> setSettings(HuaweiFreeBudsPro3Settings newSettings) async {}
 }
