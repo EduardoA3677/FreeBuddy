@@ -14,7 +14,7 @@ class LdacSection extends StatelessWidget {
     final l = AppLocalizations.of(context)!;
     return StreamBuilder(
       stream: headphones.ldacEnabled,
-      initialData: false,
+      initialData: headphones.ldacEnabled.valueOrNull ?? false,
       builder: (_, snap) {
         return ListTileSwitch(
           title: Text(l.ldac),
