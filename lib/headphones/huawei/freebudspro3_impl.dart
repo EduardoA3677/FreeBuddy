@@ -25,7 +25,8 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   final _lrcBatteryCtrl = BehaviorSubject<LRCBatteryLevels>();
   final _ancModeCtrl = BehaviorSubject<AncMode>();
   final _settingsCtrl = BehaviorSubject<HuaweiFreeBudsPro3Settings>();
-
+  final _ldacEnabledCtrl = BehaviorSubject<bool>();
+  final _lowLatencyEnabledCtrl = BehaviorSubject<bool>();
   // stream controllers *
 
   /// This watches if we are still missing any info and re-requests it
@@ -56,6 +57,8 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         _lrcBatteryCtrl.close();
         _ancModeCtrl.close();
         _settingsCtrl.close();
+        _ldacEnabledCtrl.close();
+        _lowLatencyEnabledCtrl.close();
       },
     );
     _initRequestInfo();
@@ -67,6 +70,8 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         lrcBattery.valueOrNull,
         ancMode.valueOrNull,
         settings.valueOrNull,
+        ldacEnabled.valueOrNull,
+        lowLatencyEnabled.valueOrNull,
       ].any((e) => e == null)) {
         _initRequestInfo();
       }
@@ -102,11 +107,15 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         break;
       // # Settings(ldac)
       case {1: [var ldacCode, ...]} when cmd.isAbout(_Cmd.getLdac):
-        _settingsCtrl.add(lastSettings.copyWith(ldac: ldacCode == 1));
+        final isEnabled = ldacCode == 1;
+        _settingsCtrl.add(lastSettings.copyWith(ldac: isEnabled));
+        _ldacEnabledCtrl.add(isEnabled);
         break;
       // # Settings(lowLatency)
       case {1: [var lowLatencyCode, ...]} when cmd.isAbout(_Cmd.getLowLatency):
-        _settingsCtrl.add(lastSettings.copyWith(lowLatency: lowLatencyCode == 1));
+        final isEnabled = lowLatencyCode == 1;
+        _settingsCtrl.add(lastSettings.copyWith(lowLatency: isEnabled));
+        _lowLatencyEnabledCtrl.add(isEnabled);
         break;
       // # Settings(gestureDoubleTap)
       case {1: [var leftCode, ...], 2: [var rightCode, ...]}
@@ -178,6 +187,23 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   @override
   Future<void> setAncMode(AncMode mode) async => _mbb.sink.add(_Cmd.anc(mode));
 
+  @override
+  ValueStream<bool> get lowLatencyEnabled => _lowLatencyEnabledCtrl.stream;
+  
+  @override
+  Future<void> setLowLatencyEnabled(bool enabled) async {
+    _mbb.sink.add(_Cmd.lowLatency(enabled));
+    _mbb.sink.add(_Cmd.getLowLatency);
+  }
+
+    @override
+  ValueStream<bool> get ldacEnabled => _ldacEnabledCtrl.stream;
+  
+  @override
+  Future<void> setLdacEnabled(bool enabled) async {
+    _mbb.sink.add(_Cmd.ldac(enabled));
+    _mbb.sink.add(_Cmd.getLdac);
+  }
   @override
   ValueStream<HuaweiFreeBudsPro3Settings> get settings => _settingsCtrl.stream;
 

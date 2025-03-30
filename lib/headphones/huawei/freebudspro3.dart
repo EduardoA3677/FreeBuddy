@@ -1,9 +1,11 @@
 import 'package:rxdart/rxdart.dart';
 
 import '../framework/anc.dart';
+import '../framework/ldac.dart';
 import '../framework/bluetooth_headphones.dart';
 import '../framework/headphones_info.dart';
 import '../framework/headphones_settings.dart';
+import '../framework/low_latency.dart';
 import '../framework/lrc_battery.dart';
 import 'settings.dart';
 
@@ -18,6 +20,8 @@ abstract base class HuaweiFreeBudsPro3
         HeadphonesModelInfo,
         LRCBattery,
         Anc,
+        Ldac,
+        LowLatency,
         HeadphonesSettings<HuaweiFreeBudsPro3Settings> {
   const HuaweiFreeBudsPro3();
 
