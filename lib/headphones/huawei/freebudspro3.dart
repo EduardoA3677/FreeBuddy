@@ -2,9 +2,12 @@ import 'package:rxdart/rxdart.dart';
 
 import '../framework/anc.dart';
 import '../framework/bluetooth_headphones.dart';
+import '../framework/dual_connect.dart';
 import '../framework/headphones_info.dart';
 import '../framework/headphones_settings.dart';
+import '../framework/low_latency.dart';
 import '../framework/lrc_battery.dart';
+import '../framework/sound_quality.dart';
 import 'settings.dart';
 
 /// Base abstract class of Pro 3's. It contains static info like vendor names etc,
@@ -18,7 +21,10 @@ abstract base class HuaweiFreeBudsPro3
         HeadphonesModelInfo,
         LRCBattery,
         Anc,
-        HeadphonesSettings<HuaweiFreeBudsPro3Settings> {
+        HeadphonesSettings<HuaweiFreeBudsPro3Settings>,
+        LowLatency,
+        DualConnect,
+        SoundQuality {
   const HuaweiFreeBudsPro3();
 
   @override
@@ -37,4 +43,12 @@ abstract base class HuaweiFreeBudsPro3
   // This will be a bit of chaos for now 👍👍
   static final idNameRegex =
       RegExp(r'^(?=(HUAWEI FreeBuds Pro 3))', caseSensitive: true);
+      
+  /// LDAC is an alias for high quality sound preference
+  ValueStream<bool> get ldacEnabled => soundQuality.map((q) => q == SoundQualityPreference.quality);
+  
+  /// Set LDAC enabled (high quality) or disabled (connectivity)
+  Future<void> setLdacEnabled(bool enabled) async {
+    await setSoundQuality(enabled ? SoundQualityPreference.quality : SoundQualityPreference.connectivity);
+  }
 }

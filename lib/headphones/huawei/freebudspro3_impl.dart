@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
@@ -7,10 +8,17 @@ import 'package:the_last_bluetooth/the_last_bluetooth.dart' as tlb;
 
 import '../../logger.dart';
 import '../framework/anc.dart';
+import '../framework/dual_connect.dart';
+import '../framework/low_latency.dart';
 import '../framework/lrc_battery.dart';
+import '../framework/sound_quality.dart';
 import 'freebudspro3.dart';
 import 'mbb.dart';
 import 'settings.dart';
+
+extension HexEncoder on List<int> {
+  String get hex => map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+}
 
 final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   final tlb.BluetoothDevice _bluetoothDevice;
@@ -25,12 +33,24 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   final _lrcBatteryCtrl = BehaviorSubject<LRCBatteryLevels>();
   final _ancModeCtrl = BehaviorSubject<AncMode>();
   final _settingsCtrl = BehaviorSubject<HuaweiFreeBudsPro3Settings>();
-
+  final _lowLatencyEnabledCtrl = BehaviorSubject<bool>();
+  final _dualConnectEnabledCtrl = BehaviorSubject<bool>();
+  final _dualConnectDevicesCtrl = BehaviorSubject<Map<String, DualConnectDevice>>();
+  final _preferredDeviceMacCtrl = BehaviorSubject<String>();
+  final _soundQualityCtrl = BehaviorSubject<SoundQualityPreference>();
+  final _soundQualityOptionsCtrl = BehaviorSubject<List<SoundQualityPreference>>.seeded([
+    SoundQualityPreference.connectivity, 
+    SoundQualityPreference.quality
+  ]);
   // stream controllers *
 
   /// This watches if we are still missing any info and re-requests it
   late StreamSubscription _watchdogStreamSub;
-
+  
+  // DualConnect related fields
+  final Map<int, DualConnectDevice> _pendingDevices = {};
+  int _devicesCount = 999;
+  
   HuaweiFreeBudsPro3Impl(this._mbb, this._bluetoothDevice) {
     // hope this will nicely play with closing, idk honestly
     final aliasStreamSub = _bluetoothDevice.alias
@@ -56,6 +76,12 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         _lrcBatteryCtrl.close();
         _ancModeCtrl.close();
         _settingsCtrl.close();
+        _lowLatencyEnabledCtrl.close();
+        _dualConnectEnabledCtrl.close();
+        _dualConnectDevicesCtrl.close();
+        _preferredDeviceMacCtrl.close();
+        _soundQualityCtrl.close();
+        _soundQualityOptionsCtrl.close();
       },
     );
     _initRequestInfo();
@@ -67,6 +93,8 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         lrcBattery.valueOrNull,
         ancMode.valueOrNull,
         settings.valueOrNull,
+        lowLatencyEnabled.valueOrNull,
+        soundQuality.valueOrNull,
       ].any((e) => e == null)) {
         _initRequestInfo();
       }
@@ -100,13 +128,22 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
       case {1: [var autoPauseCode, ...]} when cmd.isAbout(_Cmd.getAutoPause):
         _settingsCtrl.add(lastSettings.copyWith(autoPause: autoPauseCode == 1));
         break;
-      // # Settings(ldac)
-      case {1: [var ldacCode, ...]} when cmd.isAbout(_Cmd.getLdac):
-        _settingsCtrl.add(lastSettings.copyWith(ldac: ldacCode == 1));
+      // # Settings(soundQuality/ldac)
+      case {1: [var soundQualityCode, ...]} when cmd.isAbout(_Cmd.getSoundQuality):
+        final isEnabled = soundQualityCode == 1;
+        _settingsCtrl.add(lastSettings.copyWith(ldac: isEnabled));
+        break;
+      // # Settings(soundQualityPreference)  
+      case {2: [var qualityCode, ...]} when cmd.isAbout(_Cmd.getSoundQualityPreference):
+        _soundQualityCtrl.add(qualityCode == 0 
+          ? SoundQualityPreference.connectivity 
+          : SoundQualityPreference.quality);
         break;
       // # Settings(lowLatency)
       case {1: [var lowLatencyCode, ...]} when cmd.isAbout(_Cmd.getLowLatency):
-        _settingsCtrl.add(lastSettings.copyWith(lowLatency: lowLatencyCode == 1));
+        final isEnabled = lowLatencyCode == 1;
+        _settingsCtrl.add(lastSettings.copyWith(lowLatency: isEnabled));
+        _lowLatencyEnabledCtrl.add(isEnabled);
         break;
       // # Settings(gestureDoubleTap)
       case {1: [var leftCode, ...], 2: [var rightCode, ...]}
@@ -139,18 +176,76 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
           ),
         );
         break;
+      // # DualConnect(enabled)
+      case {1: [var enabledCode, ...]} when cmd.isAbout(_Cmd.getDualConnectEnabled):
+        _dualConnectEnabledCtrl.add(enabledCode == 1);
+        break;
+      // # DualConnect(device)
+      case {4: var macBytes} when cmd.isAbout(_Cmd.getDualConnectEnumerate):
+        _handleDualConnectDevice(cmd);
+        break;
     }
+  }
+
+  void _handleDualConnectDevice(MbbCommand cmd) {
+    try {
+      final macAddress = cmd.args[4]!.hex;
+      if (macAddress.length < 12) return;
+      
+      final deviceIndex = int.parse(cmd.args[3]![0].toString());
+      _devicesCount = int.parse(cmd.args[2]![0].toString());
+      
+      final name = utf8.decode(cmd.args[9] ?? [], allowMalformed: true);
+      final autoConnect = (cmd.args[8]?[0] == 1);
+      final preferred = (cmd.args[7]?[0] == 1);
+      final connState = cmd.args[5]?[0] ?? 0;
+      final connected = connState > 0;
+      final playing = connState == 9;
+      
+      _pendingDevices[deviceIndex] = DualConnectDevice(
+        name: name,
+        mac: macAddress,
+        preferred: preferred,
+        connected: connected,
+        playing: playing,
+        autoConnect: autoConnect,
+      );
+      
+      if (preferred) {
+        _preferredDeviceMacCtrl.add(macAddress);
+      }
+      
+      // Process if we have all devices or timeout
+      if (_devicesCount == _pendingDevices.length) {
+        _processPendingDevices();
+      }
+    } catch (e, s) {
+      logg.e('Error handling DualConnect device', e, s);
+    }
+  }
+  
+  void _processPendingDevices() {
+    final devices = <String, DualConnectDevice>{};
+    for (final device in _pendingDevices.values) {
+      devices[device.mac] = device;
+    }
+    _dualConnectDevicesCtrl.add(devices);
+    _pendingDevices.clear();
   }
 
   Future<void> _initRequestInfo() async {
     _mbb.sink.add(_Cmd.getBattery);
     _mbb.sink.add(_Cmd.getAnc);
     _mbb.sink.add(_Cmd.getAutoPause);
-    _mbb.sink.add(_Cmd.getLdac);
+    _mbb.sink.add(_Cmd.getSoundQuality);
     _mbb.sink.add(_Cmd.getLowLatency);
     _mbb.sink.add(_Cmd.getGestureDoubleTap);
     _mbb.sink.add(_Cmd.getGestureHold);
     _mbb.sink.add(_Cmd.getGestureHoldToggledAncModes);
+    _mbb.sink.add(_Cmd.getSoundQualityPreference);
+    _mbb.sink.add(_Cmd.getDualConnectEnabled);
+    // Request device enumeration for DualConnect
+    _mbb.sink.add(_Cmd.getDualConnectEnumerate);
   }
 
   @override
@@ -180,6 +275,72 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
 
   @override
   ValueStream<HuaweiFreeBudsPro3Settings> get settings => _settingsCtrl.stream;
+
+  @override
+  ValueStream<bool> get ldacEnabled => soundQuality.map((q) => q == SoundQualityPreference.quality);
+  
+  @override
+  Future<void> setLdacEnabled(bool enabled) async {
+    await setSoundQuality(enabled ? SoundQualityPreference.quality : SoundQualityPreference.connectivity);
+  }
+  
+  @override
+  ValueStream<bool> get lowLatencyEnabled => _lowLatencyEnabledCtrl.stream;
+  
+  @override
+  Future<void> setLowLatencyEnabled(bool enabled) async {
+    _mbb.sink.add(_Cmd.lowLatency(enabled));
+    _mbb.sink.add(_Cmd.getLowLatency);
+  }
+  
+  @override
+  ValueStream<bool> get dualConnectEnabled => _dualConnectEnabledCtrl.stream;
+  
+  @override
+  ValueStream<Map<String, DualConnectDevice>> get dualConnectDevices => 
+      _dualConnectDevicesCtrl.stream;
+  
+  @override
+  ValueStream<String> get preferredDeviceMac => _preferredDeviceMacCtrl.stream;
+  
+  @override
+  Future<void> setDualConnectEnabled(bool enabled) async {
+    _mbb.sink.add(_Cmd.dualConnectToggle(enabled));
+    _mbb.sink.add(_Cmd.getDualConnectEnabled);
+  }
+  
+  @override
+  Future<void> setPreferredDevice(String mac) async {
+    _mbb.sink.add(_Cmd.dualConnectPreferred(mac));
+    await refreshDeviceList();
+  }
+  
+  @override
+  Future<void> executeDualConnCommand(String mac, DualConnCommand command) async {
+    _mbb.sink.add(_Cmd.dualConnectCommand(command, mac));
+    await refreshDeviceList();
+  }
+  
+  @override
+  Future<void> refreshDeviceList() async {
+    _pendingDevices.clear();
+    _devicesCount = 999;
+    _mbb.sink.add(_Cmd.getDualConnectEnabled);
+    _mbb.sink.add(_Cmd.getDualConnectEnumerate);
+  }
+  
+  @override
+  ValueStream<SoundQualityPreference> get soundQuality => _soundQualityCtrl.stream;
+  
+  @override
+  ValueStream<List<SoundQualityPreference>> get soundQualityOptions => _soundQualityOptionsCtrl.stream;
+  
+  @override
+  Future<void> setSoundQuality(SoundQualityPreference quality) async {
+    final value = quality == SoundQualityPreference.connectivity ? 0 : 1;
+    _mbb.sink.add(_Cmd.setSoundQualityPreference(value));
+    _mbb.sink.add(_Cmd.getSoundQualityPreference);
+  }
 
   @override
   Future<void> setSettings(newSettings) async {
@@ -216,8 +377,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
       _mbb.sink.add(_Cmd.getAutoPause);
     }
     if ((newSettings.ldac ?? prev.ldac) != prev.ldac) {
-      _mbb.sink.add(_Cmd.ldac(newSettings.ldac!));
-      _mbb.sink.add(_Cmd.getLdac);
+      await setLdacEnabled(newSettings.ldac!);
     }
     if ((newSettings.lowLatency ?? prev.lowLatency) != prev.lowLatency) {
       _mbb.sink.add(_Cmd.lowLatency(newSettings.lowLatency!));
@@ -299,17 +459,50 @@ abstract class _Cmd {
         1: [enabled ? 1 : 0]
       });
 
-  static const getLdac = MbbCommand(43, 163);
+  static const getSoundQuality = MbbCommand(43, 19);
   
-  static MbbCommand ldac(bool enabled) => MbbCommand(43, 162, {
+  static MbbCommand soundQuality(bool enabled) => MbbCommand(43, 18, {
         1: [enabled ? 1 : 0]
       });
 
-  static const getLowLatency = MbbCommand(43, 108);
+  static const getLowLatency = MbbCommand(43, 21);
   
-  static MbbCommand lowLatency(bool enabled) => MbbCommand(43, 108, {
+  static MbbCommand lowLatency(bool enabled) => MbbCommand(43, 20, {
         1: [enabled ? 1 : 0]
       });
+
+  static const getDualConnectEnabled = MbbCommand(43, 44);
+  
+  static MbbCommand dualConnectToggle(bool enabled) => MbbCommand(43, 43, {
+        1: [enabled ? 1 : 0]
+      });
+
+  static const getDualConnectEnumerate = MbbCommand(43, 45);
+
+  static MbbCommand dualConnectPreferred(String mac) => MbbCommand(43, 46, {
+        1: _hexToBytes(mac)
+      });
+
+  static MbbCommand dualConnectCommand(DualConnCommand command, String mac) =>
+      MbbCommand(43, 47, {
+        command.mbbCode: _hexToBytes(mac)
+      });
+
+  static const getSoundQualityPreference = MbbCommand(43, 165);
+
+  static MbbCommand setSoundQualityPreference(int value) => MbbCommand(43, 164, {
+        1: [value]
+      });
+      
+  static List<int> _hexToBytes(String hex) {
+    List<int> bytes = [];
+    for (int i = 0; i < hex.length; i += 2) {
+      if (i + 2 <= hex.length) {
+        bytes.add(int.parse(hex.substring(i, i + 2), radix: 16));
+      }
+    }
+    return bytes;
+  }
 }
 
 extension _FBPro3AncMode on AncMode {
