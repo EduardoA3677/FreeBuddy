@@ -306,7 +306,7 @@ abstract class _Cmd {
 
   static const getLowLatency = MbbCommand(43, 108);
   
-  static MbbCommand lowLatency(bool enabled) => MbbCommand(43, 108, {
+  static MbbCommand lowLatency(bool enabled) => MbbCommand(43, 107, {
         1: [enabled ? 1 : 0]
       });
 }

@@ -14,14 +14,13 @@ class LowLatencySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     return StreamBuilder(
-      stream: headphones.settings.map((s) => (lowLatency: s.lowLatency)),
-      initialData: (lowLatency: false),
+      stream: headphones.settings.map((s) => s.lowLatency),
+      initialData: false,
       builder: (_, snap) {
-        final gs = snap.data!;
         return ListTileSwitch(
           title: Text(l.lowLatency),
           subtitle: Text(l.lowLatencyDesc),
-          value: gs.lowLatency ?? false,
+          value: snap.data ?? false,
           onChanged: (newVal) => headphones.setSettings(
                 HuaweiFreeBudsPro3Settings(
                   lowLatency: newVal,
