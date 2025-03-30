@@ -9,8 +9,8 @@ class HuaweiFreeBudsPro3Settings {
   final Set<AncMode>? holdBothToggledAncModes;
 
   final bool? autoPause;
-  final bool? ldac;
   final bool? lowLatency;
+  final bool? ldac;
 
   const HuaweiFreeBudsPro3Settings({
     this.doubleTapLeft,
@@ -18,8 +18,8 @@ class HuaweiFreeBudsPro3Settings {
     this.holdBoth,
     this.holdBothToggledAncModes,
     this.autoPause,
-    this.ldac,
     this.lowLatency,
+    this.ldac,
   });
 
   // don't want to use codegen *yet*
@@ -29,8 +29,8 @@ class HuaweiFreeBudsPro3Settings {
     Hold? holdBoth,
     Set<AncMode>? holdBothToggledAncModes,
     bool? autoPause,
-    bool? ldac,
     bool? lowLatency,
+    bool? ldac,
   }) =>
       HuaweiFreeBudsPro3Settings(
         doubleTapLeft: doubleTapLeft ?? this.doubleTapLeft,
@@ -39,8 +39,8 @@ class HuaweiFreeBudsPro3Settings {
         holdBothToggledAncModes:
             holdBothToggledAncModes ?? this.holdBothToggledAncModes,
         autoPause: autoPause ?? this.autoPause,
-        ldac: ldac ?? this.ldac,
         lowLatency: lowLatency ?? this.lowLatency,
+        ldac: ldac ?? this.ldac,
       );
 }
 

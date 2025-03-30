@@ -24,6 +24,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   final _bluetoothNameCtrl = BehaviorSubject<String>();
   final _lrcBatteryCtrl = BehaviorSubject<LRCBatteryLevels>();
   final _ancModeCtrl = BehaviorSubject<AncMode>();
+  final _ldacCtrl = BehaviorSubject<bool>();
   final _settingsCtrl = BehaviorSubject<HuaweiFreeBudsPro3Settings>();
   // stream controllers *
 
@@ -54,6 +55,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         _bluetoothNameCtrl.close();
         _lrcBatteryCtrl.close();
         _ancModeCtrl.close();
+        _ldacCtrl.close();
         _settingsCtrl.close();
       },
     );
@@ -65,6 +67,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         // no alias because it's okay to be null 👍
         lrcBattery.valueOrNull,
         ancMode.valueOrNull,
+        ldac.valueOrNull,
         settings.valueOrNull,
       ].any((e) => e == null)) {
         _initRequestInfo();
@@ -101,7 +104,8 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         break;
       // # Settings(ldac)
       case {1: [var ldacCode, ...]} when cmd.isAbout(_Cmd.getLdac):
-        _settingsCtrl.add(lastSettings.copyWith(ldac: ldacCode == 1));
+        final ldacMode = ldacCode == 1;
+        _ldacCtrl.add(ldacMode);
         break;
       // # Settings(lowLatency)
       case {1: [var lowLatencyCode, ...]} when cmd.isAbout(_Cmd.getLowLatency):
@@ -178,6 +182,12 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   Future<void> setAncMode(AncMode mode) async => _mbb.sink.add(_Cmd.anc(mode));
 
   @override
+  ValueStream<bool> get ldac => _ldacCtrl.stream;
+
+  @override
+  Future<void> setLdac(bool enabled) async => _mbb.sink.add(_Cmd.ldac(enabled));
+
+  @override
   ValueStream<HuaweiFreeBudsPro3Settings> get settings => _settingsCtrl.stream;
 
   @override
@@ -214,10 +224,6 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
       _mbb.sink.add(_Cmd.autoPause(newSettings.autoPause!));
       _mbb.sink.add(_Cmd.getAutoPause);
     }
-    if ((newSettings.ldac ?? prev.ldac) != prev.ldac) {
-      _mbb.sink.add(_Cmd.ldac(newSettings.ldac!));
-      _mbb.sink.add(_Cmd.getLdac);
-    }
     if ((newSettings.lowLatency ?? prev.lowLatency) != prev.lowLatency) {
       _mbb.sink.add(_Cmd.lowLatency(newSettings.lowLatency!));
       _mbb.sink.add(_Cmd.getLowLatency);
@@ -229,8 +235,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
 /// This isn't very pretty, or eliminates all of the boilerplate... but i
 /// feel like nothing will so let's love it as it is <3
 ///
-/// All elements names plainly like "noiseCancel" or "and" mean "set..X",
-/// and getters actually have "get" in their names
+///
 abstract class _Cmd {
   static const getBattery = MbbCommand(1, 8);
 
@@ -299,7 +304,7 @@ abstract class _Cmd {
       });
 
   static const getLdac = MbbCommand(43, 163);
-  
+
   static MbbCommand ldac(bool enabled) => MbbCommand(43, 162, {
         1: [enabled ? 1 : 0]
       });
