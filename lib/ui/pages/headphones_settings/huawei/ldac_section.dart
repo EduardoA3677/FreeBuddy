@@ -22,7 +22,9 @@ class LdacSection extends StatelessWidget {
           title: Text(l.ldac),
           subtitle: Text(l.ldacDesc),
           value: snap.data ?? false,
-          onChanged: (newVal) => headphones.settings.value.copyWith(ldac: newVal),
+          onChanged: (newVal) => headphones.setSettings(
+            HuaweiFreeBudsPro3Settings(ldac: newVal),
+          ),
         );
       },
     );
