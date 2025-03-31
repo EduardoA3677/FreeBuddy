@@ -22,8 +22,8 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
         AncMode.transparency,
       },
       autoPause: true,
-      ldac: false,
-      lowLatency: false,
+      ldac: true,
+      lowLatency: true,
     ),
   );
 
