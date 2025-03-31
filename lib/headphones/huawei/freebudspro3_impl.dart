@@ -105,10 +105,10 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         break;
       // # Settings(ldac)
       case {1: [var ldacCode, ...]} when cmd.isAbout(_Cmd.getLdac):
-        // ldacCode: 1 = quality (enabled), 0 = connectivity (disabled)
-        final isQualityMode = ldacCode == 1;
-        _settingsCtrl.add(lastSettings.copyWith(ldac: isQualityMode));
-        _ldacCtrl.add(isQualityMode);
+        // ldacCode: 0 = quality (enabled), 1 = connectivity (disabled)
+        final isEnabled = ldacCode == 0;  // Invertido: 0 es enabled, 1 es disabled
+        _settingsCtrl.add(lastSettings.copyWith(ldac: isEnabled));
+        _ldacCtrl.add(isEnabled);
         break;
       // # Settings(lowLatency)
       case {1: [var lowLatencyCode, ...]} when cmd.isAbout(_Cmd.getLowLatency):
@@ -317,7 +317,7 @@ abstract class _Cmd {
   static const getLdac = MbbCommand(43, 163);
 
   static MbbCommand ldac(bool enabled) => MbbCommand(43, 162, {
-        1: [enabled ? 1 : 0]
+        1: [enabled ? 0 : 1]  // Invertido: enviamos 0 para enabled, 1 para disabled
       });
 }
 
