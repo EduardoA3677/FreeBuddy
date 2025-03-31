@@ -3,7 +3,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../headphones/framework/headphones_settings.dart';
 import '../../../../headphones/framework/ldac.dart';
-import '../../../../headphones/huawei/freebudspro3.dart';
 import '../../../../headphones/huawei/settings.dart';
 import '../../../common/list_tile_switch.dart';
 
@@ -16,7 +15,7 @@ class LdacSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     // Cast headphones to Ldac to use the ldac interface methods
-    final ldacHeadphones = headphones as HuaweiFreeBudsPro3;
+    final ldacHeadphones = headphones as Ldac;
     
     return StreamBuilder(
       stream: headphones.settings.map((s) => s.ldac),
@@ -49,7 +48,7 @@ class LdacSection extends StatelessWidget {
                         Expanded(
                           child: DropdownButtonFormField<LdacMode>(
                             decoration: InputDecoration(
-                              labelText: "LDAC Mode",
+                              labelText: l.ldacMode,
                               border: OutlineInputBorder(),
                             ),
                             value: snapshot.data,
@@ -66,8 +65,8 @@ class LdacSection extends StatelessWidget {
                               return DropdownMenuItem<LdacMode>(
                                 value: value,
                                 child: Text(value == LdacMode.connectivity
-                                    ? 'Connectivity (Better Stability)'
-                                    : 'Quality (Better Sound)'),
+                                    ? l.ldacModeConnectivity 
+                                    : l.ldacModeQuality),
                               );
                             }).toList(),
                           ),
