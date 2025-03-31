@@ -1,7 +1,6 @@
 import 'package:rxdart/rxdart.dart';
 
 import '../framework/anc.dart';
-import '../framework/ldac.dart';
 import '../simulators/anc_sim.dart';
 import '../simulators/bluetooth_headphones_sim.dart';
 import '../simulators/lrc_battery_sim.dart';
@@ -25,34 +24,23 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
       autoPause: true,
       ldac: true,
       lowLatency: true,
-      ldacMode: LdacMode.quality,
     ),
   );
   
-  final _ldacEnabledCtrl = BehaviorSubject<bool>.seeded(true);
-  final _ldacModeCtrl = BehaviorSubject<LdacMode>.seeded(LdacMode.quality);
+  final _ldacCtrl = BehaviorSubject<bool>.seeded(true);
 
   @override
   ValueStream<HuaweiFreeBudsPro3Settings> get settings => _settingsCtrl.stream;
 
   @override
-  ValueStream<bool> get ldacEnabled => _ldacEnabledCtrl.stream;
+  ValueStream<bool> get ldac => _ldacCtrl.stream;
   
   @override
-  ValueStream<LdacMode> get ldacMode => _ldacModeCtrl.stream;
-  
-  @override
-  Future<void> setLdacEnabled(bool enabled) async {
-    _ldacEnabledCtrl.add(enabled);
+  Future<void> setLdac(bool enabled) async {
+    _ldacCtrl.add(enabled);
     _settingsCtrl.add(_settingsCtrl.value.copyWith(ldac: enabled));
   }
   
-  @override
-  Future<void> setLdacMode(LdacMode mode) async {
-    _ldacModeCtrl.add(mode);
-    _settingsCtrl.add(_settingsCtrl.value.copyWith(ldacMode: mode));
-  }
-
   @override
   Future<void> setSettings(HuaweiFreeBudsPro3Settings newSettings) async {
     final settings = _settingsCtrl.value.copyWith(
@@ -63,20 +51,16 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
       autoPause: newSettings.autoPause,
       ldac: newSettings.ldac,
       lowLatency: newSettings.lowLatency,
-      ldacMode: newSettings.ldacMode,
     );
     
     _settingsCtrl.add(settings);
     
     if (newSettings.ldac != null) {
-      _ldacEnabledCtrl.add(newSettings.ldac!);
-    }
-    
-    if (newSettings.ldacMode != null) {
-      _ldacModeCtrl.add(newSettings.ldacMode!);
+      _ldacCtrl.add(newSettings.ldac!);
     }
   }
 }
+
 // Classo use as placeholder for Disabled() widget
 // this is not done with mixins because we may want to fill it with
 // last-remembered values in future, and we will pretty much override
@@ -95,16 +79,10 @@ final class HuaweiFreeBudsPro3SimPlaceholder extends HuaweiFreeBudsPro3
   ValueStream<HuaweiFreeBudsPro3Settings> get settings => BehaviorSubject();
   
   @override
-  ValueStream<bool> get ldacEnabled => BehaviorSubject();
+  ValueStream<bool> get ldac => BehaviorSubject();
   
   @override
-  ValueStream<LdacMode> get ldacMode => BehaviorSubject();
-  
-  @override
-  Future<void> setLdacEnabled(bool enabled) async {}
-  
-  @override
-  Future<void> setLdacMode(LdacMode mode) async {}
+  Future<void> setLdac(bool enabled) async {}
 
   @override
   Future<void> setSettings(HuaweiFreeBudsPro3Settings newSettings) async {}

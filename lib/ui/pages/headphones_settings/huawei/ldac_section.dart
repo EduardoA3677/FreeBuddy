@@ -17,66 +17,19 @@ class LdacSection extends StatelessWidget {
     // Cast headphones to Ldac to use the ldac interface methods
     final ldacHeadphones = headphones as Ldac;
     
-    return StreamBuilder(
-      stream: headphones.settings.map((s) => s.ldac),
+    return StreamBuilder<bool>(
+      stream: ldacHeadphones.ldac,
       initialData: false,
       builder: (_, snap) {
         final ldacEnabled = snap.data ?? false;
         
-        return Column(
-          children: [
-            ListTileSwitch(
-              title: Text(l.ldac),
-              subtitle: Text(l.ldacDesc),
-              value: ldacEnabled,
-              onChanged: (newVal) {
-                ldacHeadphones.setLdacEnabled(newVal);
-                headphones.setSettings(
-                  HuaweiFreeBudsPro3Settings(ldac: newVal),
-                );
-              },
-            ),
-            if (ldacEnabled)
-              StreamBuilder<LdacMode>(
-                stream: ldacHeadphones.ldacMode,
-                initialData: LdacMode.quality,
-                builder: (context, snapshot) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField<LdacMode>(
-                            decoration: InputDecoration(
-                              labelText: l.ldacMode,
-                              border: OutlineInputBorder(),
-                            ),
-                            value: snapshot.data,
-                            onChanged: (LdacMode? newValue) {
-                              if (newValue != null) {
-                                ldacHeadphones.setLdacMode(newValue);
-                                headphones.setSettings(
-                                  HuaweiFreeBudsPro3Settings(ldacMode: newValue),
-                                );
-                              }
-                            },
-                            items: LdacMode.values
-                                .map<DropdownMenuItem<LdacMode>>((LdacMode value) {
-                              return DropdownMenuItem<LdacMode>(
-                                value: value,
-                                child: Text(value == LdacMode.connectivity
-                                    ? l.ldacModeConnectivity 
-                                    : l.ldacModeQuality),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-          ],
+        return ListTileSwitch(
+          title: Text(l.ldac),
+          subtitle: Text(l.ldacDesc),
+          value: ldacEnabled,
+          onChanged: (newVal) {
+            ldacHeadphones.setLdac(newVal);
+          },
         );
       },
     );

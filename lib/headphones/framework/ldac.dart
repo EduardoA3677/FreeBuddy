@@ -2,18 +2,9 @@ import 'package:rxdart/rxdart.dart';
 
 /// Interface for headphones supporting LDAC audio codec
 abstract interface class Ldac {
-  ValueStream<bool> get ldacEnabled;
+  /// Stream of LDAC status: true for Quality mode, false for Connectivity mode
+  ValueStream<bool> get ldac;
   
-  ValueStream<LdacMode> get ldacMode;
-  
-  Future<void> setLdacEnabled(bool enabled);
-  
-  Future<void> setLdacMode(LdacMode mode);
-}
-
-/// LDAC (Lossy Digital Audio Compression) is a high-quality audio codec
-/// developed by Sony that enables Bluetooth transmission of high-resolution audio
-enum LdacMode {
-  connectivity,  
-  quality,
+  /// Set LDAC status: true for Quality mode, false for Connectivity mode
+  Future<void> setLdac(bool enabled);
 }
