@@ -7,6 +7,7 @@ import 'package:the_last_bluetooth/the_last_bluetooth.dart' as tlb;
 
 import '../../logger.dart';
 import '../framework/anc.dart';
+import '../framework/ldac.dart';
 import '../framework/lrc_battery.dart';
 import 'freebudspro3.dart';
 import 'mbb.dart';
@@ -25,6 +26,9 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
   final _lrcBatteryCtrl = BehaviorSubject<LRCBatteryLevels>();
   final _ancModeCtrl = BehaviorSubject<AncMode>();
   final _settingsCtrl = BehaviorSubject<HuaweiFreeBudsPro3Settings>();
+  final _ldacEnabledCtrl = BehaviorSubject<bool>();
+  final _ldacModeCtrl = BehaviorSubject<LdacMode>();
+
   // stream controllers *
 
   /// This watches if we are still missing any info and re-requests it
@@ -55,6 +59,8 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         _lrcBatteryCtrl.close();
         _ancModeCtrl.close();
         _settingsCtrl.close();
+        _ldacEnabledCtrl.close();
+        _ldacModeCtrl.close();
       },
     );
     _initRequestInfo();
@@ -65,6 +71,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
         // no alias because it's okay to be null 👍
         lrcBattery.valueOrNull,
         ancMode.valueOrNull,
+        ldacMode.valueOrNull,
         settings.valueOrNull,
       ].any((e) => e == null)) {
         _initRequestInfo();
@@ -102,6 +109,16 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
       // # Settings(ldac)
       case {1: [var ldacCode, ...]} when cmd.isAbout(_Cmd.getLdac):
         _settingsCtrl.add(lastSettings.copyWith(ldac: ldacCode == 1));
+        _ldacEnabledCtrl.add(ldacCode == 1);
+        break;
+        
+      // # Settings(ldacMode)
+      case {2: [var ldacModeCode, ...]} when cmd.isAbout(_Cmd.getLdacMode):
+        final mode = ldacModeCode == 1 
+            ? LdacMode.quality 
+            : LdacMode.connectivity;
+        _settingsCtrl.add(lastSettings.copyWith(ldacMode: mode));
+        _ldacModeCtrl.add(mode);
         break;
       // # Settings(lowLatency)
       case {1: [var lowLatencyCode, ...]} when cmd.isAbout(_Cmd.getLowLatency):
@@ -146,6 +163,7 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
     _mbb.sink.add(_Cmd.getAnc);
     _mbb.sink.add(_Cmd.getAutoPause);
     _mbb.sink.add(_Cmd.getLdac);
+    _mbb.sink.add(_Cmd.getLdacMode);
     _mbb.sink.add(_Cmd.getLowLatency);
     _mbb.sink.add(_Cmd.getGestureDoubleTap);
     _mbb.sink.add(_Cmd.getGestureHold);
@@ -176,6 +194,24 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
 
   @override
   Future<void> setAncMode(AncMode mode) async => _mbb.sink.add(_Cmd.anc(mode));
+
+  @override
+  ValueStream<bool> get ldacEnabled => _ldacEnabledCtrl.stream;
+  
+  @override
+  ValueStream<LdacMode> get ldacMode => _ldacModeCtrl.stream;
+  
+  @override
+  Future<void> setLdacEnabled(bool enabled) async {
+    _mbb.sink.add(_Cmd.ldac(enabled));
+    _mbb.sink.add(_Cmd.getLdac);
+  }
+  
+  @override
+  Future<void> setLdacMode(LdacMode mode) async {
+    _mbb.sink.add(_Cmd.ldacMode(mode));
+    _mbb.sink.add(_Cmd.getLdacMode);
+  }
 
   @override
   ValueStream<HuaweiFreeBudsPro3Settings> get settings => _settingsCtrl.stream;
@@ -222,14 +258,15 @@ final class HuaweiFreeBudsPro3Impl extends HuaweiFreeBudsPro3 {
       _mbb.sink.add(_Cmd.ldac(newSettings.ldac!));
       _mbb.sink.add(_Cmd.getLdac);
     }
+    
+    if ((newSettings.ldacMode ?? prev.ldacMode) != prev.ldacMode) {
+      _mbb.sink.add(_Cmd.ldacMode(newSettings.ldacMode!));
+      _mbb.sink.add(_Cmd.getLdacMode);
+    }
   }
 }
 
 /// This is just a holder for magic numbers
-/// This isn't very pretty, or eliminates all of the boilerplate... but i
-/// feel like nothing will so let's love it as it is <3
-///
-///
 abstract class _Cmd {
   static const getBattery = MbbCommand(1, 8);
 
@@ -296,17 +333,22 @@ abstract class _Cmd {
   static MbbCommand autoPause(bool enabled) => MbbCommand(43, 16, {
         1: [enabled ? 1 : 0]
       });
+  static const getLowLatency = MbbCommand(43, 43);
+
+  static MbbCommand lowLatency(bool enabled) => MbbCommand(43, 43, {
+        1: [enabled ? 1 : 0]
+      });
 
   static const getLdac = MbbCommand(43, 163);
 
   static MbbCommand ldac(bool enabled) => MbbCommand(43, 162, {
         1: [enabled ? 1 : 0]
       });
-
-  static const getLowLatency = MbbCommand(43, 108);
+      
+  static const getLdacMode = MbbCommand(43, 163);
   
-  static MbbCommand lowLatency(bool enabled) => MbbCommand(43, 107, {
-        1: [enabled ? 1 : 0]
+  static MbbCommand ldacMode(LdacMode mode) => MbbCommand(43, 162, {
+        2: [mode == LdacMode.quality ? 1 : 0]
       });
 }
 
