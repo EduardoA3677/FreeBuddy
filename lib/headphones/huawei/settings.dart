@@ -1,4 +1,5 @@
 import '../framework/anc.dart';
+import '../framework/ldac.dart';
 
 class HuaweiFreeBudsPro3Settings {
   // hey hey hay, not only settings are gonna be duplicate spaghetti shithole,
@@ -11,6 +12,7 @@ class HuaweiFreeBudsPro3Settings {
   final bool? autoPause;
   final bool? lowLatency;
   final bool? ldac;
+  final LdacMode? ldacMode;
 
   const HuaweiFreeBudsPro3Settings({
     this.doubleTapLeft,
@@ -20,6 +22,7 @@ class HuaweiFreeBudsPro3Settings {
     this.autoPause,
     this.lowLatency,
     this.ldac,
+    this.ldacMode,
   });
 
   // don't want to use codegen *yet*
@@ -31,6 +34,7 @@ class HuaweiFreeBudsPro3Settings {
     bool? autoPause,
     bool? lowLatency,
     bool? ldac,
+    LdacMode? ldacMode,
   }) =>
       HuaweiFreeBudsPro3Settings(
         doubleTapLeft: doubleTapLeft ?? this.doubleTapLeft,
@@ -41,6 +45,7 @@ class HuaweiFreeBudsPro3Settings {
         autoPause: autoPause ?? this.autoPause,
         lowLatency: lowLatency ?? this.lowLatency,
         ldac: ldac ?? this.ldac,
+        ldacMode: ldacMode ?? this.ldacMode,
       );
 }
 
