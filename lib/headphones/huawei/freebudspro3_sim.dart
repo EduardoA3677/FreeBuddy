@@ -22,7 +22,8 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
         AncMode.transparency,
       },
       autoPause: true,
-      ldac: true,
+      ldac: false,
+      lowLatency: false,
     ),
   );
 
@@ -39,17 +40,9 @@ final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
         holdBothToggledAncModes: newSettings.holdBothToggledAncModes,
         autoPause: newSettings.autoPause,
         ldac: newSettings.ldac,
+        lowLatency: newSettings.lowLatency,
       ),
     );
-  }
-
-  @override
-  ValueStream<bool> get ldac => _settingsCtrl.stream.map((settings) => settings.ldac ?? false).shareValueSeeded(false);
-  
-  @override
-  Future<void> setLdac(bool enabled) async {
-    final currentSettings = _settingsCtrl.value;
-    _settingsCtrl.add(currentSettings.copyWith(ldac: enabled));
   }
 }
 // Classo use as placeholder for Disabled() widget
@@ -71,9 +64,4 @@ final class HuaweiFreeBudsPro3SimPlaceholder extends HuaweiFreeBudsPro3
   @override
   Future<void> setSettings(HuaweiFreeBudsPro3Settings newSettings) async {}
 
-  @override
-  ValueStream<bool> get ldac => BehaviorSubject.seeded(false);
-
-  @override
-  Future<void> setLdac(bool enabled) async {}
 }
