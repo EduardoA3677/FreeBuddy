@@ -13,16 +13,18 @@ class LdacSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    // Cast headphones to Ldac to use the ldac interface methods    
-    return StreamBuilder(
+    
+    return StreamBuilder<bool>(
       stream: headphones.settings.map((s) => s.ldac),
-      initialData: false,
+      initialData: headphones.settings.value.ldac ?? false,
       builder: (_, snap) {
         return ListTileSwitch(
           title: Text(l.ldac),
           subtitle: Text(l.ldacDesc),
           value: snap.data ?? false,
-          onChanged: (newVal) => headphones.settings.value.copyWith(ldac: newVal),
+          onChanged: (newVal) {
+            headphones.setSettings(headphones.settings.value.copyWith(ldac: newVal));
+          },
         );
       },
     );
