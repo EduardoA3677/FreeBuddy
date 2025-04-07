@@ -4,15 +4,15 @@ import '../framework/anc.dart';
 import '../simulators/anc_sim.dart';
 import '../simulators/bluetooth_headphones_sim.dart';
 import '../simulators/lrc_battery_sim.dart';
-import 'freebuds3i.dart';
+import 'freebudspro3.dart';
 import 'settings.dart';
 
-final class HuaweiFreeBuds3iSim extends HuaweiFreeBuds3i
+final class HuaweiFreeBudsPro3Sim extends HuaweiFreeBudsPro3
     with BluetoothHeadphonesSim, LRCBatteryAlwaysFullSim, AncSim {
   // ehhhhhh...
 
-  final _settingsCtrl = BehaviorSubject<HuaweiFreeBuds3iSettings>.seeded(
-    const HuaweiFreeBuds3iSettings(
+  final _settingsCtrl = BehaviorSubject<HuaweiFreeBudsPro3Settings>.seeded(
+    const HuaweiFreeBudsPro3Settings(
       doubleTapLeft: DoubleTap.playPause,
       doubleTapRight: DoubleTap.playPause,
       holdBoth: Hold.cycleAnc,
@@ -21,20 +21,22 @@ final class HuaweiFreeBuds3iSim extends HuaweiFreeBuds3i
         AncMode.off,
         AncMode.transparency,
       },
+      autoPause: true,
     ),
   );
 
   @override
-  ValueStream<HuaweiFreeBuds3iSettings> get settings => _settingsCtrl.stream;
+  ValueStream<HuaweiFreeBudsPro3Settings> get settings => _settingsCtrl.stream;
 
   @override
-  Future<void> setSettings(HuaweiFreeBuds3iSettings newSettings) async {
+  Future<void> setSettings(HuaweiFreeBudsPro3Settings newSettings) async {
     _settingsCtrl.add(
       _settingsCtrl.value.copyWith(
         doubleTapLeft: newSettings.doubleTapLeft,
         doubleTapRight: newSettings.doubleTapRight,
         holdBoth: newSettings.holdBoth,
         holdBothToggledAncModes: newSettings.holdBothToggledAncModes,
+        autoPause: newSettings.autoPause,
       ),
     );
   }
@@ -46,16 +48,16 @@ final class HuaweiFreeBuds3iSim extends HuaweiFreeBuds3i
 // all of this
 //
 // ...or not. I just don't know yet 🤷
-final class HuaweiFreeBuds3iSimPlaceholder extends HuaweiFreeBuds3i
+final class HuaweiFreeBudsPro3SimPlaceholder extends HuaweiFreeBudsPro3
     with
         BluetoothHeadphonesSimPlaceholder,
         LRCBatteryAlwaysFullSimPlaceholder,
         AncSimPlaceholder {
-  const HuaweiFreeBuds3iSimPlaceholder();
+  const HuaweiFreeBudsPro3SimPlaceholder();
 
   @override
-  ValueStream<HuaweiFreeBuds3iSettings> get settings => BehaviorSubject();
+  ValueStream<HuaweiFreeBudsPro3Settings> get settings => BehaviorSubject();
 
   @override
-  Future<void> setSettings(HuaweiFreeBuds3iSettings newSettings) async {}
+  Future<void> setSettings(HuaweiFreeBudsPro3Settings newSettings) async {}
 }
