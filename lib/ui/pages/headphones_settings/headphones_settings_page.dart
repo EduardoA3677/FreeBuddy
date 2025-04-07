@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../headphones/framework/headphones_settings.dart';
-import '../../../headphones/huawei/settings.dart';
+import '../../../headphones/huawei/features/settings.dart';
+import '../../../headphones/model_definition/huawei_model_definition.dart';
 import '../../common/headphones_connection_ensuring_overlay.dart';
 import 'huawei/auto_pause_section.dart';
 import 'huawei/double_tap_section.dart';
@@ -26,19 +27,34 @@ class HeadphonesSettingsPage extends StatelessWidget {
   }
 }
 
-// this is shitty. and we don't want this. not here.
-// ...
-// but i have no better idea for now :)))))
+// This builds settings sections based on headphones type and capabilities
 List<Widget> widgetsForModel(HeadphonesSettings settings) {
-  if (settings is HeadphonesSettings<HuaweiFreeBudsPro3Settings>) {
-    return [
-      AutoPauseSection(settings),
-      const Divider(indent: 16, endIndent: 16),
-      DoubleTapSection(settings),
-      const Divider(indent: 16, endIndent: 16),
-      HoldSection(settings),
-      const SizedBox(height: 64),
-    ];
+  if (settings is HuaweiHeadphonesBase) {
+    final huaweiSettings =
+        settings as HeadphonesSettings<HuaweiHeadphonesSettings>;
+    final model = (settings as HuaweiHeadphonesImpl).modelDefinition;
+
+    final sections = <Widget>[];
+
+    // Add auto-pause section if supported
+    if (model.supportsAutoPause) {
+      sections.add(AutoPauseSection(huaweiSettings));
+      sections.add(const Divider(indent: 16, endIndent: 16));
+    }
+
+    // Add double-tap section if supported
+    if (model.supportsDoubleTap) {
+      sections.add(DoubleTapSection(huaweiSettings));
+      sections.add(const Divider(indent: 16, endIndent: 16));
+    }
+
+    // Add hold section if supported
+    if (model.supportsHold) {
+      sections.add(HoldSection(huaweiSettings));
+    }
+
+    sections.add(const SizedBox(height: 64));
+    return sections;
   } else {
     throw "You shouldn't be on this screen if you don't have settings!";
   }

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../headphones/framework/headphones_settings.dart';
-import '../../../../headphones/huawei/settings.dart';
+import '../../../../headphones/huawei/features/settings.dart';
 import '../../../common/list_tile_radio.dart';
 import '../../../common/list_tile_switch.dart';
 import '../../disabled.dart';
 
 class DoubleTapSection extends StatelessWidget {
-  final HeadphonesSettings<HuaweiFreeBudsPro3Settings> headphones;
+  final HeadphonesSettings<HuaweiHeadphonesSettings> headphones;
 
   const DoubleTapSection(this.headphones, {super.key});
 
@@ -35,7 +35,7 @@ class DoubleTapSection extends StatelessWidget {
               onChanged: (newVal) {
                 final g = newVal ? DoubleTap.playPause : DoubleTap.nothing;
                 headphones.setSettings(
-                  HuaweiFreeBudsPro3Settings(doubleTapLeft: g, doubleTapRight: g),
+                  HuaweiHeadphonesSettings(doubleTapLeft: g, doubleTapRight: g),
                 );
               },
             ),
@@ -54,7 +54,7 @@ class DoubleTapSection extends StatelessWidget {
                         value: dt.l,
                         onChanged: enabled
                             ? (g) => headphones.setSettings(
-                                  HuaweiFreeBudsPro3Settings(doubleTapLeft: g),
+                                  HuaweiHeadphonesSettings(doubleTapLeft: g),
                                 )
                             : null,
                       ),
@@ -68,7 +68,7 @@ class DoubleTapSection extends StatelessWidget {
                         value: dt.r,
                         onChanged: enabled
                             ? (g) => headphones.setSettings(
-                                  HuaweiFreeBudsPro3Settings(doubleTapRight: g),
+                                  HuaweiHeadphonesSettings(doubleTapRight: g),
                                 )
                             : null,
                       ),
