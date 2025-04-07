@@ -22,7 +22,6 @@ const commonTimeout = Duration(seconds: 10);
 const taskIdRoutineUpdate = "freebuddy.routine_update";
 
 Future<bool> routineUpdateCallback() async {
-  // TODO: Multi-headphones BIG decisions here 😬😬 - possibly impossible to resolve without nuking all of this
   // NOT_SURE: Also use real/mock logic here?? idk, but if you want,
   // feel free to make some proper DI for this to be shared in UI and here
   HeadphonesConnectionCubit? cubit;

@@ -1,4 +1,3 @@
-// TODO: Refactor this pice of shit ;_;
 // I need to write like 10 lines for every new settings, and it's probably not
 // working correctly. Use rxdart or smth
 import 'package:async/async.dart';
@@ -29,7 +28,6 @@ enum _Prefs {
   final dynamic defaultValue;
 }
 
-// TODO: Improve everything here with rxdart or something
 class SharedPreferencesAppSettings implements AppSettings {
   SharedPreferencesAppSettings(this.preferences);
 

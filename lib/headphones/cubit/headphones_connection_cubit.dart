@@ -134,7 +134,6 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
           if (i + 1 >= connectTries) rethrow;
           // since, i found out that connect() may be blocking, then just in
           // case give ui some time for 2 frames :D (16.6*2)
-          // of course, TODO: make this not necessary
           await Future.delayed(Duration(milliseconds: 50));
         }
       }
@@ -213,7 +212,6 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
   // maybetodo: i'm wondering if to make this public, and not internally called
   // in constructor, but this would complicate di...
   Future<void> _initInit() async {
-    // TODO: Some *tests* for this nightmare...
     if (await cubitAlreadyRunningSomewhere()) {
       loggI.w("Found already running cubit while init() - "
           "will wait $killOtherCubitTimeout and then kill it");
@@ -236,7 +234,6 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
     }
 
     // And *NOW* we can talk...
-    // TODO: I mean, actually, it still sometimes hangs... but I think that's
     // a deep un-fixable-for-now fault of jni :///
     IsolateNameServer.removePortNameMapping(pingReceivePortName);
     IsolateNameServer.registerPortWithName(
@@ -275,7 +272,6 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       emit(const HeadphonesNoPermission());
       return;
     }
-    // TODO: Some day, debug if (underneath?) this is somehow same instance
     // as the background one, and why does it crash/hang when we init it twice
     // ...but that's for another day xdddd
     _bluetooth.init();
@@ -286,7 +282,6 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
     _devStream = _bluetooth.pairedDevices.listen(_pairedDevicesHandle);
   }
 
-  // TODO:
   Future<bool> enableBluetooth() async => false;
 
   Future<void> openBluetoothSettings() => AppSettings.openAppSettings(

@@ -111,7 +111,6 @@ class _BatteryContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context);
-    // TODO: Maybe move this advanced color stuff somewhere else someday
     // yep... well but like... what else i'm supposed to??
     // ignore: deprecated_member_use
     final color = Hct.fromInt(t.colorScheme.primary.value);
