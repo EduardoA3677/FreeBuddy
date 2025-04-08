@@ -19,21 +19,21 @@ typedef MatchedModel = ({
 
 MatchedModel? matchModel(BluetoothDevice matchedDevice) {
   final name = matchedDevice.name.value;
-  
+
   // Try to match with Huawei models
   for (final model in HuaweiModels.allModels) {
     if (model.idNameRegex.hasMatch(name)) {
       return (
         builder: (io, dev) => HuaweiHeadphonesImpl(
-          modelDefinition: model,
-          bluetoothDevice: dev,
-          mbb: mbbChannel(io),
-        ),
+              modelDefinition: model,
+              bluetoothDevice: dev,
+              mbb: mbbChannel(io),
+            ),
         placeholder: HuaweiHeadphonesSimPlaceholder(model),
       ) as MatchedModel;
     }
   }
-  
+
   // No match found
   return null;
 }
