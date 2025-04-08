@@ -7,7 +7,7 @@ import '../mbb.dart';
 import 'settings.dart';
 
 /// Implementation for hold gesture functionality
-class HoldImplementation {
+class HoldFeature {
   /// Command to get hold gesture settings
   static final getHoldCommand = MbbCommand(43, 23);
 

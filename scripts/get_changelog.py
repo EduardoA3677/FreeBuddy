@@ -1,12 +1,15 @@
 import argparse
 import re
+import os
 
 p = argparse.ArgumentParser()
 p.add_argument('--version', help='Version to get changelog for. You can type with or without "v" prefix')
 args = p.parse_args()
 
 version = args.version.strip().replace('v', '')
-if not re.match(r'\d+.\d+.\d+', version):
+if not version:
+    version = os.getenv('tag', '').strip()
+if not re.match(r'\d+\.\d+\.\d+', version):
     raise ValueError('Invalid version')
 
 with open("CHANGELOG.md", 'r') as f:

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../../../headphones/framework/headphones_settings.dart';
-import '../../../../headphones/huawei/settings.dart';
+import '../../../../headphones/huawei/features/settings.dart';
+import '../../../../headphones/huawei/huawei_headphones_base.dart';
 import '../../../common/list_tile_switch.dart';
 
 class AutoPauseSection extends StatelessWidget {
-  final HeadphonesSettings<HuaweiFreeBudsPro3Settings> headphones;
+  final HuaweiHeadphonesBase headphones;
 
   const AutoPauseSection(this.headphones, {super.key});
 
@@ -22,7 +22,7 @@ class AutoPauseSection extends StatelessWidget {
           subtitle: Text(l.autoPauseDesc),
           value: snap.data ?? false,
           onChanged: (newVal) => headphones.setSettings(
-            HuaweiFreeBudsPro3Settings(autoPause: newVal),
+            HuaweiHeadphonesSettings(autoPause: newVal),
           ),
         );
       },

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../headphones/framework/anc.dart';
-import '../../../../headphones/framework/headphones_settings.dart';
-import '../../../../headphones/huawei/settings.dart';
+import '../../../../headphones/huawei/features/settings.dart';
+import '../../../../headphones/huawei/huawei_headphones_base.dart';
 import '../../../common/list_tile_checkbox.dart';
 import '../../../common/list_tile_switch.dart';
 import '../../disabled.dart';
 
 class HoldSection extends StatelessWidget {
-  final HeadphonesSettings<HuaweiFreeBudsPro3Settings> headphones;
+  final HuaweiHeadphonesBase headphones;
 
   const HoldSection(this.headphones, {super.key});
 
@@ -30,7 +30,7 @@ class HoldSection extends StatelessWidget {
               subtitle: Text(l.pageHeadphonesSettingsHoldDesc),
               value: enabled,
               onChanged: (newVal) => headphones.setSettings(
-                HuaweiFreeBudsPro3Settings(
+                HuaweiHeadphonesSettings(
                   holdBoth: newVal ? Hold.cycleAnc : Hold.nothing,
                 ),
               ),
@@ -40,7 +40,7 @@ class HoldSection extends StatelessWidget {
               child: _HoldSettingsCard(
                 enabledModes: MapEntry(gs.holdBoth, gs.anc),
                 onChanged: (m) => headphones.setSettings(
-                  HuaweiFreeBudsPro3Settings(
+                  HuaweiHeadphonesSettings(
                     holdBoth: m.key,
                     holdBothToggledAncModes: m.value,
                   ),

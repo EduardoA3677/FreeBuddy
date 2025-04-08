@@ -4,7 +4,7 @@ import '../../framework/lrc_battery.dart';
 import '../mbb.dart';
 
 /// Implementation for battery reporting functionality
-class BatteryImplementation {
+class BatteryFeature {
   /// Command to get battery information
   static final getBatteryCommand = MbbCommand(1, 8);
 

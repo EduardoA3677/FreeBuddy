@@ -1,0 +1,101 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+\.[0-9]+\.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag'
+        required: true
+        default: 'v0.2.0'
+      build_format:
+        description: 'Choose the build format'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - 'apk'
+          - 'aab'
+          - 'both'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/cirruslabs/flutter:stable # Usar la última versión estable de Flutter
+    steps:
+      - uses: actions/checkout@v4
+
+      # Install Python
+      - name: Install Python
+        run: |
+          apt-get update
+          apt-get install -y python3 python3-pip
+          ln -s /usr/bin/python3 /usr/bin/python
+
+      # Determine tag from either trigger or input
+      - name: Set tag
+        id: set_tag
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="${{ github.ref_name }}"
+          fi
+
+          # Remove 'v' prefix if present
+          CLEAN_TAG=$(echo "$TAG" | sed 's/^v//')
+          echo "tag=$CLEAN_TAG" >> $GITHUB_OUTPUT
+
+      # Build APK & AAB with signing
+      - name: Build APK & AAB with signing
+        uses: NiklasLehnfeld/flutter-android-build-action@v2
+        id: android-build
+        with:
+          release: true
+          keystore: ${{ secrets.KEYSTORE }}
+          keystore-pwd: ${{ secrets.KEYSTORE_PWD }}
+          key-pwd: ${{ secrets.KEY_PWD }}
+
+      # Rename and prepare artifacts based on build format
+      - name: Process build artifacts
+        id: artifacts
+        run: |
+          BUILD_FORMAT="${{ github.event.inputs.build_format }}"
+          if [ -z "$BUILD_FORMAT" ]; then
+            BUILD_FORMAT="both"  # Default if not provided
+          fi
+
+          # Create empty file list
+          echo "files=" >> $GITHUB_OUTPUT
+
+          # Handle APK
+          if [ "$BUILD_FORMAT" = "apk" ] || [ "$BUILD_FORMAT" = "both" ]; then
+            mv ${{ steps.android-build.outputs.apk-path }} ./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk
+            echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk" >> $GITHUB_OUTPUT
+          fi
+
+          # Handle AAB
+          if [ "$BUILD_FORMAT" = "aab" ] || [ "$BUILD_FORMAT" = "both" ]; then
+            mv ${{ steps.android-build.outputs.aab-path }} ./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab
+            if [ "$BUILD_FORMAT" = "both" ]; then
+              echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk,./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab" >> $GITHUB_OUTPUT
+            else
+              echo "files=./FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      # Get changelog
+      - name: Get changelog
+        run: |
+          python scripts/get_changelog.py --version ${{ steps.set_tag.outputs.tag }} > ./body-file.txt
+
+      # Create GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ steps.set_tag.outputs.tag }}
+          body_path: ./body-file.txt
+          files: ${{ steps.artifacts.outputs.files }}
+          fail_on_unmatched_files: false

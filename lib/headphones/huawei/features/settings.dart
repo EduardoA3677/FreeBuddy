@@ -1,6 +1,6 @@
 import '../../../headphones/framework/anc.dart';
 
-/// Common settings structure for Huawei headphones
+/// Common settings structure for all Huawei headphones models
 class HuaweiHeadphonesSettings {
   final DoubleTap? doubleTapLeft;
   final DoubleTap? doubleTapRight;

@@ -1,10 +1,11 @@
 import 'package:rxdart/rxdart.dart';
 
-import '../model_definition/huawei_model_definition.dart';
 import '../simulators/anc_sim.dart';
 import '../simulators/bluetooth_headphones_sim.dart';
 import '../simulators/lrc_battery_sim.dart';
 import 'features/settings.dart';
+import 'huawei_headphones_base.dart';
+import 'model_definition.dart';
 
 /// Simulator for Huawei headphones
 class HuaweiHeadphonesSim extends HuaweiHeadphonesBase
@@ -30,7 +31,7 @@ class HuaweiHeadphonesSim extends HuaweiHeadphonesBase
   Future<void> setSettings(HuaweiHeadphonesSettings newSettings) async {
     final prev = _settingsCtrl.value;
 
-    _settingsCtrl.add(prev.copyWith(
+    _settingsCtrl.add(HuaweiHeadphonesSettings(
       doubleTapLeft: newSettings.doubleTapLeft ?? prev.doubleTapLeft,
       doubleTapRight: newSettings.doubleTapRight ?? prev.doubleTapRight,
       holdBoth: newSettings.holdBoth ?? prev.holdBoth,
@@ -49,7 +50,7 @@ class HuaweiHeadphonesSimPlaceholder extends HuaweiHeadphonesBase
         AncSimPlaceholder {
   final HuaweiModelDefinition model;
 
-  HuaweiHeadphonesSimPlaceholder(this.model);
+  const HuaweiHeadphonesSimPlaceholder(this.model);
 
   @override
   String get name => model.name;

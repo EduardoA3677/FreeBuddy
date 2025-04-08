@@ -4,7 +4,7 @@ import '../mbb.dart';
 import 'settings.dart';
 
 /// Implementation for auto-pause functionality
-class AutoPauseImplementation {
+class AutoPauseFeature {
   /// Command to get auto-pause setting
   static final getAutoPauseCommand = MbbCommand(43, 17);
 

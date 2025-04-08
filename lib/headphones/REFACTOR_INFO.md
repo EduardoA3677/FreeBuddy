@@ -1,27 +1,27 @@
 # Headphones Module Refactoring
 
-This module has been refactored to make it easier to add new headphones models in the future.
+This module has been refactored to make it easier to add new headphone models in the future.
 
 ## Key Changes
 
-1. **Model Definition System**:
-
-   - Created a unified model definition system in `model_definition/` directory
-   - Each model's capabilities are defined in `huawei_models.dart`
-
-2. **Modularized Features**:
+1. **Modular Feature System**:
 
    - Each feature (ANC, Double-Tap, Hold gesture, etc.) is now in a separate file
    - Features are in `huawei/features/` directory
 
-3. **Implementation Changes**:
+2. **Generic Settings Class**:
 
-   - Replaced model-specific implementation with generic implementation
-   - Implementation is driven by model definitions
+   - Replaced model-specific settings with generic `HuaweiHeadphonesSettings`
+   - Settings structure can be shared across different models
 
-4. **Upgrading Process**:
-   - To add a new model, simply add a new definition in `huawei_models.dart`
-   - No need to create separate implementation files for each model
+3. **Model Definition System**:
+
+   - Created a flexible model definition system in `huawei/model_definition.dart`
+   - Each model specifies which features it supports and default settings
+
+4. **Unified Implementation**:
+   - Replaced model-specific implementation with a generic implementation
+   - The same implementation can be used for all Huawei models
 
 ## Files to Delete
 
@@ -31,10 +31,30 @@ The following files are no longer needed and can be deleted:
 - `huawei/freebudspro3_impl.dart`
 - `huawei/freebudspro3_sim.dart`
 
-## Migration Guide
+## How to Add a New Model
 
-If you had custom code in any of the deleted files, you should:
+To add a new Huawei headphone model:
 
-1. Check if the functionality is already covered by the new system
-2. If not, consider adding it as a feature module in `huawei/features/`
-3. Update the model definition to include your feature
+1. Add a new model definition in `huawei/model_definition.dart`:
+
+   ```dart
+   static final newModel = HuaweiModelDefinition(
+     name: "Model Name",
+     idNameRegex: RegExp(r'^(?=(HUAWEI Model Name))', caseSensitive: true),
+     imageAssetPath: 'path/to/image.png',
+     supportsAnc: true,
+     // ... specify which features it supports
+     defaultSettings: const HuaweiHeadphonesSettings(...),
+   );
+   ```
+
+2. Add the model to the `allModels` list:
+   ```dart
+   static final List<HuaweiModelDefinition> allModels = [
+     freeBudsPro3,
+     freeBuds4i,
+     newModel,  // Add your new model here
+   ];
+   ```
+
+That's it! No need to create any additional implementation files.

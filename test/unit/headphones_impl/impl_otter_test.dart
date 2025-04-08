@@ -4,8 +4,9 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:freebuddy/headphones/framework/anc.dart';
 import 'package:freebuddy/headphones/framework/lrc_battery.dart';
-import 'package:freebuddy/headphones/huawei/freebudspro3_impl.dart';
+import 'package:freebuddy/headphones/huawei/huawei_headphones_impl.dart';
 import 'package:freebuddy/headphones/huawei/mbb.dart';
+import 'package:freebuddy/headphones/huawei/model_definition.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';
@@ -18,12 +19,18 @@ void main() {
     late StreamController<Uint8List> inputCtrl;
     late StreamController<Uint8List> outputCtrl;
     late StreamChannel<Uint8List> channel;
-    late HuaweiFreeBudsPro3Impl fbPro3;
+    late HuaweiHeadphonesImpl fbPro3;
     setUp(() {
       inputCtrl = StreamController<Uint8List>.broadcast();
       outputCtrl = StreamController<Uint8List>();
       channel = StreamChannel<Uint8List>(inputCtrl.stream, outputCtrl.sink);
-      fbPro3 = HuaweiFreeBudsPro3Impl(mbbChannel(channel), const FakeBtDev());
+
+      // Use the generalized implementation with the Pro3 model definition
+      fbPro3 = HuaweiHeadphonesImpl(
+        modelDefinition: HuaweiModels.freeBudsPro3,
+        bluetoothDevice: const FakeBtDev(),
+        mbb: mbbChannel(channel),
+      );
     });
     tearDown(() {
       inputCtrl.close();

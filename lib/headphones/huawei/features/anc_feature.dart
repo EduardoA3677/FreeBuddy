@@ -5,7 +5,7 @@ import '../../framework/anc.dart';
 import '../mbb.dart';
 
 /// Implementation for Active Noise Cancelling functionality
-class AncImplementation {
+class AncFeature {
   /// Command to get current ANC mode
   static final getAncCommand = MbbCommand(43, 42);
 

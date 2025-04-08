@@ -5,7 +5,7 @@ import '../mbb.dart';
 import 'settings.dart';
 
 /// Implementation for double-tap gesture functionality
-class DoubleTapImplementation {
+class DoubleTapFeature {
   /// Command to get current double-tap settings
   static final getDoubleTapCommand = MbbCommand(1, 32);
 

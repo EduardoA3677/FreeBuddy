@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../../../headphones/framework/headphones_settings.dart';
 import '../../../../headphones/huawei/features/settings.dart';
+import '../../../../headphones/huawei/huawei_headphones_base.dart';
 import '../../../common/list_tile_radio.dart';
 import '../../../common/list_tile_switch.dart';
 import '../../disabled.dart';
 
 class DoubleTapSection extends StatelessWidget {
-  final HeadphonesSettings<HuaweiHeadphonesSettings> headphones;
+  final HuaweiHeadphonesBase headphones;
 
   const DoubleTapSection(this.headphones, {super.key});
 
