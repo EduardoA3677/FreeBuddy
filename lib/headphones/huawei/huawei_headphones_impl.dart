@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart' as tlb;
@@ -7,6 +8,7 @@ import 'package:the_last_bluetooth/the_last_bluetooth.dart' as tlb;
 import '../../logger.dart';
 import '../framework/anc.dart';
 import '../framework/lrc_battery.dart';
+import '../model_definition/huawei_models_definition.dart';
 import 'features/anc_feature.dart';
 import 'features/auto_pause_feature.dart';
 import 'features/battery_feature.dart';
@@ -15,7 +17,6 @@ import 'features/hold_feature.dart';
 import 'features/settings.dart';
 import 'huawei_headphones_base.dart';
 import 'mbb.dart';
-import '../model_definition/huawei_models_definition.dart';
 
 /// Implementation of Huawei headphones based on model definition
 class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
@@ -47,8 +48,9 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
       );
     } catch (e) {
       // Fallback to a default model if the device is not recognized
-      logg.w(
-          "Unsupported model: $deviceName. Using FreeBuds Pro 3 as fallback");
+      logg.context("Huawei",
+          "Unsupported model: $deviceName. Using FreeBuds Pro 3 as fallback",
+          level: Level.warning);
       return HuaweiHeadphonesImpl(
         modelDefinition: HuaweiModels.freeBudsPro3,
         bluetoothDevice: bluetoothDevice,
@@ -78,7 +80,8 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
     // Listen to MBB commands
     _mbb.stream.listen(
       _handleMbbCommand,
-      onError: logg.onError,
+      onError: (e, s) => logg.context("MBB", "Stream error",
+          level: Level.error, error: e, stackTrace: s),
       onDone: () {
         _watchdogStreamSub.cancel();
         _closeAllStreams();
@@ -152,7 +155,8 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
         _settingsCtrl.add(updatedSettings);
       }
     } catch (e, s) {
-      logg.e("Error handling MBB command", error: e, stackTrace: s);
+      logg.context("Huawei", "Error handling MBB command",
+          level: Level.error, error: e, stackTrace: s);
     }
   }
 

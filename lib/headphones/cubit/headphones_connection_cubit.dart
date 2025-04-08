@@ -6,6 +6,7 @@ import 'package:app_settings/app_settings.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';
@@ -83,8 +84,11 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
     final ping = IsolateNameServer.lookupPortByName(
         HeadphonesConnectionCubit.pingReceivePortName);
     if (ping == null) {
-      loggI.e("No cubit to kill :( (this probably means you're using "
-          "this function WRONG, or something WEIRD happened)");
+      loggI.context(
+          "Cubit",
+          "No cubit to kill :( (this probably means you're using "
+              "this function WRONG, or something WEIRD happened)",
+          level: Level.error);
       return true;
     }
     ping.send(_killUrself);
@@ -92,7 +96,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
     if (await _checkUntilNoPort(killOtherCubitTimeout)) {
       return true;
     } else {
-      loggI.e("Cubit didn't kill itself as nicely asked :(");
+      loggI.context("Cubit", "Cubit didn't kill itself as nicely asked :(",
+          level: Level.error);
       return false;
     }
   }
@@ -120,7 +125,9 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
           _connection = _bluetooth.connectRfcomm(dev, sppUuid);
           break;
         } catch (_) {
-          loggI.w('Error when connecting socket: ${i + 1}/$connectTries tries');
+          loggI.context('Connection',
+              'Error when connecting socket: ${i + 1}/$connectTries tries',
+              level: Level.warning);
           if (!(dev.isConnected.valueOrNull ?? false)) {
             // this may happen because connecting may take some time
             // ...which is, well, not indicated by connectRfcomm being async...
@@ -128,7 +135,9 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
             // ...
             // how am i even supposed to? do this on another isolate??
             // well, maybe... 🙄 ehhh
-            loggI.w("...i's because device is not connected, dummy 😌");
+            loggI.context('Connection',
+                "...i's because device is not connected, dummy 😌",
+                level: Level.warning);
             rethrow;
           }
           if (i + 1 >= connectTries) rethrow;
@@ -145,7 +154,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       // hopefully this happens *before* next stream event with data 🤷
       // so that it nicely goes again and we emit HeadphonesDisconnected()
     } catch (e, s) {
-      loggI.e("Error while connecting to socket", error: e, stackTrace: s);
+      loggI.context("Connection", "Error while connecting to socket",
+          level: Level.error, error: e, stackTrace: s);
     }
     await _connection?.sink.close();
     _connection = null;
@@ -204,7 +214,9 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
         super(const HeadphonesNotPaired()) {
     final rolex = Stopwatch()..start();
     _initInit().then(
-      (_) => loggI.d("_initInit() took ${rolex.elapsedMilliseconds}ms"),
+      (_) => loggI.context(
+          "Init", "_initInit() took ${rolex.elapsedMilliseconds}ms",
+          level: Level.debug),
     );
   }
 
@@ -213,12 +225,16 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
   // in constructor, but this would complicate di...
   Future<void> _initInit() async {
     if (await cubitAlreadyRunningSomewhere()) {
-      loggI.w("Found already running cubit while init() - "
-          "will wait $killOtherCubitTimeout and then kill it");
+      loggI.context(
+          "Cubit",
+          "Found already running cubit while init() - "
+              "will wait $killOtherCubitTimeout and then kill it",
+          level: Level.warning);
       if (await _checkUntilNoPort(killOtherCubitTimeout)) {
-        loggI.i("Gone already, no need for war crimes 😇");
+        loggI.context("Cubit", "Gone already, no need for war crimes 😇",
+            level: Level.info);
       } else {
-        loggI.i("Killing other cubit...");
+        loggI.context("Cubit", "Killing other cubit...", level: Level.info);
         // ### Important thoughts ###
         //
         // I think it's a good way to stop background tasks, because when cubit
@@ -228,7 +244,9 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
         //
         // But, leaving those notes here, in case, some day, they don't.
         if (!await killOtherCubit()) {
-          loggI.f("Failed to kill other cubit 😵... well, anyway...");
+          loggI.context(
+              "Cubit", "Failed to kill other cubit 😵... well, anyway...",
+              level: Level.fatal);
         }
       }
     }
@@ -243,7 +261,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       if (message is SendPort) message.send(true);
       // kill urself
       if (message == _killUrself) {
-        loggI.w("Killing myself bc other cubit asked to 😖");
+        loggI.context("Cubit", "Killing myself bc other cubit asked to 😖",
+            level: Level.warning);
         close();
       }
     });
@@ -254,17 +273,23 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
 
   Future<void> _init() async {
     if (_btEnabledStream != null) {
-      loggI.w("_init() was already done and finished, but got called"
-          "again. Weird.");
+      loggI.context(
+          "Init",
+          "_init() was already done and finished, but got called"
+              "again. Weird.",
+          level: Level.warning);
       return;
     }
-    loggI.d("Starting init...");
+    loggI.context("Init", "Starting init...", level: Level.debug);
     // last check in case it's a call from requestPermission()
     // this would prob mean user went through all permission asking stuff, and
     // _initInit() is stilllll running... 😵‍💫
     if (!_warCrimesFinished) {
-      loggI.w("_init() called but _initInit() not finished 😵‍💫 - "
-          "this isn't good, but we may survive this...");
+      loggI.context(
+          "Init",
+          "_init() called but _initInit() not finished 😵‍💫 - "
+              "this isn't good, but we may survive this...",
+          level: Level.warning);
       return;
     }
     // it's down here to be sure that we do have device connected so
