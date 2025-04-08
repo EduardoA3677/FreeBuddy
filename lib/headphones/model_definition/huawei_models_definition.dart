@@ -1,5 +1,5 @@
 import '../framework/anc.dart';
-import 'features/settings.dart';
+import '../huawei/features/settings.dart';
 
 /// Definition of a Huawei headphones model with its capabilities
 class HuaweiModelDefinition {

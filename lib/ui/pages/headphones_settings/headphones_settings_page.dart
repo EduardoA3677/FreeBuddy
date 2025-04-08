@@ -4,7 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../headphones/framework/bluetooth_headphones.dart';
 import '../../../headphones/huawei/huawei_headphones_base.dart';
 import '../../../headphones/huawei/huawei_headphones_impl.dart';
-import '../../../headphones/huawei/model_definition.dart';
+import '../../../headphones/model_definition/huawei_models_definition.dart';
 import '../../common/headphones_connection_ensuring_overlay.dart';
 import 'huawei/auto_pause_section.dart';
 import 'huawei/double_tap_section.dart';

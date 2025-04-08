@@ -15,7 +15,7 @@ import 'features/hold_feature.dart';
 import 'features/settings.dart';
 import 'huawei_headphones_base.dart';
 import 'mbb.dart';
-import 'model_definition.dart';
+import '../model_definition/huawei_models_definition.dart';
 
 /// Implementation of Huawei headphones based on model definition
 class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {

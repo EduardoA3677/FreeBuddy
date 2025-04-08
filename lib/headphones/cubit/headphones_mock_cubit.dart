@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../huawei/huawei_headphones_sim.dart';
-import '../huawei/model_definition.dart';
+import '../model_definition/huawei_models_definition.dart';
 import 'headphones_connection_cubit.dart';
 import 'headphones_cubit_objects.dart';
 

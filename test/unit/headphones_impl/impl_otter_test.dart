@@ -6,7 +6,7 @@ import 'package:freebuddy/headphones/framework/anc.dart';
 import 'package:freebuddy/headphones/framework/lrc_battery.dart';
 import 'package:freebuddy/headphones/huawei/huawei_headphones_impl.dart';
 import 'package:freebuddy/headphones/huawei/mbb.dart';
-import 'package:freebuddy/headphones/huawei/model_definition.dart';
+import 'package:freebuddy/headphones/model_definition/huawei_models_definition.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';

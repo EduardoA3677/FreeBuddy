@@ -1,6 +1,6 @@
 import '../framework/anc.dart';
 import '../huawei/features/settings.dart';
-import '../huawei/model_definition.dart';
+import 'huawei_models_definition.dart';
 
 /// In-ear detection feature
 class InEarDetection {

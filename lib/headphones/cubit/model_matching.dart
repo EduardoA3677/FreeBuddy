@@ -7,7 +7,7 @@ import '../framework/bluetooth_headphones.dart';
 import '../huawei/huawei_headphones_impl.dart';
 import '../huawei/huawei_headphones_sim.dart';
 import '../huawei/mbb.dart';
-import '../huawei/model_definition.dart';
+import '../model_definition/huawei_models_definition.dart';
 
 typedef HeadphonesBuilder = BluetoothHeadphones Function(
     StreamChannel<Uint8List> io, BluetoothDevice device);
