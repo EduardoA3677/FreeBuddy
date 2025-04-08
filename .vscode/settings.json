@@ -57,6 +57,10 @@
   "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.advanced": {
     "useLanguageServer": true,
-    "authProvider": "github"
+    "authProvider": "github",
+    "useExperimental": true,
+    "useExperimentalChat": true,
+    "useExperimentalEdits": true,
+    "useExperimentalCodeActions": true
   }
 }
