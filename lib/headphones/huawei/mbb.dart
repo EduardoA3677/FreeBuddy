@@ -4,13 +4,9 @@ import 'dart:typed_data';
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
 import 'package:crclib/catalog.dart';
-import 'package:logger/logger.dart';
 import 'package:stream_channel/stream_channel.dart';
 
-import '../../logger.dart';
-
-// Logger específico para el protocolo MBB
-final _mbbLogger = logg;
+import '../../logger.dart'; // Importación del logger
 
 /// Helper class for Mbb protocol used to communicate with headphones
 class MbbUtils {
@@ -19,10 +15,15 @@ class MbbUtils {
 
   /// Get Crc16Xmodem checksum of [data] as Uin8List of two bytes
   static Uint8List checksum(List<int> data) {
-    final crc = Crc16Xmodem().convert(
-        data); // NOTA: Hubo un error aquí donde crc no añadía padding de ceros,
-    // lo que causaba rechazo de mensajes y problemas con los gestos.
-    // Importante: necesitamos tests unitarios para esta funcionalidad
+    final crc = Crc16Xmodem().convert(data);
+    // NOTE: There was a fat-ass bug here: crc didn't pad the first number with
+    // 0, so every time byte was like this, whole message was rejected :/
+    //
+    // Because of this, app couldn't get info about gestures when left bud was
+    // "play/pause" and right was "voice assist" - it was just blank :/
+    //
+    // Why I'm saying this - we need some unit tests for all of this
+    // even at those early stages
     final str = crc.toRadixString(16).padLeft(4, '0');
     final hexes = [str.substring(0, 2), str.substring(2)];
     final bytes = hexes.map((hex) => int.parse(hex, radix: 16));
@@ -105,19 +106,13 @@ class MbbCommand {
       serviceId,
       commandId,
       ...dataBytes, // Make sure they are >0 and <256
-    ]; // Log detallado del comando enviado
-    _mbbLogger.context('MBB',
-        '📤 Enviando comando: serviceId=$serviceId, commandId=$commandId',
-        level: Level.info);
-    _mbbLogger.context(
-        'MBB', 'Argumentos del comando: ${LogHelper.formatObject(args)}',
-        level: Level.debug);
+    ];
 
-    final payload =
-        Uint8List.fromList(bytesList..addAll(MbbUtils.checksum(bytesList)));
-    _mbbLogger.binary('Payload del comando', payload);
+    // Log the command being sent
+    logg.i(
+        'MBB Command SENT: serviceId=$serviceId, commandId=$commandId, args=$args');
 
-    return payload;
+    return Uint8List.fromList(bytesList..addAll(MbbUtils.checksum(bytesList)));
   }
 
   static List<MbbCommand> fromPayload(
@@ -158,19 +153,10 @@ class MbbCommand {
         offset += 2 + argLength;
         args[argId] = argData;
       }
-      final cmd = MbbCommand(
-          serviceId, commandId, args); // Log detallado del comando recibido
-      _mbbLogger.context('MBB',
-          '📥 Comando recibido: serviceId=$serviceId, commandId=$commandId',
-          level: Level.info);
-
-      if (LogConfig.verboseMode) {
-        final argsDetails = args
-            .map((key, value) => MapEntry(key, LogHelper.formatBytes(value)));
-        _mbbLogger.context('MBB', 'Argumentos detallados: $argsDetails',
-            level: Level.debug);
-      }
-
+      final cmd = MbbCommand(serviceId, commandId, args);
+      // Log the command being received
+      logg.i(
+          'MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=$args');
       cmds.add(cmd);
     }
     return cmds;
@@ -182,45 +168,27 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
       StreamChannelTransformer(
         StreamTransformer.fromHandlers(
           handleData: (data, stream) {
-            _mbbLogger.context(
-                'MBB', '📥 Datos binarios recibidos: ${data.length} bytes',
-                level: Level.debug);
-
-            // Log detallado de los datos brutos si estamos en modo verbose
-            if (LogConfig.verboseMode) {
-              _mbbLogger.binary('Datos brutos recibidos', data);
-            }
+            logg.d('MBB RAW DATA RECEIVED: ${data.length} bytes');
 
             try {
               final commands = MbbCommand.fromPayload(data);
               for (final cmd in commands) {
-                // Filtrar comandos específicos que no necesitamos procesar
-                if (cmd.serviceId == 10 && cmd.commandId == 13) {
-                  _mbbLogger.context('MBB',
-                      'Filtrando comando de tipo: serviceId=${cmd.serviceId}, commandId=${cmd.commandId}',
-                      level: Level.debug);
-                  continue;
-                }
+                // FILTER THE SHIT OUT
+                if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
 
-                // Log detallado del comando que estamos procesando
-                if (LogConfig.verboseMode) {
-                  final argsDetails = cmd.args.map((key, value) => MapEntry(key,
-                      '(len:${value.length}) ${LogHelper.formatBytes(value)}'));
-                  _mbbLogger.context(
-                      'MBB',
-                      'Procesando comando: serviceId=${cmd.serviceId}, '
-                          'commandId=${cmd.commandId}, argsDetails=$argsDetails',
-                      level: Level.debug);
-                }
+                // Log more detailed info about the command
+                final argsDetails = cmd.args
+                    .map((key, value) =>
+                        MapEntry(key, '(len:${value.length}) $value'))
+                    .toString();
+                logg.d('MBB Processing command: serviceId=${cmd.serviceId}, '
+                    'commandId=${cmd.commandId}, argsDetails=$argsDetails');
 
                 stream.add(cmd);
               }
             } catch (e, stacktrace) {
-              _mbbLogger.context('MBB', '❌ Error al procesar datos MBB',
-                  level: Level.error, error: e, stackTrace: stacktrace);
-
-              // Log detallado del payload problemático
-              _mbbLogger.binary('Payload con error', data);
+              logg.e('Error processing MBB payload',
+                  error: e, stackTrace: stacktrace);
             }
           },
         ),
@@ -228,29 +196,11 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
           handleData: (data, sink) {
             try {
               final payload = data.toPayload();
-              _mbbLogger.context(
-                  'MBB', '📤 Enviando datos: ${payload.length} bytes',
-                  level: Level.debug);
-
-              // Log detallado en modo verbose
-              if (LogConfig.verboseMode) {
-                _mbbLogger.binary('Enviando payload', payload);
-              }
-
+              logg.d('MBB RAW DATA SENT: ${payload.length} bytes');
               rfcomm.sink.add(payload);
             } catch (e, stacktrace) {
-              _mbbLogger.context('MBB', '❌ Error al enviar comando MBB',
-                  level: Level.error, error: e, stackTrace: stacktrace);
-
-              // Log de información del comando que falló
-              _mbbLogger.context('MBB',
-                  'Comando fallido: serviceId=${data.serviceId}, commandId=${data.commandId}',
-                  level: Level.debug);
-              if (data.args.isNotEmpty) {
-                _mbbLogger.context('MBB',
-                    'Args del comando fallido: ${LogHelper.formatObject(data.args)}',
-                    level: Level.debug);
-              }
+              logg.e('Error sending MBB command',
+                  error: e, stackTrace: stacktrace);
             }
           },
         ),

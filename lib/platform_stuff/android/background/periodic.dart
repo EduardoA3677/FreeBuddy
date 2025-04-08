@@ -2,7 +2,6 @@
 ///
 /// Right now it is small and simple enough to have everything in one file
 
-import 'package:logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -30,11 +29,8 @@ Future<bool> routineUpdateCallback() async {
     // i think this function is still "dependency injection" safe
     // ...but it's not wise to keep remembering what is and what isn't, is it?
     if (await HeadphonesConnectionCubit.cubitAlreadyRunningSomewhere()) {
-      loggI.context(
-          "Background",
-          "Not updating stuff from ROUTINE_UPDATE "
-              "because cubit is already running",
-          level: Level.debug);
+      loggI.d("Not updating stuff from ROUTINE_UPDATE "
+          "because cubit is already running");
       return true;
     }
     cubit = di.getHeadphonesCubit();

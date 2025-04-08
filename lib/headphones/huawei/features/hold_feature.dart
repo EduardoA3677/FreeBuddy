@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:logger/logger.dart';
 import 'package:stream_channel/stream_channel.dart';
 
 import '../../../logger.dart';
@@ -39,12 +38,10 @@ class HoldFeature {
     if (se.equals(toggledModes, {AncMode.off, AncMode.transparency})) {
       mbbValue = 4;
     }
+
     if (mbbValue == null) {
-      logg.context(
-          "HoldFeature",
-          "Unknown mbbValue for $toggledModes"
-              " - setting as 2 for 'all of them' as a recovery",
-          level: Level.warning);
+      logg.w("Unknown mbbValue for $toggledModes"
+          " - setting as 2 for 'all of them' as a recovery");
       mbbValue = 2;
     }
 

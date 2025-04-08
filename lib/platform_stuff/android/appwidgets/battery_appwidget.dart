@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../headphones/cubit/headphones_cubit_objects.dart';
@@ -25,8 +24,7 @@ void batteryHomeWidgetHearBloc(BuildContext context,
             .throttleTime(const Duration(seconds: 1),
                 trailing: true, leading: false)
             .listen((event) async {
-      logg.context("Widget", "Updating battery widget from UI listener: $event",
-          level: Level.debug);
+      logg.d("Updating widget from UI listener: $event");
       await updateBatteryHomeWidget(event);
     });
   }
