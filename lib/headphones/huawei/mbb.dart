@@ -6,6 +6,8 @@ import 'package:collection/collection.dart';
 import 'package:crclib/catalog.dart';
 import 'package:stream_channel/stream_channel.dart';
 
+import '../../logger.dart'; // Importación del logger
+
 /// Helper class for Mbb protocol used to communicate with headphones
 class MbbUtils {
   // plus 3 magic bytes + 2 command bytes
@@ -105,6 +107,11 @@ class MbbCommand {
       commandId,
       ...dataBytes, // Make sure they are >0 and <256
     ];
+
+    // Log the command being sent
+    logg.i(
+        'MBB Command SENT: serviceId=$serviceId, commandId=$commandId, args=$args');
+
     return Uint8List.fromList(bytesList..addAll(MbbUtils.checksum(bytesList)));
   }
 
@@ -146,7 +153,11 @@ class MbbCommand {
         offset += 2 + argLength;
         args[argId] = argData;
       }
-      cmds.add(MbbCommand(serviceId, commandId, args));
+      final cmd = MbbCommand(serviceId, commandId, args);
+      // Log the command being received
+      logg.i(
+          'MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=$args');
+      cmds.add(cmd);
     }
     return cmds;
   }
@@ -157,15 +168,41 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
       StreamChannelTransformer(
         StreamTransformer.fromHandlers(
           handleData: (data, stream) {
-            for (final cmd in MbbCommand.fromPayload(data)) {
-              // FILTER THE SHIT OUT
-              if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
-              stream.add(cmd);
+            logg.d('MBB RAW DATA RECEIVED: ${data.length} bytes');
+
+            try {
+              final commands = MbbCommand.fromPayload(data);
+              for (final cmd in commands) {
+                // FILTER THE SHIT OUT
+                if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
+
+                // Log more detailed info about the command
+                final argsDetails = cmd.args
+                    .map((key, value) =>
+                        MapEntry(key, '(len:${value.length}) $value'))
+                    .toString();
+                logg.d('MBB Processing command: serviceId=${cmd.serviceId}, '
+                    'commandId=${cmd.commandId}, argsDetails=$argsDetails');
+
+                stream.add(cmd);
+              }
+            } catch (e, stacktrace) {
+              logg.e('Error processing MBB payload',
+                  error: e, stackTrace: stacktrace);
             }
           },
         ),
         StreamSinkTransformer.fromHandlers(
-          handleData: (data, sink) => rfcomm.sink.add(data.toPayload()),
+          handleData: (data, sink) {
+            try {
+              final payload = data.toPayload();
+              logg.d('MBB RAW DATA SENT: ${payload.length} bytes');
+              rfcomm.sink.add(payload);
+            } catch (e, stacktrace) {
+              logg.e('Error sending MBB command',
+                  error: e, stackTrace: stacktrace);
+            }
+          },
         ),
       ),
     );
