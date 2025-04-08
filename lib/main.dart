@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -28,19 +27,6 @@ void main() {
   // This is so that we try to connect to headphones under splash screen
   // This will make it more smooth to the user
   FlutterNativeSplash.preserve(widgetsBinding: bind);
-
-  // Configuración de UI del sistema para soporte edge-to-edge
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    systemNavigationBarColor: Colors.transparent,
-    systemNavigationBarDividerColor: Colors.transparent,
-  ));
-
-  // Habilitar el modo edge-to-edge
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.edgeToEdge,
-  );
-
   if (!kIsWeb && Platform.isAndroid) {
     // this is async, so it won't block runApp
     android_periodic.init();
@@ -125,7 +111,6 @@ class MyApp extends StatelessWidget {
         theme: lightTheme(lightDynamic),
         darkTheme: darkTheme(darkDynamic),
         themeMode: ThemeMode.system,
-        debugShowCheckedModeBanner: false, // Elimina la etiqueta de depuración
         routes: {
           '/': (context) => const HomePage(),
           '/headphones_settings': (context) => const HeadphonesSettingsPage(),
