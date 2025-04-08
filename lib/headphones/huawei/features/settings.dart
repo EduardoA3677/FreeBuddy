@@ -1,6 +1,6 @@
-import '../../../headphones/framework/anc.dart';
+import '../../framework/anc.dart';
 
-/// Common settings structure for all Huawei headphones models
+/// Common settings for all Huawei headphones models
 class HuaweiHeadphonesSettings {
   final DoubleTap? doubleTapLeft;
   final DoubleTap? doubleTapRight;
@@ -16,7 +16,7 @@ class HuaweiHeadphonesSettings {
     this.autoPause,
   });
 
-  /// Creates a new copy with specific fields updated
+  // don't want to use codegen *yet*
   HuaweiHeadphonesSettings copyWith({
     DoubleTap? doubleTapLeft,
     DoubleTap? doubleTapRight,
@@ -34,7 +34,10 @@ class HuaweiHeadphonesSettings {
       );
 }
 
-/// Double-tap gesture actions
+// i don't have idea how to public/privatise those and how to name them
+// let's assume that any screen/logic that uses them at all is already
+// model-specific so generic names are okay
+
 enum DoubleTap {
   nothing,
   voiceAssistant,
@@ -43,7 +46,6 @@ enum DoubleTap {
   previous;
 }
 
-/// Hold gesture actions
 enum Hold {
   nothing,
   cycleAnc;

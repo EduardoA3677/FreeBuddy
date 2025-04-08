@@ -12,30 +12,37 @@ import 'package:stream_channel/stream_channel.dart';
 import 'package:the_last_bluetooth/the_last_bluetooth.dart';
 
 void main() {
-  group("FreeBuds Pro 3 implementation tests", () {
+  group("Huawei headphones implementation tests", () {
     // test with keyword "info" test if impl reacts to info *from* buds
     // ones with "set" test if impl sends correct bytes *to* buds
 
     late StreamController<Uint8List> inputCtrl;
     late StreamController<Uint8List> outputCtrl;
     late StreamChannel<Uint8List> channel;
-    late HuaweiHeadphonesImpl fbPro3;
+    late HuaweiHeadphonesImpl headphones;
+    late HuaweiModelDefinition testModel;
+
     setUp(() {
       inputCtrl = StreamController<Uint8List>.broadcast();
       outputCtrl = StreamController<Uint8List>();
       channel = StreamChannel<Uint8List>(inputCtrl.stream, outputCtrl.sink);
 
-      // Use the generalized implementation with the Pro3 model definition
-      fbPro3 = HuaweiHeadphonesImpl(
-        modelDefinition: HuaweiModels.freeBudsPro3,
+      // Use the FreeBuds Pro 3 model for testing, but could be any model
+      testModel = HuaweiModels.freeBudsPro3;
+
+      // Use the generalized implementation with the model definition
+      headphones = HuaweiHeadphonesImpl(
+        modelDefinition: testModel,
         bluetoothDevice: const FakeBtDev(),
         mbb: mbbChannel(channel),
       );
     });
+
     tearDown(() {
       inputCtrl.close();
       outputCtrl.close();
     });
+
     test("Request data on start", () async {
       expect(
         outputCtrl.stream.bytesToList(),
@@ -45,13 +52,15 @@ void main() {
         ]),
       );
     });
+
     test("ANC mode set", () async {
-      await fbPro3.setAncMode(AncMode.noiseCancelling);
+      await headphones.setAncMode(AncMode.noiseCancelling);
       expect(
         outputCtrl.stream.bytesToList(),
         emitsThrough([90, 0, 7, 0, 43, 4, 1, 2, 1, 255, 255, 236]),
       );
     });
+
     test("ANC mode info", () async {
       const cmds = [
         MbbCommand(43, 42, {
@@ -71,7 +80,7 @@ void main() {
         inputCtrl.add(c.toPayload());
       }
       expect(
-        fbPro3.ancMode,
+        headphones.ancMode,
         emitsInOrder([
           AncMode.noiseCancelling,
           AncMode.off,
@@ -80,6 +89,7 @@ void main() {
         ]),
       );
     });
+
     test("Battery info", () async {
       inputCtrl.add(const MbbCommand(1, 39, {
         1: [35],
@@ -87,20 +97,44 @@ void main() {
         3: [1, 0, 1]
       }).toPayload());
       expect(
-        fbPro3.lrcBattery,
+        headphones.lrcBattery,
         emits(const LRCBatteryLevels(35, 70, 99, true, false, true)),
       );
     });
+
     test("Properly closes", () async {
       expectLater(
-        fbPro3.ancMode,
+        headphones.ancMode,
         emitsInOrder([AncMode.noiseCancelling, emitsDone]),
       );
-      expectLater(fbPro3.lrcBattery, emitsDone);
+      expectLater(headphones.lrcBattery, emitsDone);
       inputCtrl.add(const MbbCommand(43, 42, {
         1: [4, 1]
       }).toPayload());
       await inputCtrl.close();
+    });
+  });
+
+  group("Different model tests", () {
+    test("Model selection works", () {
+      final freeBuds4i = HuaweiModels.freeBuds4i;
+      expect(freeBuds4i.supportsAnc, true);
+      expect(freeBuds4i.supportsAutoPause, false);
+
+      final freeBudsPro3 = HuaweiModels.freeBudsPro3;
+      expect(freeBudsPro3.supportsAnc, true);
+      expect(freeBudsPro3.supportsAutoPause, true);
+    });
+
+    test("Finding model by name", () {
+      final model = HuaweiModels.findModelByName("HUAWEI FreeBuds Pro 3");
+      expect(model.name, "FreeBuds Pro 3");
+
+      final model2 = HuaweiModels.findModelByName("HUAWEI FreeBuds 4i");
+      expect(model2.name, "FreeBuds 4i");
+
+      expect(
+          () => HuaweiModels.findModelByName("Unknown Model"), throwsException);
     });
   });
 }
