@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
 import 'di.dart' as di;
+import 'edge2egde.dart';
 import 'headphones/cubit/headphones_connection_cubit.dart';
 import 'headphones/cubit/headphones_cubit_objects.dart';
 import 'platform_stuff/android/appwidgets/battery_appwidget.dart';
@@ -22,8 +23,10 @@ import 'ui/pages/introduction/introduction.dart';
 import 'ui/pages/settings/settings_page.dart';
 import 'ui/theme/themes.dart';
 
-void main() {
+void main() async {
   final bind = WidgetsFlutterBinding.ensureInitialized();
+  //Support edge to edge on Android < 15
+  await settingUpSystemUIOverlay();
   // This is so that we try to connect to headphones under splash screen
   // This will make it more smooth to the user
   FlutterNativeSplash.preserve(widgetsBinding: bind);

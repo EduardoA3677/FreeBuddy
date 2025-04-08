@@ -34,7 +34,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
     // - [ ] Think what to put when we have no image, or generally not many
     //       features 🤷
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(12.0) +
+          EdgeInsets.only(bottom: MediaQuery.viewPaddingOf(context).bottom),
       child: WindowSizeClass.of(context) == WindowSizeClass.compact
           ? Column(
               children: [
