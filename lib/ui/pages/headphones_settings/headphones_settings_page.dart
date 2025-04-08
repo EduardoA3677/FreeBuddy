@@ -12,15 +12,31 @@ import 'huawei/hold_section.dart';
 
 class HeadphonesSettingsPage extends StatelessWidget {
   const HeadphonesSettingsPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: Text(l.pageHeadphonesSettingsTitle)),
-      body: Center(
-        child: HeadphonesConnectionEnsuringOverlay(
-          builder: (_, h) => ListView(children: _buildSettingsWidgets(h)),
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: Text(l.pageHeadphonesSettingsTitle),
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .surface
+            .withAlpha(242), // ~0.95 opacity
+        elevation: 0,
+      ),
+      body: SafeArea(
+        top: false, // No aplicar padding superior ya que el AppBar lo maneja
+        child: Center(
+          child: HeadphonesConnectionEnsuringOverlay(
+            builder: (_, h) => ListView(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+              children: _buildSettingsWidgets(h),
+            ),
+          ),
         ),
       ),
     );

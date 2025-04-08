@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Maybe make a check for platform version, but honestly this is nice
 bool get useMaterial3 => true;
@@ -7,6 +8,27 @@ bool get useMaterial3 => true;
 ThemeData _customize(ThemeData theme) {
   final tt = theme.textTheme;
   return theme.copyWith(
+    // Mejora de apariencia visual para soporte edge-to-edge
+    appBarTheme: theme.appBarTheme.copyWith(
+      elevation: 0,
+      scrolledUnderElevation: 2.0,
+      systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    ),
+    // Mejoras en elevaciones y sombras para una apariencia más moderna
+    cardTheme: theme.cardTheme.copyWith(
+      clipBehavior: Clip.antiAlias,
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    ),
+    // Bordes redondeados para los botones
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    ),
     textTheme: tt.copyWith(
       // Display
       displaySmall: tt.displaySmall!.copyWith(

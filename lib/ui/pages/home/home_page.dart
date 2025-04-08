@@ -40,9 +40,19 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+
     return Scaffold(
+      // Extender el contenido hasta los bordes de la pantalla
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(l.appTitle),
+        // AppBar con fondo ligeramente translúcido para un efecto moderno
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .surface
+            .withAlpha(242), // ~0.95 opacity
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -50,9 +60,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Center(
-        child: HeadphonesConnectionEnsuringOverlay(
-          builder: (_, h) => HeadphonesControlsWidget(headphones: h),
+      body: SafeArea(
+        // Usar SafeArea en lugar de Padding manual para manejar correctamente
+        // el espacio en diferentes dispositivos
+        top: false, // No aplicar padding superior ya que el AppBar lo maneja
+        child: Center(
+          child: HeadphonesConnectionEnsuringOverlay(
+            builder: (_, h) => HeadphonesControlsWidget(headphones: h),
+          ),
         ),
       ),
     );
