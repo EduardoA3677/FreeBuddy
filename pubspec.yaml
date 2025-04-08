@@ -42,7 +42,11 @@ dependencies:
   permission_handler: ^11.3.0
   dynamic_color: ^1.7.0
   home_widget: ^0.7.0
-  workmanager: ^0.5.0
+  workmanager:
+    git:
+      url: https://github.com/fluttercommunity/flutter_workmanager.git
+      path: workmanager
+      ref: main
   flutter_native_splash: ^2.4.0
 
   # Logic libs
