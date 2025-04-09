@@ -115,7 +115,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
     return OutlinedButton.icon(
       icon: const Icon(Icons.settings),
       label: Text('Settings'), // Using hardcoded string until l10n is fixed
-      onPressed: () => GoRouter.of(context).push('/headphones-settings'),
+      onPressed: () => GoRouter.of(context).push('/headphones_settings'),
     );
   }
 }
