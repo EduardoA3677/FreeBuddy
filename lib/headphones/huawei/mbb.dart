@@ -77,14 +77,13 @@ class MbbCommand {
       data.addAll(value);
     });
     final dataBytes = Uint8List.fromList(data);
-    final byteLength =
-        dataBytes.length + 2 + 1; // +2->checksums +1->magic bytes
+    final byteLength = dataBytes.length + 2 + 1; // +2->checksums +1->*because*
     assert(byteLength <= 255);
     final bytesList = [
       90, // Magic bytes
-      0, // Additional magic byte
+      0, //
       byteLength,
-      0, // Another magic byte (I think)
+      0, // another magic byte (i think)
       serviceId,
       commandId,
       ...dataBytes,
@@ -109,13 +108,13 @@ class MbbCommand {
     if (smartDivide) {
       while (payload.length >= 8) {
         divided.add(
-            payload.sublist(0, MbbUtils.getLengthFromLengthByte(payload[2])));
+          payload.sublist(0, MbbUtils.getLengthFromLengthByte(payload[2])),
+        );
         payload = payload.sublist(MbbUtils.getLengthFromLengthByte(payload[2]));
       }
     } else {
       divided.add(payload);
     }
-
     if (divided.isEmpty) {
       if (verify) {
         throw Exception("No commands found in $payload");
@@ -123,7 +122,6 @@ class MbbCommand {
         return [];
       }
     }
-
     final cmds = <MbbCommand>[];
     for (final divPay in divided) {
       if (verify) MbbUtils.verifyIntegrity(divPay);
@@ -164,56 +162,14 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
             final commands = MbbCommand.fromPayload(data);
             for (final cmd in commands) {
               if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
-              try {
-                final argsDetails = cmd.args
-                    .map((key, value) =>
-                        MapEntry(key, '(len:${value.length}) $value'))
-                    .toString();
-                logg.d('MBB Processing command: serviceId=${cmd.serviceId}, '
-                    'commandId=${cmd.commandId}, argsDetails=$argsDetails');
-              } catch (logError) {
-                logg.e('Error processing command args', error: logError);
-              }
               stream.add(cmd);
             }
-          } catch (e, stacktrace) {
-            logg.e('Error processing MBB payload',
-                error: e, stackTrace: stacktrace);
-          }
-        }, handleDone: (stream) {
-          try {
-            logg.d('MBB stream done');
-            stream.close();
           } catch (e) {
-            logg.e('Error closing MBB stream', error: e);
-          }
-        }, handleError: (error, stackTrace, stream) {
-          try {
-            logg.e('MBB stream error', error: error, stackTrace: stackTrace);
-            stream.addError(error, stackTrace);
-          } catch (e) {
-            logg.e('Error propagating MBB stream error', error: e);
+            logg.e('Error parsing MBB command', error: e);
           }
         }),
         StreamSinkTransformer.fromHandlers(
-          handleData: (data, sink) {
-            try {
-              final payload = data.toPayload();
-              logg.d('MBB RAW DATA SENT: ${payload.length} bytes');
-              rfcomm.sink.add(payload);
-            } catch (e, stacktrace) {
-              logg.e('Error sending MBB command',
-                  error: e, stackTrace: stacktrace);
-            }
-          },
-          handleError: (error, stackTrace, sink) {
-            try {
-              logg.e('MBB sink error', error: error, stackTrace: stackTrace);
-              sink.addError(error, stackTrace);
-            } catch (e) {
-              logg.e('Error propagating MBB sink error', error: e);
-            }
-          },
+          handleData: (data, sink) => rfcomm.sink.add(data.toPayload()),
         ),
       ),
     );

@@ -15,7 +15,6 @@ import 'di.dart' as di;
 import 'edge2egde.dart';
 import 'headphones/cubit/headphones_connection_cubit.dart';
 import 'headphones/cubit/headphones_cubit_objects.dart';
-import 'logger.dart';
 import 'platform_stuff/android/appwidgets/battery_appwidget.dart';
 import 'platform_stuff/android/background/periodic.dart' as android_periodic;
 import 'ui/app_settings.dart';
@@ -33,8 +32,6 @@ void main() async {
 
   // Mantener la pantalla splash mientras se conecta a los auriculares
   FlutterNativeSplash.preserve(widgetsBinding: bind);
-
-  // Inicializar funciones específicas de Android
   if (!kIsWeb && Platform.isAndroid) {
     await _initializeAndroid();
   }
@@ -64,7 +61,7 @@ class MyAppWrapper extends StatefulWidget {
 
 class _MyAppWrapperState extends State<MyAppWrapper>
     with WidgetsBindingObserver {
-  final _btCubit = di.getHeadphonesCubit();
+  final _btBlock = di.getHeadphonesCubit();
   late final StreamingSharedPreferences _preferences;
   bool _isPrefsInitialized = false;
 
@@ -85,11 +82,11 @@ class _MyAppWrapperState extends State<MyAppWrapper>
 
   void _setupSplashRemoval() {
     // Remover splash cuando se conecten los auriculares o después de 1.5 segundos
-    _btCubit.stream
+    _btBlock.stream
         .firstWhere((e) => e is HeadphonesConnectedOpen)
         .timeout(
-          const Duration(milliseconds: 1500),
-          onTimeout: () => const HeadphonesNotPaired(),
+          const Duration(seconds: 1),
+          onTimeout: () => const HeadphonesNotPaired(), // just placeholder
         )
         .then((_) => FlutterNativeSplash.remove());
   }
@@ -111,10 +108,14 @@ class _MyAppWrapperState extends State<MyAppWrapper>
       create: (context) =>
           SharedPreferencesAppSettings(Future.value(_preferences)),
       child: MultiBlocProvider(
-        providers: [BlocProvider.value(value: _btCubit)],
+        providers: [BlocProvider.value(value: _btBlock)],
+        // don't know if this is good place to put this, but seems right
+        // maybe convert this to multi listener with advanced "listenWhen" logic
+        // this would make it a nice single place to know what launches when 🤔
         child:
             BlocListener<HeadphonesConnectionCubit, HeadphonesConnectionState>(
           listener: batteryHomeWidgetHearBloc,
+          // Should this be *here* or somewhere special? Idk, okay for now 🤷
           listenWhen: (p, c) => !kIsWeb && Platform.isAndroid,
           child: const MyApp(),
         ),
@@ -124,25 +125,15 @@ class _MyAppWrapperState extends State<MyAppWrapper>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    // Optimización de ciclo de vida para evitar fugas de memoria y uso de batería
-    if (state == AppLifecycleState.detached ||
-        state == AppLifecycleState.hidden) {
-      await _btCubit.close();
-    } else if (state == AppLifecycleState.resumed) {
-      // Safely try to reconnect when app returns to foreground
-      try {
-        _btCubit.tryConnectIfNeeded();
-      } catch (e) {
-        // Log the error but don't crash the app
-        loggI.e('Error reconnecting', error: e);
-      }
+    if (state == AppLifecycleState.detached) {
+      await _btBlock.close();
     }
     super.didChangeAppLifecycleState(state);
   }
 
   @override
   void dispose() async {
-    await _btCubit.close();
+    await _btBlock.close();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
