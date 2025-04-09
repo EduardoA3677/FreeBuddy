@@ -43,5 +43,6 @@
   "github.copilot.chat.scopeSelection": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.editor.enableCodeActions": true,
-  "github.copilot.nextEditSuggestions.enabled": true
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "tabnine.receiveBetaChannelUpdates": true
 }

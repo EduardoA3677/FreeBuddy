@@ -15,6 +15,7 @@ import 'di.dart' as di;
 import 'edge2egde.dart';
 import 'headphones/cubit/headphones_connection_cubit.dart';
 import 'headphones/cubit/headphones_cubit_objects.dart';
+import 'logger.dart';
 import 'platform_stuff/android/appwidgets/battery_appwidget.dart';
 import 'platform_stuff/android/background/periodic.dart' as android_periodic;
 import 'ui/app_settings.dart';
@@ -128,8 +129,13 @@ class _MyAppWrapperState extends State<MyAppWrapper>
         state == AppLifecycleState.hidden) {
       await _btCubit.close();
     } else if (state == AppLifecycleState.resumed) {
-      // Reconectar si es necesario cuando la app vuelva a primer plano
-      _btCubit.tryConnectIfNeeded();
+      // Safely try to reconnect when app returns to foreground
+      try {
+        _btCubit.tryConnectIfNeeded();
+      } catch (e) {
+        // Log the error but don't crash the app
+        loggI.e('Error reconnecting', error: e);
+      }
     }
     super.didChangeAppLifecycleState(state);
   }

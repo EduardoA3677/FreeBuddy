@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../headphones/cubit/headphones_connection_cubit.dart';
+import '../../../logger.dart';
 
 class ConnectedClosedWidget extends StatelessWidget {
   const ConnectedClosedWidget({super.key});
@@ -25,7 +26,19 @@ class ConnectedClosedWidget extends StatelessWidget {
         Text(l.pageHomeConnectedClosedDesc, textAlign: TextAlign.center),
         const SizedBox(height: 32),
         FilledButton(
-          onPressed: () => context.read<HeadphonesConnectionCubit>().connect(),
+          onPressed: () {
+            try {
+              context.read<HeadphonesConnectionCubit>().connect();
+            } catch (e) {
+              loggI.e('Error connecting from UI', error: e);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error: $e'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(l.pageHomeConnectedClosedConnect),
