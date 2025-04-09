@@ -68,6 +68,7 @@ class MbbCommand {
 
   @override
   int get hashCode => serviceId.hashCode ^ commandId.hashCode ^ args.hashCode;
+
   Uint8List toPayload() {
     final data = <int>[];
     args.forEach((key, value) {
@@ -88,10 +89,10 @@ class MbbCommand {
       commandId,
       ...dataBytes,
     ];
+
     try {
-      final functionType = _identifyFunctionType(serviceId, commandId);
       logg.i(
-          '【$functionType】MBB Command preparing to send: serviceId=$serviceId, commandId=$commandId, args=${_formatArgs(args)}');
+          'MBB Command SENT: serviceId=$serviceId, commandId=$commandId, args=$args');
     } catch (e) {
       logg.e('Error logging MBB command', error: e);
     }
@@ -140,10 +141,10 @@ class MbbCommand {
         args[argId] = argData;
       }
       final cmd = MbbCommand(serviceId, commandId, args);
+
       try {
-        final functionType = _identifyFunctionType(serviceId, commandId);
         logg.i(
-            '【$functionType】MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=${_formatArgs(args)}');
+            'MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=$args');
       } catch (e) {
         logg.e('Error logging MBB received command', error: e);
       }
@@ -152,70 +153,6 @@ class MbbCommand {
     }
     return cmds;
   }
-}
-
-/// Identifica el tipo de función basada en serviceId y commandId
-String _identifyFunctionType(int serviceId, int commandId) {
-  // Service ID 43: Gestos y funciones principales
-  if (serviceId == 43) {
-    if (commandId == 13 || commandId == 14) {
-      return "BATTERY";
-    } else if (commandId == 21 || commandId == 20) {
-      return "DOUBLE_TAP";
-    } else if (commandId == 22 || commandId == 23) {
-      return "HOLD";
-    } else if (commandId == 24 || commandId == 25) {
-      return "HOLD_MODES";
-    } else if (commandId == 170 || commandId == 171 || commandId == 172) {
-      return "ANC";
-    } else if (commandId == 180 || commandId == 181) {
-      return "AUTO_PAUSE";
-    } else if (commandId == 190 || commandId == 191) {
-      return "IN_EAR";
-    }
-    return "CONTROL";
-  }
-  // Service ID 10: Sistema y batería
-  else if (serviceId == 10) {
-    if (commandId == 12 || commandId == 13) {
-      return "BATTERY";
-    }
-    return "SYSTEM";
-  }
-  // Service ID 11: Actualización de firmware
-  else if (serviceId == 11) {
-    return "FIRMWARE";
-  }
-  return "OTHER";
-}
-
-/// Da formato a los argumentos para hacerlos más legibles
-String _formatArgs(Map<int, List<int>> args) {
-  if (args.isEmpty) return "{}";
-
-  final buffer = StringBuffer("{");
-  var first = true;
-
-  args.forEach((key, value) {
-    if (!first) buffer.write(", ");
-    first = false;
-
-    buffer.write("$key: ");
-
-    if (value.length == 1) {
-      // Para valores simples, mostrar el valor directamente
-      buffer.write("[${value[0]}]");
-    } else if (value.length <= 4) {
-      // Para valores pequeños, mostrar la lista completa
-      buffer.write("$value");
-    } else {
-      // Para listas largas, mostrar longitud y algunos elementos
-      buffer.write("[len:${value.length}][${value.take(3).join(',')}...]");
-    }
-  });
-
-  buffer.write("}");
-  return buffer.toString();
 }
 
 StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
@@ -228,11 +165,12 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
             for (final cmd in commands) {
               if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
               try {
-                final functionType =
-                    _identifyFunctionType(cmd.serviceId, cmd.commandId);
-                logg.d(
-                    '【$functionType】MBB Processing: serviceId=${cmd.serviceId}, '
-                    'commandId=${cmd.commandId}, args=${_formatArgs(cmd.args)}');
+                final argsDetails = cmd.args
+                    .map((key, value) =>
+                        MapEntry(key, '(len:${value.length}) $value'))
+                    .toString();
+                logg.d('MBB Processing command: serviceId=${cmd.serviceId}, '
+                    'commandId=${cmd.commandId}, argsDetails=$argsDetails');
               } catch (logError) {
                 logg.e('Error processing command args', error: logError);
               }
@@ -244,7 +182,7 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
           }
         }, handleDone: (stream) {
           try {
-            logg.d('MBB stream finalizado');
+            logg.d('MBB stream done');
             stream.close();
           } catch (e) {
             logg.e('Error closing MBB stream', error: e);

@@ -104,7 +104,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
         } catch (_) {
           loggI.w('Error when connecting socket: ${i + 1}/$connectTries tries');
           if (!(dev.isConnected.valueOrNull ?? false)) {
-            loggI.w("...it's because device is not connected, dummy 😌");
+            loggI.w("...i's because device is not connected, dummy 😌");
             rethrow;
           }
           if (i + 1 >= connectTries) rethrow;
