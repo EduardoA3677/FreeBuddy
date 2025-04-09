@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../headphones/framework/anc.dart';
 import '../../../../headphones/framework/bluetooth_headphones.dart';
@@ -114,7 +115,7 @@ class _HeadphonesSettingsButton extends StatelessWidget {
     return Padding(
       padding: t.cardTheme.margin ?? const EdgeInsets.all(4.0),
       child: OutlinedButton(
-        onPressed: () => Navigator.pushNamed(context, '/headphones_settings'),
+        onPressed: () => GoRouter.of(context).push('/headphones_settings'),
         child: Padding(
           padding: const EdgeInsets.all(2.0),
           child: Row(

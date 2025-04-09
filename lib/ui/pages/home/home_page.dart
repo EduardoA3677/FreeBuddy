@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app_settings.dart';
 import '../../common/headphones_connection_ensuring_overlay.dart';
@@ -29,8 +30,7 @@ class _HomePageState extends State<HomePage> {
       if (!ctx.mounted) return;
       // true from this route means all success and we can set the flag
       // false means user exited otherwise or smth - anyway, don't set the flag
-      final success =
-          await Navigator.of(ctx).pushNamed('/introduction') as bool?;
+      final success = await GoRouter.of(ctx).push('/introduction') as bool?;
       if (success ?? false) {
         await settings.setSeenIntroduction(true);
       }
@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+            onPressed: () => GoRouter.of(context).push('/settings'),
           ),
         ],
       ),
