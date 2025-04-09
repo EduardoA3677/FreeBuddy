@@ -1,18 +1,101 @@
 import 'package:collection/collection.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 
 import '../../../logger.dart';
 import '../../framework/anc.dart';
 import '../mbb.dart';
+import 'base/feature_base.dart';
+import 'enums/mbb_codes.dart';
 import 'settings.dart';
 
 /// Implementation for hold gesture functionality
-class HoldFeature {
+class HoldFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
+  static const featureId = 'hold';
+  final _settingsCtrl = BehaviorSubject<HuaweiHeadphonesSettings>.seeded(
+      const HuaweiHeadphonesSettings());
+
+  @override
+  ValueStream<HuaweiHeadphonesSettings> get settings => _settingsCtrl.stream;
+
   /// Command to get hold gesture settings
   static final getHoldCommand = MbbCommand(43, 23);
 
+  @override
+  void dispose() {
+    _settingsCtrl.close();
+    super.dispose();
+  }
+
   /// Command to get which ANC modes toggle with hold
   static final getHoldToggledModesCommand = MbbCommand(43, 25);
+
+  @override
+  String get id => featureId;
+
+  @override
+  String get displayName => 'Hold Gesture';
+
+  @override
+  bool isSupported(bool Function(String featureId) supportCheck) {
+    return supportCheck(featureId);
+  }
+
+  @override
+  void requestInitialData(StreamChannel<MbbCommand> mbb) {
+    mbb.sink.add(getHoldCommand);
+    mbb.sink.add(getHoldToggledModesCommand);
+  }
+
+  @override
+  bool handleMbbCommand(MbbCommand cmd) {
+    // We don't directly handle the commands here as we only update settings
+    return false;
+  }
+
+  @override
+  HuaweiHeadphonesSettings? updateSettingsFromMbbCommand(
+      MbbCommand cmd, HuaweiHeadphonesSettings currentSettings) {
+    // Handle hold gesture updates
+    if (cmd.isAbout(getHoldCommand) &&
+        cmd.args.containsKey(1) &&
+        cmd.args[1]!.isNotEmpty) {
+      final holdCode = cmd.args[1]![0];
+      return currentSettings.copyWith(
+        holdBoth: Hold.values.firstWhereOrNull((e) => e.mbbCode == holdCode),
+      );
+    }
+
+    // Handle hold toggled modes updates
+    if (cmd.isAbout(getHoldToggledModesCommand) &&
+        cmd.args.containsKey(1) &&
+        cmd.args[1]!.isNotEmpty) {
+      final modesCode = cmd.args[1]![0];
+      return currentSettings.copyWith(
+        holdBothToggledAncModes: holdToggledAncModesFromMbbValue(modesCode),
+      );
+    }
+
+    return null;
+  }
+
+  @override
+  Future<void> applySettings(
+      HuaweiHeadphonesSettings settings, StreamChannel<MbbCommand> mbb) async {
+    // Apply hold gesture settings
+    if (settings.holdBoth != null) {
+      mbb.sink.add(setHoldCommand(settings.holdBoth!));
+      mbb.sink.add(getHoldCommand);
+    }
+
+    // Apply toggled modes settings
+    if (settings.holdBothToggledAncModes != null) {
+      mbb.sink
+          .add(setHoldToggledModesCommand(settings.holdBothToggledAncModes!));
+      mbb.sink.add(getHoldCommand);
+      mbb.sink.add(getHoldToggledModesCommand);
+    }
+  }
 
   /// Creates command to set hold gesture
   static MbbCommand setHoldCommand(Hold gestureHold) {
@@ -61,69 +144,4 @@ class HoldFeature {
       _ => null,
     };
   }
-
-  /// Processes hold gesture updates from device
-  static HuaweiHeadphonesSettings? handleHoldUpdate(
-      MbbCommand cmd, HuaweiHeadphonesSettings lastSettings) {
-    if (!cmd.isAbout(getHoldCommand)) {
-      return null;
-    }
-
-    if (cmd.args.containsKey(1) && cmd.args[1]!.isNotEmpty) {
-      final holdCode = cmd.args[1]![0];
-      return lastSettings.copyWith(
-        holdBoth: Hold.values.firstWhereOrNull((e) => e.mbbCode == holdCode),
-      );
-    }
-
-    return null;
-  }
-
-  /// Processes hold toggled modes updates from device
-  static HuaweiHeadphonesSettings? handleHoldToggledModesUpdate(
-      MbbCommand cmd, HuaweiHeadphonesSettings lastSettings) {
-    if (!cmd.isAbout(getHoldToggledModesCommand)) {
-      return null;
-    }
-
-    if (cmd.args.containsKey(1) && cmd.args[1]!.isNotEmpty) {
-      final modesCode = cmd.args[1]![0];
-      return lastSettings.copyWith(
-        holdBothToggledAncModes: holdToggledAncModesFromMbbValue(modesCode),
-      );
-    }
-
-    return null;
-  }
-
-  /// Applies hold settings to device
-  static void applyHoldSettings(
-    StreamChannel<MbbCommand> mbb,
-    HuaweiHeadphonesSettings prev,
-    HuaweiHeadphonesSettings newSettings,
-  ) {
-    // Update hold gesture if changed
-    if ((newSettings.holdBoth ?? prev.holdBoth) != prev.holdBoth) {
-      mbb.sink.add(setHoldCommand(newSettings.holdBoth!));
-      mbb.sink.add(getHoldCommand);
-      mbb.sink.add(getHoldToggledModesCommand);
-    }
-
-    // Update toggled modes if changed
-    if ((newSettings.holdBothToggledAncModes ?? prev.holdBothToggledAncModes) !=
-        prev.holdBothToggledAncModes) {
-      mbb.sink.add(
-          setHoldToggledModesCommand(newSettings.holdBothToggledAncModes!));
-      mbb.sink.add(getHoldCommand);
-      mbb.sink.add(getHoldToggledModesCommand);
-    }
-  }
-}
-
-/// Extension to add MBB code conversion for Hold enum
-extension HoldToMbbCode on Hold {
-  int get mbbCode => switch (this) {
-        Hold.nothing => 255,
-        Hold.cycleAnc => 10,
-      };
 }

@@ -7,17 +7,18 @@ import 'package:the_last_bluetooth/the_last_bluetooth.dart' as tlb;
 import '../../logger.dart';
 import '../framework/anc.dart';
 import '../framework/lrc_battery.dart';
-import 'features/anc_feature.dart';
-import 'features/auto_pause_feature.dart';
-import 'features/battery_feature.dart';
-import 'features/double_tap_feature.dart';
-import 'features/hold_feature.dart';
+import '../model_definition/huawei_models_definition.dart';
+import 'features/anc_feature.dart' as anc;
+import 'features/auto_pause_feature.dart' as auto_pause;
+import 'features/base/feature_registry.dart';
+import 'features/battery_feature.dart' as battery;
+import 'features/double_tap_feature.dart' as double_tap;
+import 'features/hold_feature.dart' as hold;
 import 'features/settings.dart';
 import 'huawei_headphones_base.dart';
 import 'mbb.dart';
-import '../model_definition/huawei_models_definition.dart';
 
-/// Implementation of Huawei headphones based on model definition
+/// Enhanced implementation of Huawei headphones that uses a feature-based approach
 class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   final HuaweiModelDefinition modelDefinition;
   final tlb.BluetoothDevice _bluetoothDevice;
@@ -28,34 +29,13 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   final _lrcBatteryCtrl = BehaviorSubject<LRCBatteryLevels>();
   final _ancModeCtrl = BehaviorSubject<AncMode>();
   final _settingsCtrl = BehaviorSubject<HuaweiHeadphonesSettings>();
+  // Features
+  late final FeatureRegistry _featureRegistry;
+  battery.BatteryFeature? _batteryFeature;
+  anc.AncFeature? _ancFeature;
 
   /// This watches if we are still missing any info and re-requests it
   late StreamSubscription _watchdogStreamSub;
-
-  /// Factory constructor that creates the appropriate implementation based on device name
-  factory HuaweiHeadphonesImpl.fromDevice({
-    required tlb.BluetoothDevice bluetoothDevice,
-    required StreamChannel<MbbCommand> mbb,
-  }) {
-    final deviceName = bluetoothDevice.name.valueOrNull ?? "";
-    try {
-      final modelDef = HuaweiModels.findModelByName(deviceName);
-      return HuaweiHeadphonesImpl(
-        modelDefinition: modelDef,
-        bluetoothDevice: bluetoothDevice,
-        mbb: mbb,
-      );
-    } catch (e) {
-      // Fallback to a default model if the device is not recognized
-      logg.w(
-          "Unsupported model: $deviceName. Using FreeBuds Pro 3 as fallback");
-      return HuaweiHeadphonesImpl(
-        modelDefinition: HuaweiModels.freeBudsPro3,
-        bluetoothDevice: bluetoothDevice,
-        mbb: mbb,
-      );
-    }
-  }
 
   HuaweiHeadphonesImpl({
     required this.modelDefinition,
@@ -75,6 +55,15 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
     // Initialize settings with default values
     _settingsCtrl.add(modelDefinition.defaultSettings);
 
+    // Initialize feature registry
+    _featureRegistry = FeatureRegistry(
+      mbb: _mbb,
+      supportCheck: _isFeatureSupported,
+    );
+
+    // Create and register features
+    _registerFeatures();
+
     // Listen to MBB commands
     _mbb.stream.listen(
       _handleMbbCommand,
@@ -85,8 +74,51 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
       },
     );
 
-    _requestInitialInfo();
     _startWatchdog();
+  }
+
+  bool _isFeatureSupported(String featureId) {
+    return switch (featureId) {
+      anc.AncFeature.featureId => modelDefinition.supportsAnc,
+      double_tap.DoubleTapFeature.featureId =>
+        modelDefinition.supportsDoubleTap,
+      hold.HoldFeature.featureId => modelDefinition.supportsHold,
+      auto_pause.AutoPauseFeature.featureId =>
+        modelDefinition.supportsAutoPause,
+      battery.BatteryFeature.featureId => true, // Battery is always supported
+      _ => false,
+    };
+  }
+
+  void _registerFeatures() {
+    // Create battery feature
+    _batteryFeature = battery.BatteryFeature();
+    _featureRegistry.registerFeature(_batteryFeature!);
+
+    // Link battery feature to LRC battery stream
+    _batteryFeature!.batteryLevels.listen(_lrcBatteryCtrl.add);
+
+    // Create ANC feature if supported
+    if (modelDefinition.supportsAnc) {
+      _ancFeature = anc.AncFeature();
+      _featureRegistry.registerFeature(_ancFeature!);
+
+      // Link ANC feature to ANC mode stream
+      _ancFeature!.ancMode.listen(_ancModeCtrl.add);
+    }
+
+    // Register other features
+    if (modelDefinition.supportsDoubleTap) {
+      _featureRegistry.registerFeature(double_tap.DoubleTapFeature());
+    }
+
+    if (modelDefinition.supportsHold) {
+      _featureRegistry.registerFeature(hold.HoldFeature());
+    }
+
+    if (modelDefinition.supportsAutoPause) {
+      _featureRegistry.registerFeature(auto_pause.AutoPauseFeature());
+    }
   }
 
   void _closeAllStreams() {
@@ -94,88 +126,26 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
     _lrcBatteryCtrl.close();
     _ancModeCtrl.close();
     _settingsCtrl.close();
+
+    _featureRegistry.dispose();
   }
 
   void _handleMbbCommand(MbbCommand cmd) {
     try {
-      // Handle battery updates
-      if (BatteryFeature.handleBatteryUpdate(cmd, _lrcBatteryCtrl)) {
-        return;
-      }
+      // Allow feature registry to handle the command
+      _featureRegistry.handleMbbCommand(cmd);
 
-      // Handle ANC updates if supported
-      if (modelDefinition.supportsAnc &&
-          AncFeature.handleAncUpdate(cmd, _ancModeCtrl)) {
-        return;
-      }
-
-      // Handle settings updates
+      // Process settings updates
       final lastSettings =
           _settingsCtrl.valueOrNull ?? modelDefinition.defaultSettings;
-      HuaweiHeadphonesSettings? updatedSettings;
+      final updatedSettings =
+          _featureRegistry.updateSettings(cmd, lastSettings);
 
-      // Process double-tap settings
-      if (modelDefinition.supportsDoubleTap) {
-        final tapSettings =
-            DoubleTapFeature.handleDoubleTapUpdate(cmd, lastSettings);
-        if (tapSettings != null) {
-          updatedSettings = tapSettings;
-        }
-      }
-
-      // Process hold settings
-      if (modelDefinition.supportsHold) {
-        final holdSettings =
-            HoldFeature.handleHoldUpdate(cmd, updatedSettings ?? lastSettings);
-        if (holdSettings != null) {
-          updatedSettings = holdSettings;
-        }
-
-        final modesSettings = HoldFeature.handleHoldToggledModesUpdate(
-            cmd, updatedSettings ?? lastSettings);
-        if (modesSettings != null) {
-          updatedSettings = modesSettings;
-        }
-      }
-
-      // Process auto-pause settings
-      if (modelDefinition.supportsAutoPause) {
-        final pauseSettings = AutoPauseFeature.handleAutoPauseUpdate(
-            cmd, updatedSettings ?? lastSettings);
-        if (pauseSettings != null) {
-          updatedSettings = pauseSettings;
-        }
-      }
-
-      // Update settings if any changes were detected
       if (updatedSettings != null) {
         _settingsCtrl.add(updatedSettings);
       }
     } catch (e, s) {
       logg.e("Error handling MBB command", error: e, stackTrace: s);
-    }
-  }
-
-  void _requestInitialInfo() {
-    // Always request battery info
-    _mbb.sink.add(BatteryFeature.getBatteryCommand);
-
-    // Request other features based on model capabilities
-    if (modelDefinition.supportsAnc) {
-      _mbb.sink.add(AncFeature.getAncCommand);
-    }
-
-    if (modelDefinition.supportsDoubleTap) {
-      _mbb.sink.add(DoubleTapFeature.getDoubleTapCommand);
-    }
-
-    if (modelDefinition.supportsHold) {
-      _mbb.sink.add(HoldFeature.getHoldCommand);
-      _mbb.sink.add(HoldFeature.getHoldToggledModesCommand);
-    }
-
-    if (modelDefinition.supportsAutoPause) {
-      _mbb.sink.add(AutoPauseFeature.getAutoPauseCommand);
     }
   }
 
@@ -188,7 +158,14 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
         if (modelDefinition.supportsAnc) ancMode.valueOrNull,
         settings.valueOrNull,
       ].any((e) => e == null)) {
-        _requestInitialInfo();
+        // Re-request data through features
+        if (_batteryFeature != null) {
+          _batteryFeature!.requestInitialData(_mbb);
+        }
+
+        if (_ancFeature != null) {
+          _ancFeature!.requestInitialData(_mbb);
+        }
       }
     });
   }
@@ -224,8 +201,8 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
 
   @override
   Future<void> setAncMode(AncMode mode) async {
-    if (modelDefinition.supportsAnc) {
-      _mbb.sink.add(AncFeature.setAncCommand(mode));
+    if (modelDefinition.supportsAnc && _ancFeature != null) {
+      await _ancFeature!.setMode(mode, _mbb);
     }
   }
 
@@ -235,21 +212,6 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
 
   @override
   Future<void> setSettings(HuaweiHeadphonesSettings newSettings) async {
-    final prev = _settingsCtrl.valueOrNull ?? modelDefinition.defaultSettings;
-
-    // Apply double-tap settings if supported
-    if (modelDefinition.supportsDoubleTap) {
-      DoubleTapFeature.applyDoubleTapSettings(_mbb, prev, newSettings);
-    }
-
-    // Apply hold settings if supported
-    if (modelDefinition.supportsHold) {
-      HoldFeature.applyHoldSettings(_mbb, prev, newSettings);
-    }
-
-    // Apply auto-pause settings if supported
-    if (modelDefinition.supportsAutoPause && newSettings.autoPause != null) {
-      AutoPauseFeature.applyAutoPauseSettings(_mbb, prev, newSettings);
-    }
+    await _featureRegistry.applySettings(newSettings);
   }
 }

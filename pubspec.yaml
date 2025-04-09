@@ -27,7 +27,6 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  #    path: "../the_last_bluetooth"
   app_settings: ^6.1.1
   async: ^2.11.0
   ## These two conflict with, as always, flutter_test
@@ -35,30 +34,31 @@ dependencies:
 
   # Logic libs
   crclib: ^3.0.0
+  device_info_plus: ^9.1.1
   dynamic_color: ^1.7.0
   flutter:
     sdk: flutter
+  flutter_animate: ^4.5.0
   flutter_bloc: ^9.1.0
 
   # Flutter/ui stuff
   flutter_localizations:
     sdk: flutter
   flutter_native_splash: ^2.4.0
+  go_router: ^13.0.0
   home_widget: ^0.7.0
   intl: ^0.19.0
   logger: ^2.5.0
   ## This is low-level, but I *do* use it to mix colors here and there
   material_color_utilities: ^0.11.0
   material_symbols_icons: ^4.2801.0
+  meta: ^1.16.0
   permission_handler: ^11.3.0
   provider: ^6.1.0
   rxdart: ^0.28.0
   stream_channel: ^2.1.0
   streaming_shared_preferences: ^2.0.0
-  go_router: ^13.0.0
-  flutter_animate: ^4.5.0
-  device_info_plus: ^9.1.1
-  
+
   # Platform plugins
   #  flutter_foreground_task: ^4.1.0 - not using it really yet
   the_last_bluetooth:

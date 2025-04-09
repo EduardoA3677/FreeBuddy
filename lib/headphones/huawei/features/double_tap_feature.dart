@@ -1,25 +1,55 @@
 import 'package:collection/collection.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 
 import '../mbb.dart';
+import 'base/feature_base.dart';
+import 'enums/mbb_codes.dart';
 import 'settings.dart';
 
 /// Implementation for double-tap gesture functionality
-class DoubleTapFeature {
+class DoubleTapFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
+  static const featureId = 'double_tap';
+  final _settingsCtrl = BehaviorSubject<HuaweiHeadphonesSettings>.seeded(
+      const HuaweiHeadphonesSettings());
+
   /// Command to get current double-tap settings
   static final getDoubleTapCommand = MbbCommand(1, 32);
 
-  /// Creates command to set double-tap gestures
-  static MbbCommand doubleTapCommand({DoubleTap? left, DoubleTap? right}) {
-    return MbbCommand(1, 31, {
-      if (left != null) 1: [left.mbbCode],
-      if (right != null) 2: [right.mbbCode],
-    });
+  @override
+  ValueStream<HuaweiHeadphonesSettings> get settings => _settingsCtrl.stream;
+
+  @override
+  void dispose() {
+    _settingsCtrl.close();
+    super.dispose();
   }
 
-  /// Processes double-tap settings update from device
-  static HuaweiHeadphonesSettings? handleDoubleTapUpdate(
-      MbbCommand cmd, HuaweiHeadphonesSettings lastSettings) {
+  @override
+  String get id => featureId;
+
+  @override
+  String get displayName => 'Double Tap Gesture';
+
+  @override
+  bool isSupported(bool Function(String featureId) supportCheck) {
+    return supportCheck(featureId);
+  }
+
+  @override
+  void requestInitialData(StreamChannel<MbbCommand> mbb) {
+    mbb.sink.add(getDoubleTapCommand);
+  }
+
+  @override
+  bool handleMbbCommand(MbbCommand cmd) {
+    // We don't directly handle the commands here as we only update settings
+    return false;
+  }
+
+  @override
+  HuaweiHeadphonesSettings? updateSettingsFromMbbCommand(
+      MbbCommand cmd, HuaweiHeadphonesSettings currentSettings) {
     if (!cmd.isAbout(getDoubleTapCommand)) {
       return null;
     }
@@ -31,7 +61,7 @@ class DoubleTapFeature {
       final leftCode = cmd.args[1]![0];
       final rightCode = cmd.args[2]![0];
 
-      return lastSettings.copyWith(
+      return currentSettings.copyWith(
         doubleTapLeft:
             DoubleTap.values.firstWhereOrNull((e) => e.mbbCode == leftCode),
         doubleTapRight:
@@ -41,35 +71,26 @@ class DoubleTapFeature {
     return null;
   }
 
-  /// Applies double-tap settings to device
-  static void applyDoubleTapSettings(
-    StreamChannel<MbbCommand> mbb,
-    HuaweiHeadphonesSettings prev,
-    HuaweiHeadphonesSettings newSettings,
-  ) {
-    // Update left double-tap if changed
-    if ((newSettings.doubleTapLeft ?? prev.doubleTapLeft) !=
-        prev.doubleTapLeft) {
-      mbb.sink.add(doubleTapCommand(left: newSettings.doubleTapLeft!));
+  @override
+  Future<void> applySettings(
+      HuaweiHeadphonesSettings settings, StreamChannel<MbbCommand> mbb) async {
+    // Only apply if current settings have double-tap values
+    if (settings.doubleTapLeft != null) {
+      mbb.sink.add(doubleTapCommand(left: settings.doubleTapLeft!));
       mbb.sink.add(getDoubleTapCommand);
     }
 
-    // Update right double-tap if changed
-    if ((newSettings.doubleTapRight ?? prev.doubleTapRight) !=
-        prev.doubleTapRight) {
-      mbb.sink.add(doubleTapCommand(right: newSettings.doubleTapRight!));
+    if (settings.doubleTapRight != null) {
+      mbb.sink.add(doubleTapCommand(right: settings.doubleTapRight!));
       mbb.sink.add(getDoubleTapCommand);
     }
   }
-}
 
-/// Extension to add MBB code conversion for DoubleTap enum
-extension DoubleTapToMbbCode on DoubleTap {
-  int get mbbCode => switch (this) {
-        DoubleTap.nothing => 255,
-        DoubleTap.voiceAssistant => 0,
-        DoubleTap.playPause => 1,
-        DoubleTap.next => 2,
-        DoubleTap.previous => 7
-      };
+  /// Creates command to set double-tap gestures
+  static MbbCommand doubleTapCommand({DoubleTap? left, DoubleTap? right}) {
+    return MbbCommand(1, 31, {
+      if (left != null) 1: [left.mbbCode],
+      if (right != null) 2: [right.mbbCode],
+    });
+  }
 }
