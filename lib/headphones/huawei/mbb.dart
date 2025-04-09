@@ -10,36 +10,23 @@ import '../../logger.dart'; // Importación del logger
 
 /// Helper class for Mbb protocol used to communicate with headphones
 class MbbUtils {
-  // plus 3 magic bytes + 2 command bytes
   static int getLengthFromLengthByte(int lengthByte) => lengthByte + 3 + 2;
 
-  /// Get Crc16Xmodem checksum of [data] as Uin8List of two bytes
   static Uint8List checksum(List<int> data) {
     final crc = Crc16Xmodem().convert(data);
-    // NOTE: There was a fat-ass bug here: crc didn't pad the first number with
-    // 0, so every time byte was like this, whole message was rejected :/
-    //
-    // Because of this, app couldn't get info about gestures when left bud was
-    // "play/pause" and right was "voice assist" - it was just blank :/
-    //
-    // Why I'm saying this - we need some unit tests for all of this
-    // even at those early stages
     final str = crc.toRadixString(16).padLeft(4, '0');
     final hexes = [str.substring(0, 2), str.substring(2)];
     final bytes = hexes.map((hex) => int.parse(hex, radix: 16));
     return Uint8List.fromList(bytes.toList());
   }
 
-  /// Checks if checksums are alright
   static bool verifyChecksum(Uint8List payload) {
     final sum = checksum(payload.sublist(0, payload.length - 2));
     return sum[0] == payload[payload.length - 2] &&
         sum[1] == payload[payload.length - 1];
   }
 
-  /// Will return exception if anything wrong. Otherwise does nothing.
   static void verifyIntegrity(Uint8List payload) {
-    // 3 magic bytes, 1 length, 1 service, 1 command, 2 checksum
     if (payload.length < 3 + 1 + 1 + 1 + 2) {
       throw Exception("Payload $payload is too short");
     }
@@ -56,8 +43,6 @@ class MbbUtils {
   }
 }
 
-/// Helper class to contain info about single command
-/// Also parses it and generates payload
 class MbbCommand {
   final int serviceId;
   final int commandId;
@@ -65,15 +50,12 @@ class MbbCommand {
 
   const MbbCommand(this.serviceId, this.commandId, [this.args = const {}]);
 
-  /// Is the command *about* the same thing as [other]? Not necessary same args
-  ///
-  /// Compares serviceId and commandId
   bool isAbout(MbbCommand other) =>
       serviceId == other.serviceId && commandId == other.commandId;
 
   @override
-  String toString() => 'MbbCommand(serviceId: $serviceId, '
-      'commandId: $commandId, dataArgs: $args)';
+  String toString() =>
+      'MbbCommand(serviceId: $serviceId, commandId: $commandId, dataArgs: $args)';
 
   @override
   bool operator ==(Object other) =>
@@ -87,7 +69,6 @@ class MbbCommand {
   @override
   int get hashCode => serviceId.hashCode ^ commandId.hashCode ^ args.hashCode;
 
-  /// Convert to binary data to be sent to headphones
   Uint8List toPayload() {
     final data = <int>[];
     args.forEach((key, value) {
@@ -96,22 +77,24 @@ class MbbCommand {
       data.addAll(value);
     });
     final dataBytes = Uint8List.fromList(data);
-    final byteLength = dataBytes.length + 2 + 1; // +2->checksums +1->*because*
+    final byteLength =
+        dataBytes.length + 2 + 1; // +2->checksums +1->magic bytes
     assert(byteLength <= 255);
     final bytesList = [
       90, // Magic bytes
-      0, //
+      0, // Additional magic byte
       byteLength,
-      0, // another magic byte (i think)
+      0, // Another magic byte (I think)
       serviceId,
       commandId,
-      ...dataBytes, // Make sure they are >0 and <256
-    ]; // Log the command being sent - use a cleaner format to avoid ANSI color issues
+      ...dataBytes,
+    ];
+
     try {
       logg.i(
           'MBB Command SENT: serviceId=$serviceId, commandId=$commandId, args=$args');
     } catch (e) {
-      // Failsafe for logging errors
+      logg.e('Error logging MBB command', error: e);
     }
 
     return Uint8List.fromList(bytesList..addAll(MbbUtils.checksum(bytesList)));
@@ -132,6 +115,7 @@ class MbbCommand {
     } else {
       divided.add(payload);
     }
+
     if (divided.isEmpty) {
       if (verify) {
         throw Exception("No commands found in $payload");
@@ -139,6 +123,7 @@ class MbbCommand {
         return [];
       }
     }
+
     final cmds = <MbbCommand>[];
     for (final divPay in divided) {
       if (verify) MbbUtils.verifyIntegrity(divPay);
@@ -156,13 +141,14 @@ class MbbCommand {
         args[argId] = argData;
       }
       final cmd = MbbCommand(serviceId, commandId, args);
-      // Log the command being received with improved error handling
+
       try {
         logg.i(
             'MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=$args');
       } catch (e) {
-        // Silently handle any logging errors
+        logg.e('Error logging MBB received command', error: e);
       }
+
       cmds.add(cmd);
     }
     return cmds;
@@ -175,49 +161,38 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
         StreamTransformer.fromHandlers(handleData: (data, stream) {
           try {
             logg.d('MBB RAW DATA RECEIVED: ${data.length} bytes');
-
-            try {
-              final commands = MbbCommand.fromPayload(data);
-              for (final cmd in commands) {
-                // Filter out unneeded commands
-                if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
-
-                // Log more detailed info about the command
-                try {
-                  final argsDetails = cmd.args
-                      .map((key, value) =>
-                          MapEntry(key, '(len:${value.length}) $value'))
-                      .toString();
-                  logg.d('MBB Processing command: serviceId=${cmd.serviceId}, '
-                      'commandId=${cmd.commandId}, argsDetails=$argsDetails');
-                } catch (logError) {
-                  // Ensure logging errors don't interrupt command processing
-                }
-
-                // Only add to stream if it's still active
-                stream.add(cmd);
+            final commands = MbbCommand.fromPayload(data);
+            for (final cmd in commands) {
+              if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
+              try {
+                final argsDetails = cmd.args
+                    .map((key, value) =>
+                        MapEntry(key, '(len:${value.length}) $value'))
+                    .toString();
+                logg.d('MBB Processing command: serviceId=${cmd.serviceId}, '
+                    'commandId=${cmd.commandId}, argsDetails=$argsDetails');
+              } catch (logError) {
+                logg.e('Error processing command args', error: logError);
               }
-            } catch (e, stacktrace) {
-              logg.e('Error processing MBB payload',
-                  error: e, stackTrace: stacktrace);
+              stream.add(cmd);
             }
-          } catch (e) {
-            // Catch-all for any unexpected errors
+          } catch (e, stacktrace) {
+            logg.e('Error processing MBB payload',
+                error: e, stackTrace: stacktrace);
           }
         }, handleDone: (stream) {
           try {
             logg.d('MBB stream done');
             stream.close();
           } catch (e) {
-            // Ignore errors when closing an already closed stream
+            logg.e('Error closing MBB stream', error: e);
           }
         }, handleError: (error, stackTrace, stream) {
           try {
             logg.e('MBB stream error', error: error, stackTrace: stackTrace);
-            // Don't close the stream on error, let error propagate
             stream.addError(error, stackTrace);
           } catch (e) {
-            // Ignore errors when the stream is already closed
+            logg.e('Error propagating MBB stream error', error: e);
           }
         }),
         StreamSinkTransformer.fromHandlers(
@@ -225,8 +200,6 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
             try {
               final payload = data.toPayload();
               logg.d('MBB RAW DATA SENT: ${payload.length} bytes');
-
-              // Only send if the sink is still active
               rfcomm.sink.add(payload);
             } catch (e, stacktrace) {
               logg.e('Error sending MBB command',
@@ -238,7 +211,7 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
               logg.e('MBB sink error', error: error, stackTrace: stackTrace);
               sink.addError(error, stackTrace);
             } catch (e) {
-              // Ignore errors when the sink is already closed
+              logg.e('Error propagating MBB sink error', error: e);
             }
           },
         ),
