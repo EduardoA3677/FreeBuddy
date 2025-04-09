@@ -17,7 +17,6 @@ class HeadphonesMockCubit extends Cubit<HeadphonesConnectionState>
     Future.microtask(() => emit(HeadphonesConnectedOpen(
         HuaweiHeadphonesSim(HuaweiModels.freeBudsPro3))));
   }
-
   @override
   Future<void> connect() async {}
 
@@ -29,4 +28,10 @@ class HeadphonesMockCubit extends Cubit<HeadphonesConnectionState>
 
   @override
   Future<void> requestPermission() async {}
+
+  @override
+  Future<void> tryConnectIfNeeded() async {
+    // En el mock cubit simulamos que ya estamos conectados
+    // No es necesario hacer nada adicional
+  }
 }

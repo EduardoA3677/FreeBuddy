@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -16,29 +18,42 @@ import 'headphones/cubit/headphones_cubit_objects.dart';
 import 'platform_stuff/android/appwidgets/battery_appwidget.dart';
 import 'platform_stuff/android/background/periodic.dart' as android_periodic;
 import 'ui/app_settings.dart';
-import 'ui/pages/about/about_page.dart';
-import 'ui/pages/headphones_settings/headphones_settings_page.dart';
-import 'ui/pages/home/home_page.dart';
-import 'ui/pages/introduction/introduction.dart';
-import 'ui/pages/settings/settings_page.dart';
+import 'ui/navigation/router.dart';
 import 'ui/theme/themes.dart';
 
 void main() async {
   final bind = WidgetsFlutterBinding.ensureInitialized();
-  //Support edge to edge on Android < 15
+
+  // Configurar animaciones globales
+  Animate.restartOnHotReload = true;
+
+  // Optimizar edge-to-edge en todas las versiones de Android
   await settingUpSystemUIOverlay();
-  // This is so that we try to connect to headphones under splash screen
-  // This will make it more smooth to the user
+
+  // Mantener la pantalla splash mientras se conecta a los auriculares
   FlutterNativeSplash.preserve(widgetsBinding: bind);
+
+  // Inicializar funciones específicas de Android
   if (!kIsWeb && Platform.isAndroid) {
-    // this is async, so it won't block runApp
-    android_periodic.init();
+    await _initializeAndroid();
   }
+
   runApp(const MyAppWrapper());
 }
 
-// Big ass ugly-as-fuck wrapper because:
-// https://github.com/felangel/bloc/issues/2040#issuecomment-1726472426
+Future<void> _initializeAndroid() async {
+  // Iniciar tareas periódicas
+  android_periodic.init();
+
+  // Verificar versión de Android para adaptarse
+  final deviceInfo = DeviceInfoPlugin();
+  final androidInfo = await deviceInfo.androidInfo;
+
+  // Registro de versión del sistema para posibles adaptaciones
+  debugPrint(
+      'Android ${androidInfo.version.release} (SDK ${androidInfo.version.sdkInt})');
+}
+
 class MyAppWrapper extends StatefulWidget {
   const MyAppWrapper({super.key});
 
@@ -48,36 +63,57 @@ class MyAppWrapper extends StatefulWidget {
 
 class _MyAppWrapperState extends State<MyAppWrapper>
     with WidgetsBindingObserver {
-  final _btBlock = di.getHeadphonesCubit();
+  final _btCubit = di.getHeadphonesCubit();
+  late final StreamingSharedPreferences _preferences;
+  bool _isPrefsInitialized = false;
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // ...and this removes splash if we either connected or 1 second passed
-    _btBlock.stream
+    _initPreferences();
+    _setupSplashRemoval();
+  }
+
+  Future<void> _initPreferences() async {
+    _preferences = await StreamingSharedPreferences.instance;
+    setState(() {
+      _isPrefsInitialized = true;
+    });
+  }
+
+  void _setupSplashRemoval() {
+    // Remover splash cuando se conecten los auriculares o después de 1.5 segundos
+    _btCubit.stream
         .firstWhere((e) => e is HeadphonesConnectedOpen)
         .timeout(
-          const Duration(seconds: 1),
-          onTimeout: () => const HeadphonesNotPaired(), // just placeholder
+          const Duration(milliseconds: 1500),
+          onTimeout: () => const HeadphonesNotPaired(),
         )
         .then((_) => FlutterNativeSplash.remove());
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Mostrar un indicador de carga mientras se inicializan las preferencias
+    if (!_isPrefsInitialized) {
+      return const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
     return Provider<AppSettings>(
       create: (context) =>
-          SharedPreferencesAppSettings(StreamingSharedPreferences.instance),
+          SharedPreferencesAppSettings(Future.value(_preferences)),
       child: MultiBlocProvider(
-        providers: [BlocProvider.value(value: _btBlock)],
-        // don't know if this is good place to put this, but seems right
-        // maybe convert this to multi listener with advanced "listenWhen" logic
-        // this would make it a nice single place to know what launches when 🤔
+        providers: [BlocProvider.value(value: _btCubit)],
         child:
             BlocListener<HeadphonesConnectionCubit, HeadphonesConnectionState>(
           listener: batteryHomeWidgetHearBloc,
-          // Should this be *here* or somewhere special? Idk, okay for now 🤷
           listenWhen: (p, c) => !kIsWeb && Platform.isAndroid,
           child: const MyApp(),
         ),
@@ -87,15 +123,20 @@ class _MyAppWrapperState extends State<MyAppWrapper>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.detached) {
-      await _btBlock.close();
+    // Optimización de ciclo de vida para evitar fugas de memoria y uso de batería
+    if (state == AppLifecycleState.detached ||
+        state == AppLifecycleState.hidden) {
+      await _btCubit.close();
+    } else if (state == AppLifecycleState.resumed) {
+      // Reconectar si es necesario cuando la app vuelva a primer plano
+      _btCubit.tryConnectIfNeeded();
     }
     super.didChangeAppLifecycleState(state);
   }
 
   @override
   void dispose() async {
-    await _btBlock.close();
+    await _btCubit.close();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -107,22 +148,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
-      builder: (lightDynamic, darkDynamic) => MaterialApp(
+      builder: (lightDynamic, darkDynamic) => MaterialApp.router(
+        routerConfig: router,
         onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: lightTheme(lightDynamic),
         darkTheme: darkTheme(darkDynamic),
         themeMode: ThemeMode.system,
-        routes: {
-          '/': (context) => const HomePage(),
-          '/headphones_settings': (context) => const HeadphonesSettingsPage(),
-          '/introduction': (context) => const FreebuddyIntroduction(),
-          '/settings': (context) => const SettingsPage(),
-          '/settings/about': (context) => const AboutPage(),
-          '/settings/about/licenses': (context) => const LicensePage(),
+        // Añadir animaciones de transición por defecto
+        builder: (context, child) {
+          return child!.animate().fadeIn(duration: 300.ms);
         },
-        initialRoute: '/',
       ),
     );
   }

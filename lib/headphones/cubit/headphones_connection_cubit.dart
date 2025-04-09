@@ -292,6 +292,32 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
     await _init();
   }
 
+  /// Intenta reconectar con los auriculares si están emparejados pero no conectados.
+  /// Útil cuando la aplicación vuelve a primer plano después de haber estado en segundo plano.
+  Future<void> tryConnectIfNeeded() async {
+    if (_connection != null) return; // Ya hay una conexión activa
+
+    // Solo intentamos conectar si Bluetooth está activo
+    if (!(_bluetooth.isEnabled.valueOrNull ?? false)) return;
+
+    // Comprobar si hay auriculares emparejados
+    final pairedDevices = _bluetooth.pairedDevices.valueOrNull;
+    if (pairedDevices == null || pairedDevices.isEmpty) return;
+
+    // Buscar un dispositivo conocido
+    final knownDevice = pairedDevices
+        .map((dev) => (device: dev, match: matchModel(dev)))
+        .where((m) => m.match != null)
+        .firstOrNull;
+
+    if (knownDevice != null &&
+        (knownDevice.device.isConnected.valueOrNull ?? false)) {
+      // El dispositivo está emparejado y conectado, intentamos establecer conexión
+      await _connect(knownDevice.device, knownDevice.match!);
+      loggI.i('Reconexión automática iniciada');
+    }
+  }
+
   @override
   Future<void> close() async {
     await _connection?.sink.close();
