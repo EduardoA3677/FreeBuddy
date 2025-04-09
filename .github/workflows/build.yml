@@ -52,7 +52,7 @@ jobs:
         uses: NiklasLehnfeld/flutter-android-build-action@v2
         id: android-build
         with:
-          release: true
+          release: false
           keystore: ${{ secrets.KEYSTORE }}
           keystore-pwd: ${{ secrets.KEYSTORE_PWD }}
           key-pwd: ${{ secrets.KEY_PWD }}
