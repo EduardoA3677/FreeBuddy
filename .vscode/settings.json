@@ -1,5 +1,57 @@
 {
+  // 🐦 Flutter SDK & Dart paths
   "dart.flutterSdkPath": "C:\\Users\\ralva\\Documents\\flutter\\flutter",
+  "dart.sdkPath": "C:\\Users\\ralva\\Documents\\flutter\\flutter\\bin\\cache\\dart-sdk",
+  // 💡 Flutter/Dart productivity
+  "dart.lineLength": 100,
+  "dart.completeFunctionCalls": true,
+  "dart.showTodos": true,
+  "dart.analysisExcludedFolders": [
+    "**/build/**",
+    "**/.dart_tool/**"
+  ],
+  // ✨ Formato y limpieza de código
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "always"
+    }
+  },
+  "editor.defaultFormatter": "Dart-Code.dart-code",
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always"
+  },
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  // 📁 Ocultar carpetas innecesarias en el explorador
+  "files.exclude": {
+    "**/.dart_tool": true,
+    "**/.idea": true,
+    "**/.vscode": false,
+    "**/build": true,
+    "**/android/app/debug": true,
+    "**/android/app/profile": true,
+    "**/android/app/release": true
+  },
+  // ✍️ GitHub Copilot Core
+  "github.copilot.editor.enableAutoCompletions": true,
+  "github.copilot.editor.enableCodeActions": true,
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.renameSuggestions.triggerAutomatically": true,
+  // 🤖 GitHub Copilot Chat (Agent)
+  "github.copilot.chat.agent.runTasks": true,
+  "github.copilot.chat.agent.thinkingTool": true,
+  "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.editor.temporalContext.enabled": true,
+  "github.copilot.chat.edits.temporalContext.enabled": true,
+  "github.copilot.chat.reviewSelection.enabled": true,
+  "github.copilot.chat.scopeSelection": true,
+  "github.copilot.chat.search.semanticTextResults": true,
+  // 🔤 Diccionario personalizado para evitar errores en palabras técnicas/propias
   "cSpell.words": [
     "Actaully",
     "altoghether",
@@ -31,18 +83,5 @@
     "Wireshark",
     "xdddd",
     "Xmodem"
-  ],
-  "dart.sdkPath": "C:\\Users\\ralva\\Documents\\flutter\\flutter\\bin\\cache\\dart-sdk",
-  "github.copilot.chat.agent.runTasks": true,
-  "github.copilot.chat.codesearch.enabled": true,
-  "github.copilot.chat.agent.thinkingTool": true,
-  "github.copilot.chat.editor.temporalContext.enabled": true,
-  "github.copilot.chat.edits.temporalContext.enabled": true,
-  "github.copilot.chat.search.semanticTextResults": true,
-  "github.copilot.chat.reviewSelection.enabled": true,
-  "github.copilot.chat.scopeSelection": true,
-  "github.copilot.renameSuggestions.triggerAutomatically": true,
-  "github.copilot.editor.enableCodeActions": true,
-  "github.copilot.nextEditSuggestions.enabled": true,
-  "tabnine.receiveBetaChannelUpdates": true
+  ]
 }
