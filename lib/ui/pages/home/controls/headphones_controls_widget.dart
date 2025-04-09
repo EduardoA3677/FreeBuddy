@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../headphones/framework/anc.dart';
@@ -28,106 +27,95 @@ class HeadphonesControlsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context);
-    final tt = t.textTheme;
-    // - [ ] Make this clearer - this padding shouldn't be here?
-    // - [ ] De-duplicate responsive stuff
-    // - [ ] Think what to put when we have no image, or generally not many
-    //       features 🤷
-    return Padding(
-      padding: const EdgeInsets.all(12.0) +
-          EdgeInsets.only(bottom: MediaQuery.viewPaddingOf(context).bottom),
-      child: WindowSizeClass.of(context) == WindowSizeClass.compact
-          ? Column(
-              children: [
-                StreamBuilder(
-                  stream: headphones.bluetoothAlias,
-                  builder: (_, snap) => Text(
-                    snap.data ?? headphones.bluetoothName,
-                    style: tt.headlineMedium,
-                  ),
-                ),
-                if (headphones is HeadphonesModelInfo)
-                  HeadphonesImage(headphones as HeadphonesModelInfo)
-                else
-                  const Expanded(child: Icon(Icons.headphones, size: 64)),
-                if (headphones is HeadphonesSettings)
-                  const Align(
-                    alignment: Alignment.centerRight,
-                    child: _HeadphonesSettingsButton(),
-                  ),
-                if (headphones is LRCBattery)
-                  BatteryCard(headphones as LRCBattery),
-                if (headphones is Anc) AncCard(headphones as Anc),
-              ],
-            )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      StreamBuilder(
-                        stream: headphones.bluetoothAlias,
-                        builder: (_, snap) => Text(
-                          snap.data ?? headphones.bluetoothName,
-                          style: tt.headlineMedium,
-                        ),
-                      ),
-                      if (headphones is HeadphonesModelInfo)
-                        HeadphonesImage(headphones as HeadphonesModelInfo)
-                      else
-                        const Expanded(child: Icon(Icons.headphones, size: 64)),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (headphones is HeadphonesSettings)
-                          const Align(
-                            alignment: Alignment.centerRight,
-                            child: _HeadphonesSettingsButton(),
-                          ),
-                        if (headphones is LRCBattery)
-                          BatteryCard(headphones as LRCBattery),
-                        if (headphones is Anc) AncCard(headphones as Anc),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final windowSize = WindowSizeClass.of(context);
+    final bottomPadding = MediaQuery.viewPaddingOf(context).bottom;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      padding: const EdgeInsets.all(12.0) + EdgeInsets.only(bottom: bottomPadding),
+      child: Column(
+        children: [
+          _buildHeader(textTheme),
+          const SizedBox(height: 16),
+          Expanded(
+            child: _buildMainContent(windowSize),
+          ),
+          if (headphones is HeadphonesSettings) ...[
+            const SizedBox(height: 16),
+            _buildSettingsButton(context),
+          ],
+        ],
+      ),
     );
   }
-}
 
-/// Simple button leading to headphones settings page
-class _HeadphonesSettingsButton extends StatelessWidget {
-  const _HeadphonesSettingsButton();
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context);
-    final l = AppLocalizations.of(context)!;
-    return Padding(
-      padding: t.cardTheme.margin ?? const EdgeInsets.all(4.0),
-      child: OutlinedButton(
-        onPressed: () => GoRouter.of(context).push('/headphones_settings'),
-        child: Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.settings_outlined, size: 20),
-              const SizedBox(width: 4),
-              Text(l.settings),
-            ],
+  Widget _buildHeader(TextTheme textTheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        StreamBuilder(
+          stream: headphones.bluetoothAlias,
+          builder: (_, snap) => Text(
+            snap.data ?? headphones.bluetoothName,
+            style: textTheme.headlineMedium,
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildMainContent(WindowSizeClass windowSize) {
+    final isCompact = windowSize == WindowSizeClass.compact;
+    final children = [
+      if (headphones is HeadphonesModelInfo)
+        Flexible(
+          flex: isCompact ? 0 : 1,
+          child: HeadphonesImage(headphones as HeadphonesModelInfo),
+        ),
+      if (isCompact) const SizedBox(height: 24),
+      Flexible(
+        flex: isCompact ? 0 : 1,
+        child: _buildControls(isCompact),
       ),
+    ];
+
+    return isCompact
+        ? Column(children: children)
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          );
+  }
+
+  Widget _buildControls(bool isCompact) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final children = <Widget>[
+          if (headphones is LRCBattery) BatteryCard(headphones as LRCBattery),
+          if (headphones is Anc) ...[
+            SizedBox(height: isCompact ? 16 : 0, width: isCompact ? 0 : 16),
+            AncCard(headphones as Anc),
+          ],
+        ];
+
+        return isCompact
+            ? Column(children: children)
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children.map((child) => Expanded(child: child)).toList(),
+              );
+      },
+    );
+  }
+
+  Widget _buildSettingsButton(BuildContext context) {
+    return OutlinedButton.icon(
+      icon: const Icon(Icons.settings),
+      label: Text('Settings'), // Using hardcoded string until l10n is fixed
+      onPressed: () => GoRouter.of(context).push('/headphones-settings'),
     );
   }
 }

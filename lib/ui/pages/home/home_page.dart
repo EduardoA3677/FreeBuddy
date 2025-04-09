@@ -14,22 +14,30 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+
   @override
   void initState() {
     super.initState();
-    // Looks like we need this future to wait for first frame to generate
     Future.microtask(_introCheck);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _introCheck() async {
     final ctx = context;
     final settings = ctx.read<AppSettings>();
     if (!(await settings.seenIntroduction.first)) {
-      // https://dart-lang.github.io/linter/lints/use_build_context_synchronously.html
       if (!ctx.mounted) return;
-      // true from this route means all success and we can set the flag
-      // false means user exited otherwise or smth - anyway, don't set the flag
       final success = await GoRouter.of(ctx).push('/introduction') as bool?;
       if (success ?? false) {
         await settings.setSeenIntroduction(true);
@@ -40,21 +48,74 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l.appTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
+            tooltip: l.settings,
             onPressed: () => GoRouter.of(context).push('/settings'),
           ),
         ],
       ),
-      body: Center(
-        child: HeadphonesConnectionEnsuringOverlay(
-          builder: (_, h) => HeadphonesControlsWidget(headphones: h),
+      body: SafeArea(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) => FadeTransition(
+            opacity: _controller,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: _controller,
+                curve: Curves.easeOutCubic,
+              )),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return isLandscape
+                      ? _buildLandscapeLayout(constraints)
+                      : _buildPortraitLayout(constraints);
+                },
+              ),
+            ),
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPortraitLayout(BoxConstraints constraints) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          children: [
+            HeadphonesConnectionEnsuringOverlay(
+              builder: (context, headphones) => HeadphonesControlsWidget(headphones: headphones),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLandscapeLayout(BoxConstraints constraints) {
+    return Row(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: HeadphonesConnectionEnsuringOverlay(
+              builder: (context, headphones) => HeadphonesControlsWidget(headphones: headphones),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
