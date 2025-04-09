@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -14,8 +15,7 @@ class SettingsPage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           children: [
             FilledButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed('/settings/about'),
+              onPressed: () => GoRouter.of(context).push('/settings/about'),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(l.pageAboutTitle),

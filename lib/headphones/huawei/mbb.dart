@@ -30,11 +30,11 @@ class MbbUtils {
     if (payload.length < 3 + 1 + 1 + 1 + 2) {
       throw Exception("Payload $payload is too short");
     }
-    final magicBytes = (payload[0], payload[1], payload[2]);
+    final magicBytes = (payload[0], payload[1], payload[3]);
     if (magicBytes != (90, 0, 0)) {
       throw Exception("Payload $payload has invalid magic bytes");
     }
-    if (payload.length - 6 + 1 != payload[3]) {
+    if (payload.length - 6 + 1 != payload[2]) {
       throw Exception("Length data from $payload doesn't match length byte");
     }
     if (!verifyChecksum(payload)) {

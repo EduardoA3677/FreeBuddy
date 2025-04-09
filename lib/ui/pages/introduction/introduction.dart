@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class FreebuddyIntroduction extends StatelessWidget {
@@ -69,7 +70,7 @@ class FreebuddyIntroduction extends StatelessWidget {
                 children: [
                   const Spacer(),
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop<bool>(true),
+                    onPressed: () => GoRouter.of(context).pop<bool>(true),
                     child: Text(l.pageIntroQuit),
                   ),
                 ],

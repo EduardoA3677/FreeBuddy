@@ -117,7 +117,7 @@ class AboutPage extends StatelessWidget {
             divider(),
             TextButton(
               onPressed: () =>
-                  GoRouter.of(context).go('/settings/about/licenses'),
+                  GoRouter.of(context).push('/settings/about/licenses'),
               child: Text(l.pageAboutOpenSourceLicensesBtn),
             ),
             SizedBox(height: MediaQuery.viewPaddingOf(context).bottom),
