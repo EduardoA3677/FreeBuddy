@@ -38,9 +38,8 @@ class HoldFeature {
     if (se.equals(toggledModes, {AncMode.off, AncMode.transparency})) {
       mbbValue = 4;
     }
-
     if (mbbValue == null) {
-      logg.w("Unknown mbbValue for $toggledModes"
+      logg.w("Unknown mbbValue for toggled modes: $toggledModes"
           " - setting as 2 for 'all of them' as a recovery");
       mbbValue = 2;
     }

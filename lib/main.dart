@@ -134,7 +134,7 @@ class _MyAppWrapperState extends State<MyAppWrapper>
         _btCubit.tryConnectIfNeeded();
       } catch (e) {
         // Log the error but don't crash the app
-        loggI.e('Error reconnecting', error: e);
+        loggI.e('Error reconnecting when app resumed', error: e);
       }
     }
     super.didChangeAppLifecycleState(state);
