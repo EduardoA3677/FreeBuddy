@@ -4,12 +4,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../headphones/framework/anc.dart';
 import '../../../../headphones/framework/bluetooth_headphones.dart';
+import '../../../../headphones/framework/headphones_info.dart';
 import '../../../../headphones/framework/headphones_settings.dart';
 import '../../../../headphones/framework/lrc_battery.dart';
 import '../../../../logger.dart';
 import '../../../theme/layouts.dart';
 import 'anc_card.dart';
 import 'battery_card.dart';
+import 'headphones_image.dart';
 
 /// Main whole-screen widget with controls for headphones
 ///
@@ -72,9 +74,23 @@ class HeadphonesControlsWidget extends StatelessWidget {
   }
 
   Widget _buildHeader(TextTheme textTheme, AppLocalizations l) {
-    return Text(
-      l.headphonesControl,
-      style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l.headphonesControl,
+          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        // Display model name when available
+        if (headphones is HeadphonesModelInfo)
+          Text(
+            "${(headphones as HeadphonesModelInfo).vendor} ${(headphones as HeadphonesModelInfo).name}",
+            style: textTheme.titleMedium?.copyWith(
+              color: Colors.grey[600],
+            ),
+          ),
+      ],
     );
   }
 
@@ -82,6 +98,17 @@ class HeadphonesControlsWidget extends StatelessWidget {
     log(LogLevel.debug, "Building main content for headphones: ${headphones.runtimeType}");
 
     final contentWidgets = <Widget>[];
+
+    // Add headphones image if model info is available
+    if (headphones is HeadphonesModelInfo) {
+      contentWidgets.add(
+        Container(
+          height: 150,
+          margin: const EdgeInsets.only(bottom: 16),
+          child: HeadphonesImage(headphones as HeadphonesModelInfo),
+        ),
+      );
+    }
 
     // Synchronously add features since they're UI-only operations
     void addBatteryFeature() {

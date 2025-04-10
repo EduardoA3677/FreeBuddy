@@ -55,7 +55,7 @@ class HuaweiModels {
   static final freeBuds4i = HuaweiModelDefinition(
     name: "FreeBuds 4i",
     idNameRegex: RegExp(r'^(?=(HUAWEI FreeBuds 4i))', caseSensitive: true),
-    imageAssetPath: 'assets/headphones/huawei/freebuds3i_og.png',
+    imageAssetPath: 'assets/app_icons/ic_launcher.png',
     supportsAnc: true,
     supportsDoubleTap: true,
     supportsHold: true,
@@ -68,6 +68,7 @@ class HuaweiModels {
       holdBothToggledAncModes: {
         AncMode.noiseCancelling,
         AncMode.off,
+        AncMode.transparency,
       },
       autoPause: null,
     ),

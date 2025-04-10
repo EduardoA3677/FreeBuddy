@@ -299,10 +299,15 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
         type: AppSettingsType.bluetooth,
         asAnotherTask: true,
       );
-
   Future<void> requestPermission() async {
-    await Permission.bluetoothConnect.request();
-    await _init();
+    final status = await Permission.bluetoothConnect.request();
+    if (status.isGranted) {
+      // Permission granted, initialize the app
+      await _init();
+    } else {
+      // Permission denied, keep showing the no permission state
+      emit(const HeadphonesNoPermission());
+    }
   }
 
   @override

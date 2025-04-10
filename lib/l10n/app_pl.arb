@@ -39,13 +39,12 @@
   "pageHeadphonesSettingsRightBud": "Prawa słuchawka",
   "pageHeadphonesSettingsHold": "Przytrzymanie",
   "pageHeadphonesSettingsHoldDesc": "Przytrzymanie słuchawki będzie przełączać te tryby ANC:",
-
   "ancNoiseControl": "Kontrola hałasu",
   "ancNoiseCancel": "Redukcja hałasu 🔇",
   "ancNoiseCancelDesc": "Zmniejsza hałas z otoczenia",
   "ancOff": "Wyłączone 🤷",
-  "ancOffDesc": "Wyłącza ANC",
-  "ancAwareness": "Tryb otoczenia 🔊",
+  "ancOffDesc": "Wyłącza kontrolę hałasu",
+  "ancAwareness": "Transparentność 🔊",
   "ancAwarenessDesc": "Pozwala słyszeć otoczenie",
 
   "headphonesControl": "Sterowanie słuchawkami",
@@ -74,7 +73,7 @@
   "pageAboutOpenSourceLicensesBtn": "Licencje open source",
   "pageIntroTitle": "Witaj we FreeBuddy 👋",
   "pageIntroWhatIsThis": "FreeBuddy to open-source aplikacja do twoich słuchaweczek 🎧",
-  "pageIntroSupported": "Obecnie wspierane są:\n - Huawei FreeBuds 4i\n - Huawei FreeBuds 3i",
+  "pageIntroSupported": "Obecnie wspierane są:\n - Huawei FreeBuds Pro 3\n - Huawei FreeBuds 4i\n - Huawei FreeBuds 3i",
   "pageIntroShortPrivacyPolicy": "Ta aplikacja nie zbiera żadnych maili, identyfikatorów, czy innych osobistych danych 🎉 Możesz o tym poczytać tutaj: ",
   "pageIntroAnyQuestions": "Jeśli masz jakiekolwiek pytania, napisz do mnie śmiało 💌 Wejdź w \"Ustawienia->O aplikacji\" po moje socjale!",
   "pageIntroQuit": "Oki doki 👍"

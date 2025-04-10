@@ -12,7 +12,6 @@ import 'huawei/hold_section.dart';
 
 class HeadphonesSettingsPage extends StatelessWidget {
   const HeadphonesSettingsPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
@@ -20,7 +19,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
       appBar: AppBar(title: Text(l.pageHeadphonesSettingsTitle)),
       body: Center(
         child: HeadphonesConnectionEnsuringOverlay(
-          builder: (_, h) => ListView(children: _buildSettingsWidgets(h)),
+          builder: (_, h) => ListView(children: _buildSettingsWidgets(h, context)),
         ),
       ),
     );
@@ -28,7 +27,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
 }
 
 /// Builds appropriate settings widgets based on headphone model
-List<Widget> _buildSettingsWidgets(BluetoothHeadphones headphones) {
+List<Widget> _buildSettingsWidgets(BluetoothHeadphones headphones, BuildContext context) {
   if (headphones is HuaweiHeadphonesBase) {
     final huaweiBase = headphones;
     HuaweiModelDefinition? modelDef;
@@ -39,7 +38,21 @@ List<Widget> _buildSettingsWidgets(BluetoothHeadphones headphones) {
 
     final sections = <Widget>[];
 
-    // Add auto-pause section if supported
+    // Add model name header when definition is available
+    if (modelDef != null) {
+      sections.add(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            modelDef.name,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ),
+      );
+      sections.add(const Divider(indent: 16, endIndent: 16));
+    } // Add auto-pause section if supported
     if (modelDef?.supportsAutoPause ?? false) {
       sections.add(AutoPauseSection(huaweiBase));
       sections.add(const Divider(indent: 16, endIndent: 16));

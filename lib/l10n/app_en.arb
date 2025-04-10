@@ -39,9 +39,8 @@
   "pageHeadphonesSettingsRightBud": "Right bud",
   "pageHeadphonesSettingsHold": "Touch and hold",
   "pageHeadphonesSettingsHoldDesc": "Holding a bud will toggle these ANC modes:",
-
   "ancNoiseControl": "Noise Control",
-  "ancNoiseCancel": "Noise cancelling 🔇",
+  "ancNoiseCancel": "Noise Cancelling 🔇",
   "ancNoiseCancelDesc": "Reduces noise around you",
   "ancOff": "Off 🤷",
   "ancOffDesc": "Turns ANC off",
@@ -74,7 +73,7 @@
   "pageAboutOpenSourceLicensesBtn": "Open source licenses",
   "pageIntroTitle": "Welcome to FreeBuddy 👋",
   "pageIntroWhatIsThis": "FreeBuddy is open source app for your headphones 🎧",
-  "pageIntroSupported": "Currently supported are:\n - Huawei FreeBuds 4i\n - Huawei FreeBuds 3i",
+  "pageIntroSupported": "Currently supported are:\n - Huawei FreeBuds Pro 3\n - Huawei FreeBuds 4i\n - Huawei FreeBuds 3i",
   "pageIntroShortPrivacyPolicy": "This app doesn't collect any emails, identifiers, or any personal data 🎉 You can read more about it here: ",
   "pageIntroAnyQuestions": "If you have any questions, feel free to contact me 💌 Look at \"Settings->About\" for my socials!",
   "pageIntroQuit": "Okay 👍"
