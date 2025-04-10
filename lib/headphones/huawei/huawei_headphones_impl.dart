@@ -48,8 +48,7 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
 
   void _initialize() {
     // Set up alias stream
-    final aliasStreamSub = _bluetoothDevice.alias
-        .listen((alias) => _bluetoothAliasCtrl.add(alias));
+    final aliasStreamSub = _bluetoothDevice.alias.listen((alias) => _bluetoothAliasCtrl.add(alias));
     _bluetoothAliasCtrl.onCancel = () => aliasStreamSub.cancel();
 
     // Initialize settings with default values
@@ -67,7 +66,8 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
     // Listen to MBB commands
     _mbb.stream.listen(
       _handleMbbCommand,
-      onError: logg.onError,
+      onError: (error, stackTrace) =>
+          log(LogLevel.error, "MBB Stream Error", error: error, stackTrace: stackTrace),
       onDone: () {
         _watchdogStreamSub.cancel();
         _closeAllStreams();
@@ -80,11 +80,9 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   bool _isFeatureSupported(String featureId) {
     return switch (featureId) {
       anc.AncFeature.featureId => modelDefinition.supportsAnc,
-      double_tap.DoubleTapFeature.featureId =>
-        modelDefinition.supportsDoubleTap,
+      double_tap.DoubleTapFeature.featureId => modelDefinition.supportsDoubleTap,
       hold.HoldFeature.featureId => modelDefinition.supportsHold,
-      auto_pause.AutoPauseFeature.featureId =>
-        modelDefinition.supportsAutoPause,
+      auto_pause.AutoPauseFeature.featureId => modelDefinition.supportsAutoPause,
       battery.BatteryFeature.featureId => true, // Battery is always supported
       _ => false,
     };
@@ -136,22 +134,19 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
       _featureRegistry.handleMbbCommand(cmd);
 
       // Process settings updates
-      final lastSettings =
-          _settingsCtrl.valueOrNull ?? modelDefinition.defaultSettings;
-      final updatedSettings =
-          _featureRegistry.updateSettings(cmd, lastSettings);
+      final lastSettings = _settingsCtrl.valueOrNull ?? modelDefinition.defaultSettings;
+      final updatedSettings = _featureRegistry.updateSettings(cmd, lastSettings);
 
       if (updatedSettings != null) {
         _settingsCtrl.add(updatedSettings);
       }
     } catch (e, s) {
-      logg.e("Error handling MBB command", error: e, stackTrace: s);
+      log(LogLevel.error, "Error handling MBB command", error: e, stackTrace: s);
     }
   }
 
   void _startWatchdog() {
-    _watchdogStreamSub =
-        Stream.periodic(const Duration(seconds: 3)).listen((_) {
+    _watchdogStreamSub = Stream.periodic(const Duration(seconds: 3)).listen((_) {
       if ([
         batteryLevel.valueOrNull,
         lrcBattery.valueOrNull,
@@ -188,8 +183,7 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   String get name => modelDefinition.name;
 
   @override
-  ValueStream<String> get imageAssetPath =>
-      BehaviorSubject.seeded(modelDefinition.imageAssetPath);
+  ValueStream<String> get imageAssetPath => BehaviorSubject.seeded(modelDefinition.imageAssetPath);
 
   // LRCBattery implementation
   @override

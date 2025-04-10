@@ -30,7 +30,7 @@ class ConnectedClosedWidget extends StatelessWidget {
             try {
               context.read<HeadphonesConnectionCubit>().connect();
             } catch (e) {
-              loggI.e('Error connecting from UI', error: e);
+              log(LogLevel.error, 'Error connecting from UI', error: e);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Error: $e'),

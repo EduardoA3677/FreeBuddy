@@ -29,7 +29,9 @@ Future<bool> routineUpdateCallback() async {
     // i think this function is still "dependency injection" safe
     // ...but it's not wise to keep remembering what is and what isn't, is it?
     if (await HeadphonesConnectionCubit.cubitAlreadyRunningSomewhere()) {
-      loggI.d("Not updating stuff from ROUTINE_UPDATE "
+      log(
+          LogLevel.debug,
+          "Not updating stuff from ROUTINE_UPDATE "
           "because cubit is already running");
       return true;
     }
@@ -39,19 +41,21 @@ Future<bool> routineUpdateCallback() async {
         .firstWhere((e) => e is! HeadphonesConnecting)
         .timeout(commonTimeout);
     if (headphones is! HeadphonesConnectedOpen) {
-      loggI.d("Not updating stuff from ROUTINE_UPDATE because: "
+      log(
+          LogLevel.debug,
+          "Not updating stuff from ROUTINE_UPDATE because: "
           "${headphones.toString()}");
       return true;
     }
     if (headphones.headphones is! LRCBattery) {
-      loggI.d("Not updating stuff from ROUTINE_UPDATE because connected "
+      log(
+          LogLevel.debug,
+          "Not updating stuff from ROUTINE_UPDATE because connected "
           "headphones don't support LRCBattery");
       return true;
     }
-    final batteryData = await (headphones.headphones as LRCBattery)
-        .lrcBattery
-        .first
-        .timeout(commonTimeout);
+    final batteryData =
+        await (headphones.headphones as LRCBattery).lrcBattery.first.timeout(commonTimeout);
     loggI.d("udpating widget from bgn: $batteryData");
     await updateBatteryHomeWidget(batteryData);
     await cubit.close(); // remember to close cubit to deregister port name

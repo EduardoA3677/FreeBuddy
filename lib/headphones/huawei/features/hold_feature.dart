@@ -12,8 +12,8 @@ import 'settings.dart';
 /// Implementation for hold gesture functionality
 class HoldFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
   static const featureId = 'hold';
-  final _settingsCtrl = BehaviorSubject<HuaweiHeadphonesSettings>.seeded(
-      const HuaweiHeadphonesSettings());
+  final _settingsCtrl =
+      BehaviorSubject<HuaweiHeadphonesSettings>.seeded(const HuaweiHeadphonesSettings());
 
   @override
   ValueStream<HuaweiHeadphonesSettings> get settings => _settingsCtrl.stream;
@@ -57,9 +57,7 @@ class HoldFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
   HuaweiHeadphonesSettings? updateSettingsFromMbbCommand(
       MbbCommand cmd, HuaweiHeadphonesSettings currentSettings) {
     // Handle hold gesture updates
-    if (cmd.isAbout(getHoldCommand) &&
-        cmd.args.containsKey(1) &&
-        cmd.args[1]!.isNotEmpty) {
+    if (cmd.isAbout(getHoldCommand) && cmd.args.containsKey(1) && cmd.args[1]!.isNotEmpty) {
       final holdCode = cmd.args[1]![0];
       return currentSettings.copyWith(
         holdBoth: Hold.values.firstWhereOrNull((e) => e.mbbCode == holdCode),
@@ -90,8 +88,7 @@ class HoldFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
 
     // Apply toggled modes settings
     if (settings.holdBothToggledAncModes != null) {
-      mbb.sink
-          .add(setHoldToggledModesCommand(settings.holdBothToggledAncModes!));
+      mbb.sink.add(setHoldToggledModesCommand(settings.holdBothToggledAncModes!));
       mbb.sink.add(getHoldCommand);
       mbb.sink.add(getHoldToggledModesCommand);
     }
@@ -114,8 +111,7 @@ class HoldFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
       mbbValue = 1;
     }
     if (toggledModes.length == 3) mbbValue = 2;
-    if (se.equals(
-        toggledModes, {AncMode.noiseCancelling, AncMode.transparency})) {
+    if (se.equals(toggledModes, {AncMode.noiseCancelling, AncMode.transparency})) {
       mbbValue = 3;
     }
     if (se.equals(toggledModes, {AncMode.off, AncMode.transparency})) {
@@ -123,7 +119,9 @@ class HoldFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
     }
 
     if (mbbValue == null) {
-      logg.w("Unknown mbbValue for $toggledModes"
+      log(
+          LogLevel.warning,
+          "Unknown mbbValue for $toggledModes"
           " - setting as 2 for 'all of them' as a recovery");
       mbbValue = 2;
     }

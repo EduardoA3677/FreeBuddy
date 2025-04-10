@@ -87,10 +87,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       HeadphonesConnectionCubit.pingReceivePortName,
     );
     if (ping == null) {
-      loggI.e(
-        "No cubit to kill :( (this probably means you're using "
-        "this function WRONG, or something WEIRD happened)",
-      );
+      log(LogLevel.error,
+          "No cubit to kill :( (this probably means you're using an outdated version of the app)");
       return true;
     }
     ping.send(_killUrself);
@@ -98,7 +96,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
     if (await _checkUntilNoPort(killOtherCubitTimeout)) {
       return true;
     } else {
-      loggI.e("Cubit didn't kill itself as nicely asked :(");
+      log(LogLevel.error, "Cubit didn't kill itself as nicely asked :(");
       return false;
     }
   }
@@ -170,9 +168,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       return;
     }
 
-    final knownHeadphones = devices
-        .map((dev) => (device: dev, match: matchModel(dev)))
-        .where((m) => m.match != null);
+    final knownHeadphones =
+        devices.map((dev) => (device: dev, match: matchModel(dev))).where((m) => m.match != null);
 
     if (knownHeadphones.isEmpty) {
       emit(const HeadphonesNotPaired());

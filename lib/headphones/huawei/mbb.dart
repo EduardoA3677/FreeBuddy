@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:crclib/catalog.dart';
 import 'package:stream_channel/stream_channel.dart';
 
-import '../../logger.dart'; // Importación del logger
+import '../../logger.dart';
 
 /// Helper class for Mbb protocol used to communicate with headphones
 class MbbUtils {
@@ -22,8 +22,7 @@ class MbbUtils {
 
   static bool verifyChecksum(Uint8List payload) {
     final sum = checksum(payload.sublist(0, payload.length - 2));
-    return sum[0] == payload[payload.length - 2] &&
-        sum[1] == payload[payload.length - 1];
+    return sum[0] == payload[payload.length - 2] && sum[1] == payload[payload.length - 1];
   }
 
   static void verifyIntegrity(Uint8List payload) {
@@ -50,12 +49,10 @@ class MbbCommand {
 
   const MbbCommand(this.serviceId, this.commandId, [this.args = const {}]);
 
-  bool isAbout(MbbCommand other) =>
-      serviceId == other.serviceId && commandId == other.commandId;
+  bool isAbout(MbbCommand other) => serviceId == other.serviceId && commandId == other.commandId;
 
   @override
-  String toString() =>
-      'MbbCommand(serviceId: $serviceId, commandId: $commandId, dataArgs: $args)';
+  String toString() => 'MbbCommand(serviceId: $serviceId, commandId: $commandId, dataArgs: $args)';
 
   @override
   bool operator ==(Object other) =>
@@ -90,10 +87,10 @@ class MbbCommand {
     ];
 
     try {
-      logg.i(
+      log(LogLevel.info,
           'MBB Command SENT: serviceId=$serviceId, commandId=$commandId, args=$args');
     } catch (e) {
-      logg.e('Error logging MBB command', error: e);
+      log(LogLevel.error, 'Error logging MBB command', error: e);
     }
 
     return Uint8List.fromList(bytesList..addAll(MbbUtils.checksum(bytesList)));
@@ -141,10 +138,10 @@ class MbbCommand {
       final cmd = MbbCommand(serviceId, commandId, args);
 
       try {
-        logg.i(
+        log(LogLevel.info,
             'MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=$args');
       } catch (e) {
-        logg.e('Error logging MBB received command', error: e);
+        log(LogLevel.error, 'Error logging MBB received command', error: e);
       }
 
       cmds.add(cmd);
@@ -153,8 +150,7 @@ class MbbCommand {
   }
 }
 
-StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
-    rfcomm.transform(
+StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) => rfcomm.transform(
       StreamChannelTransformer(
         StreamTransformer.fromHandlers(handleData: (data, stream) {
           try {
