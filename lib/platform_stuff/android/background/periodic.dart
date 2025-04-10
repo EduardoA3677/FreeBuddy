@@ -2,6 +2,7 @@
 ///
 /// Right now it is small and simple enough to have everything in one file
 
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -68,6 +69,9 @@ Future<bool> routineUpdateCallback() async {
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
+  // Ensure Flutter is properly initialized for background tasks
+  WidgetsFlutterBinding.ensureInitialized();
+
   // this $task is a name, not id?? wtf??
   Workmanager().executeTask((task, inputData) {
     loggI.d("Running periodic task $task"

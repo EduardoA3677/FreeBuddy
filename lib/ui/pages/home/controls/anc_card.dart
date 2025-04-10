@@ -51,30 +51,21 @@ class AncCard extends StatelessWidget {
                         label: l.ancNoiseCancel,
                         description: l.ancNoiseCancelDesc,
                         isSelected: mode == AncMode.noiseCancelling,
-                        onPressed: () {
-                          // Use standard interface instead of direct channel access
-                          anc.setAncMode(AncMode.noiseCancelling);
-                        },
+                        onPressed: () => anc.setAncMode(AncMode.noiseCancelling),
                       ),
                       AncButton(
                         icon: Symbols.noise_control_off,
                         label: l.ancOff,
                         description: l.ancOffDesc,
                         isSelected: mode == AncMode.off,
-                        onPressed: () {
-                          // Use standard interface instead of direct channel access
-                          anc.setAncMode(AncMode.off);
-                        },
+                        onPressed: () => anc.setAncMode(AncMode.off),
                       ),
                       AncButton(
                         icon: Symbols.hearing,
                         label: l.ancAwareness,
                         description: l.ancAwarenessDesc,
                         isSelected: mode == AncMode.transparency,
-                        onPressed: () {
-                          // Use standard interface instead of direct channel access
-                          anc.setAncMode(AncMode.transparency);
-                        },
+                        onPressed: () => anc.setAncMode(AncMode.transparency),
                       ),
                     ];
 

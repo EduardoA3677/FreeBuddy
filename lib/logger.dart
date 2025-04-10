@@ -67,21 +67,41 @@ class AppLogger {
 
   static void setupGlobalErrorHandling() {
     FlutterError.onError = (FlutterErrorDetails details) {
-      log(LogLevel.error, "Flutter Error: ${details.exceptionAsString()}",
-          error: details.exception, stackTrace: details.stack);
+      // Log in better format for Flutter errors
+      final errorMsg =
+          "FATAL EXCEPTION: ${details.context?.name ?? 'Flutter'}\n${details.exceptionAsString()}";
+      log(LogLevel.error, errorMsg, error: details.exception, stackTrace: details.stack);
+
+      // Make sure it also appears in system logs
+      if (Platform.isAndroid) {
+        developer.log("FREEBUDDY_FATAL: $errorMsg",
+            name: 'FreeBuddy', error: details.exception, level: 2000);
+      }
     };
 
-    // Capturar errores asíncronos no manejados
+    // Capture unhandled async errors
     PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
-      log(LogLevel.critical, "Unhandled Platform Error", error: error, stackTrace: stack);
-      return true; // Indica que el error ha sido manejado
+      final errorMsg = "FATAL EXCEPTION: main\n${error.toString()}";
+      log(LogLevel.critical, errorMsg, error: error, stackTrace: stack);
+
+      // Make sure it also appears in system logs
+      if (Platform.isAndroid) {
+        developer.log("FREEBUDDY_FATAL: $errorMsg", name: 'FreeBuddy', error: error, level: 2000);
+      }
+      return true; // Indicates error has been handled
     };
 
-    // Capturar errores en zonas asíncronas
+    // Capture errors in async zones
     runZonedGuarded(() {
-      // Esta función se ejecuta automáticamente en la zona capturada
+      // This function executes automatically in the captured zone
     }, (Object error, StackTrace stack) {
-      log(LogLevel.fatal, "Uncaught Zone Error", error: error, stackTrace: stack);
+      final errorMsg = "FATAL EXCEPTION: ${Zone.current.toString()}\n${error.toString()}";
+      log(LogLevel.fatal, errorMsg, error: error, stackTrace: stack);
+
+      // Make sure it also appears in system logs
+      if (Platform.isAndroid) {
+        developer.log("FREEBUDDY_FATAL: $errorMsg", name: 'FreeBuddy', error: error, level: 2000);
+      }
     });
   }
 }
