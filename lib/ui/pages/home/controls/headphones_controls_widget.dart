@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../headphones/framework/anc.dart';
 import '../../../../headphones/framework/bluetooth_headphones.dart';
 import '../../../../headphones/framework/headphones_info.dart';
-import '../../../../headphones/framework/headphones_settings.dart';
 import '../../../../headphones/framework/lrc_battery.dart';
 import '../../../../logger.dart';
 import '../../../theme/layouts.dart';
@@ -83,18 +81,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
                       curve: Curves.easeOutQuad),
             );
           },
-        ),
-      );
-    }
-
-    // Añadir botón de configuración si está disponible
-    if (headphones is HeadphonesSettings) {
-      contentWidgets.add(
-        Builder(
-          builder: (context) => Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: _buildSettingsButton(context, l),
-          ),
         ),
       );
     }
@@ -212,20 +198,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
             .animate()
             .fadeIn(duration: 300.ms)
             .scale(begin: const Offset(0.9, 0.9), end: const Offset(1.0, 1.0), duration: 300.ms),
-      ),
-    );
-  }
-
-  Widget _buildSettingsButton(BuildContext context, AppLocalizations l) {
-    return ElevatedButton.icon(
-      onPressed: () => GoRouter.of(context).push('/headphones_settings'),
-      icon: const Icon(Symbols.settings),
-      label: Text(l.pageHeadphonesSettingsTitle),
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       ),
     );
   }

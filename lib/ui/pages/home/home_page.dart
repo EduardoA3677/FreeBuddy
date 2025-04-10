@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         onPressed: () => GoRouter.of(context).push('/headphones_settings'),
         tooltip: l.pageHeadphonesSettingsTitle,
         elevation: 4,
-        child: const Icon(Symbols.headphones),
+        child: const Icon(Symbols.settings),
       ).animate(controller: _controller).scale(
           begin: const Offset(0.0, 0.0),
           end: const Offset(1.0, 1.0),

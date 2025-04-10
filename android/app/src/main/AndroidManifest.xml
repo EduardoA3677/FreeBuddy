@@ -4,20 +4,30 @@
 
     <!-- Base permissions -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    
+
     <!-- Bluetooth permissions -->
-    <uses-permission android:name="android.permission.BLUETOOTH" 
+    <uses-permission android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
-        android:usesPermissionFlags="neverForLocation" 
+        android:usesPermissionFlags="neverForLocation"
         tools:targetApi="s" />
-    
+
     <!-- Foreground service permissions -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
         tools:targetApi="upside_down_cake" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Storage permissions for log files -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+    <!-- For Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
 
     <application
