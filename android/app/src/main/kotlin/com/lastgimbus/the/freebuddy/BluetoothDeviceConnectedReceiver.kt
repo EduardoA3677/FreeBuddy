@@ -15,7 +15,7 @@ import androidx.work.WorkManager
 import dev.fluttercommunity.workmanager.BackgroundWorker
 
 // Ensure FreeBuddyLogger is properly imported or defined
-import com.lastgimbus.the.freebuddy.utils.FreeBuddyLogger
+import com.lastgimbus.the.freebuddy.FreeBuddyLogger
 
 /**
  * This reacts to a new bluetooth device being connected (literally any)
