@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'di.dart' as di;
 import 'headphones/cubit/headphones_connection_cubit.dart';
 import 'headphones/cubit/headphones_cubit_objects.dart';
+import 'logger.dart';
 import 'platform_stuff/android/appwidgets/battery_appwidget.dart';
 import 'ui/app_settings.dart';
 import 'ui/navigation/router.dart';
@@ -21,15 +22,41 @@ import 'ui/theme/themes.dart';
 late final SharedPreferences _preferences;
 
 void main() async {
+  // Asegurarse de que el binding de widgets esté inicializado
   WidgetsFlutterBinding.ensureInitialized();
-  _preferences = await SharedPreferences.getInstance();
 
-  runApp(
-    Provider<AppSettings>(
-      create: (_) => SharedPreferencesAppSettings(_preferences),
-      child: MyApp(),
-    ),
-  );
+  // Inicializar el sistema de logging para capturar todos los errores
+  AppLogger.setupGlobalErrorHandling();
+
+  // Registrar inicio de la aplicación
+  log(LogLevel.info, "FreeBuddy iniciando...");
+
+  // Preservar la pantalla de splash mientras se inicializa la app
+  FlutterNativeSplash.preserve(widgetsBinding: WidgetsBinding.instance);
+
+  try {
+    // Inicializar preferencias compartidas
+    _preferences = await SharedPreferences.getInstance();
+    log(LogLevel.debug, "Preferencias inicializadas correctamente");
+
+    // Iniciar la aplicación con el MyAppWrapper para gestionar el ciclo de vida
+    runApp(
+      Provider<AppSettings>(
+        create: (_) => SharedPreferencesAppSettings(_preferences),
+        child: const MyAppWrapper(),
+      ),
+    );
+  } catch (e, stackTrace) {
+    log(LogLevel.critical, "Error al iniciar la aplicación", error: e, stackTrace: stackTrace);
+    // Reintentar con una configuración mínima para mostrar el error al usuario
+    runApp(const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text("Error al iniciar FreeBuddy. Por favor reinicia la aplicación."),
+        ),
+      ),
+    ));
+  }
 }
 
 class MyAppWrapper extends StatefulWidget {
@@ -52,34 +79,60 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
   }
 
   Future<void> _initPreferences() async {
-    setState(() {
-      _isPrefsInitialized = true;
-    });
+    // Simulamos una pequeña carga para dar tiempo a la inicialización
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (mounted) {
+      setState(() {
+        _isPrefsInitialized = true;
+      });
+    }
   }
 
   void _setupSplashRemoval() {
-    // Remove splash when headphones connect or after 1.5 seconds
+    // Eliminar splash cuando los auriculares se conecten o después de 1.5 segundos
     _btBlock.stream
         .firstWhere((e) => e is HeadphonesConnectedOpen)
         .timeout(
           const Duration(seconds: 1),
-          onTimeout: () => const HeadphonesNotPaired(), // just placeholder
+          onTimeout: () => const HeadphonesNotPaired(), // Solo un placeholder
         )
-        .then((_) => FlutterNativeSplash.remove());
+        .then((_) {
+      FlutterNativeSplash.remove();
+    }).catchError((error) {
+      // Asegurarse de eliminar el splash incluso si hay errores
+      FlutterNativeSplash.remove();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Mostrar un indicador de carga mientras se inicializan las preferencias
     if (!_isPrefsInitialized) {
-      return const MaterialApp(
+      return MaterialApp(
         home: Scaffold(
           body: Center(
-            child: CircularProgressIndicator(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Indicador de carga con estilo mejorado
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                // Mensaje informativo para el usuario
+                Text(
+                  'Iniciando FreeBuddy...',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
 
+    // Una vez inicializado, configurar los providers y la estructura principal
     return Provider<AppSettings>(
       create: (context) => SharedPreferencesAppSettings(_preferences),
       child: MultiBlocProvider(
@@ -116,6 +169,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) => MaterialApp.router(
+        debugShowCheckedModeBanner: false, // Eliminar la etiqueta de debug
         routerConfig: router,
         onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -123,9 +177,17 @@ class MyApp extends StatelessWidget {
         theme: lightTheme(lightDynamic),
         darkTheme: darkTheme(darkDynamic),
         themeMode: ThemeMode.system,
-        // Añadir animaciones de transición por defecto
+        // Añadir animaciones de transición mejoradas
         builder: (context, child) {
-          return child!.animate().fadeIn(duration: 300.ms);
+          if (child == null) {
+            // Proporcionar un fallback en caso de que child sea null
+            return const Center(child: CircularProgressIndicator());
+          }
+          // Añadir animación de aparición suave
+          return child
+              .animate()
+              .fadeIn(duration: 300.ms, curve: Curves.easeOutCubic)
+              .slideY(begin: 0.05, end: 0, duration: 300.ms, curve: Curves.easeOutCubic);
         },
       ),
     );

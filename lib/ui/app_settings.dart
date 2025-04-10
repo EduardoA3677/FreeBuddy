@@ -1,6 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../headphones/framework/bluetooth_headphones.dart';
+import '../headphones/huawei/huawei_headphones_sim.dart';
+import '../headphones/model_definition/huawei_models_definition.dart';
 
 abstract class AppSettings {
   Stream<bool> get seenIntroduction;
@@ -34,11 +36,11 @@ class SharedPreferencesAppSettings implements AppSettings {
   final SharedPreferences preferences;
 
   SharedPreferencesAppSettings(this.preferences);
-
   @override
   BluetoothHeadphones get currentHeadphones {
-    // Replace with actual logic to retrieve the current headphones.
-    throw UnimplementedError('currentHeadphones is not implemented yet.');
+    // Temporary implementation using a simulator for FreeBuds 4i
+    // This ensures the app UI can display properly until a real implementation is available
+    return HuaweiHeadphonesSim(HuaweiModels.freeBuds4i);
   }
 
   @override
