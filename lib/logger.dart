@@ -28,13 +28,16 @@ class AppLogger {
   );
   static void log(LogLevel level, String message,
       {String? tag, Object? error, StackTrace? stackTrace}) {
-    final logMessage = "[${tag ?? 'FreeBuddy'}] $message";
-
-    // Log adicional para asegurar visibilidad en Android
+    final logMessage =
+        "[${tag ?? 'FreeBuddy'}] $message"; // Enhanced Android logging for better logcat visibility
     if (Platform.isAndroid) {
-      // Usar logger directo en lugar de print
-      developer.log("FREEBUDDY_LOG: $level - $logMessage", name: 'FreeBuddy');
-      if (error != null) developer.log("FREEBUDDY_ERROR: $error", name: 'FreeBuddy', error: error);
+      developer.log("FREEBUDDY_LOG: [$level] $logMessage", name: 'FreeBuddy', level: 1000);
+      if (error != null) {
+        developer.log("FREEBUDDY_ERROR: $error", name: 'FreeBuddy', error: error, level: 1000);
+        if (stackTrace != null) {
+          developer.log("FREEBUDDY_STACKTRACE: $stackTrace", name: 'FreeBuddy', level: 1000);
+        }
+      }
     }
 
     switch (level) {

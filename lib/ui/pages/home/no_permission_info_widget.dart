@@ -26,8 +26,7 @@ class NoPermissionInfoWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             FilledButton(
-              onPressed: () =>
-                  context.read<HeadphonesConnectionCubit>().requestPermission(),
+              onPressed: () => context.read<HeadphonesConnectionCubit>().requestPermission(),
               child: Text(
                 l.pageHomeNoPermissionGrant,
                 textAlign: TextAlign.center,

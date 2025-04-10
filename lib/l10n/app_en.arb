@@ -40,12 +40,20 @@
   "pageHeadphonesSettingsHold": "Touch and hold",
   "pageHeadphonesSettingsHoldDesc": "Holding a bud will toggle these ANC modes:",
 
+  "ancNoiseControl": "Noise Control",
   "ancNoiseCancel": "Noise cancelling 🔇",
   "ancNoiseCancelDesc": "Reduces noise around you",
   "ancOff": "Off 🤷",
   "ancOffDesc": "Turns ANC off",
   "ancAwareness": "Awareness 🔊",
   "ancAwarenessDesc": "Allows you to hear your surroundings",
+
+  "headphonesControl": "Headphones Controls",
+  "headphonesControlError": "Error loading controls",
+  "headphonesControlErrorDesc": "Could not load headphone controls",
+  "headphonesControlRetry": "Retry",
+  "headphonesControlNoFeatures": "No compatible features found",
+  "headphonesControlNoFeaturesDesc": "No supported features were found for your headphones.",
 
   "settings": "Settings",
   "privacyPolicy": "Privacy policy",

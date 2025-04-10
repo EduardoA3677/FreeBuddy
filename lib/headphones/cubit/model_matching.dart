@@ -12,10 +12,7 @@ import '../model_definition/huawei_models_definition.dart';
 typedef HeadphonesBuilder = BluetoothHeadphones Function(
     StreamChannel<Uint8List> io, BluetoothDevice device);
 
-typedef MatchedModel = ({
-  HeadphonesBuilder builder,
-  BluetoothHeadphones placeholder
-});
+typedef MatchedModel = ({HeadphonesBuilder builder, BluetoothHeadphones placeholder});
 
 MatchedModel? matchModel(BluetoothDevice matchedDevice) {
   final name = matchedDevice.name.value;
@@ -30,7 +27,7 @@ MatchedModel? matchModel(BluetoothDevice matchedDevice) {
               mbb: mbbChannel(io),
             ),
         placeholder: HuaweiHeadphonesSimPlaceholder(model),
-      ) as MatchedModel;
+      );
     }
   }
 

@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
@@ -34,26 +33,25 @@ class BluetoothDeviceConnectedReceiver : BroadcastReceiver() {
                     intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                 } else {
                     intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                }
-                if (device == null) {
-                    Log.wtf(TAG, "device is null!!")
+                }                if (device == null) {
+                    FreeBuddyLogger.wtf(TAG, "device is null!!")
                     return
                 }
-                Log.d(TAG, "Connected to dev: $device ; Class: ${device.bluetoothClass.majorDeviceClass}")
+                FreeBuddyLogger.d(TAG, "Connected to dev: $device ; Class: ${device.bluetoothClass.majorDeviceClass}")
                 if (ActivityCompat.checkSelfPermission(
                         context,
                         Manifest.permission.BLUETOOTH_CONNECT
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
-                    Log.i(TAG, "No BLUETOOTH_CONNECT permission :(")
+                    FreeBuddyLogger.i(TAG, "No BLUETOOTH_CONNECT permission :(")
                     return
                 }
                 if (device.bluetoothClass.majorDeviceClass != BluetoothClass.Device.Major.AUDIO_VIDEO
                 ) {
-                    Log.v(TAG, "$device is not AUDIO_VIDEO, skipping...")
+                    FreeBuddyLogger.i(TAG, "$device is not AUDIO_VIDEO, skipping...")
                     return
                 }
-                Log.i(TAG, "Scheduling one time work to update widget n stuff...")
+                FreeBuddyLogger.i(TAG, "Scheduling one time work to update widget n stuff...")
                 // this is stuff imported from dev.fluttercommunity.workmanager
                 val oneOffTaskRequest = OneTimeWorkRequest.Builder(BackgroundWorker::class.java)
                     .setInputData(

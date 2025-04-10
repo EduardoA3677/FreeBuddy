@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../headphones/framework/anc.dart';
@@ -12,6 +13,7 @@ class AncCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context)!;
 
     return Card(
       elevation: 1,
@@ -24,7 +26,7 @@ class AncCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Noise Control',
+              l.ancNoiseControl,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -40,15 +42,24 @@ class AncCard extends StatelessWidget {
                   children: [
                     AncButton(
                       icon: Symbols.noise_control_on,
-                      label: 'Noise Cancelling',
+                      label: l.ancNoiseCancel,
+                      description: l.ancNoiseCancelDesc,
                       isSelected: mode == AncMode.noiseCancelling,
                       onPressed: () => anc.setAncMode(AncMode.noiseCancelling),
                     ),
                     AncButton(
                       icon: Symbols.noise_control_off,
-                      label: 'Off',
+                      label: l.ancOff,
+                      description: l.ancOffDesc,
                       isSelected: mode == AncMode.off,
                       onPressed: () => anc.setAncMode(AncMode.off),
+                    ),
+                    AncButton(
+                      icon: Symbols.hearing,
+                      label: l.ancAwareness,
+                      description: l.ancAwarenessDesc,
+                      isSelected: mode == AncMode.transparency,
+                      onPressed: () => anc.setAncMode(AncMode.transparency),
                     ),
                   ],
                 );
@@ -64,12 +75,14 @@ class AncCard extends StatelessWidget {
 class AncButton extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String description;
   final bool isSelected;
   final VoidCallback onPressed;
 
   const AncButton({
     required this.icon,
     required this.label,
+    required this.description,
     required this.isSelected,
     required this.onPressed,
     super.key,
@@ -78,22 +91,42 @@ class AncButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(
-        icon,
-        color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
-      ),
-      label: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
-        ),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? theme.colorScheme.primary : theme.colorScheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+    final backgroundColor =
+        isSelected ? theme.colorScheme.primaryContainer : theme.colorScheme.surface;
+    final foregroundColor =
+        isSelected ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface;
+
+    return Material(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: foregroundColor),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: foregroundColor,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: foregroundColor.withAlpha(204),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
