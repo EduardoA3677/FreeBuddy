@@ -46,8 +46,8 @@
   "github.copilot.chat.agent.runTasks": true,
   "github.copilot.chat.agent.thinkingTool": true,
   "github.copilot.chat.codesearch.enabled": true,
-  "github.copilot.chat.editor.temporalContext.enabled": true,
-  "github.copilot.chat.edits.temporalContext.enabled": true,
+  "github.copilot.chat.editor.temporalContext.enabled": false,
+  "github.copilot.chat.edits.temporalContext.enabled": false,
   "github.copilot.chat.reviewSelection.enabled": true,
   "github.copilot.chat.scopeSelection": true,
   "github.copilot.chat.search.semanticTextResults": true,
@@ -83,5 +83,15 @@
     "Wireshark",
     "xdddd",
     "Xmodem"
-  ]
+  ],
+  "github.copilot.chat.codeGeneration.useInstructionFiles": false,
+  "github.copilot.chat.followUps": "always",
+  "github.copilot.chat.useProjectTemplates": false,
+  "github.copilot.chat.copilotDebugCommand.enabled": false,
+  "github.copilot.chat.startDebugging.enabled": false,
+  "github.copilot.chat.completionContext.typescript.mode": "on",
+  "github.copilot.chat.edits.suggestRelatedFilesFromGitHistory": false,
+  "github.copilot.chat.generateTests.codeLens": true,
+  "github.copilot.chat.languageContext.fix.typescript.enabled": true,
+  "github.copilot.chat.languageContext.typescript.enabled": true
 }

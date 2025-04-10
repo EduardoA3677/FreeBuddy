@@ -23,7 +23,10 @@ class BatteryCard extends StatelessWidget {
       builder: (context, snapshot) {
         final levels = snapshot.data;
         return Card(
-          elevation: 0,
+          elevation: 1,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -37,24 +40,21 @@ class BatteryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildBatteryBox(
-                  context,
+                BatteryBox(
                   icon: FreebuddyIcons.leftEarbud,
                   text: 'Left Earbud',
                   level: levels?.levelLeft,
                   charging: levels?.chargingLeft ?? false,
                 ),
                 const SizedBox(height: 8),
-                _buildBatteryBox(
-                  context,
+                BatteryBox(
                   icon: FreebuddyIcons.rightEarbud,
                   text: 'Right Earbud',
                   level: levels?.levelRight,
                   charging: levels?.chargingRight ?? false,
                 ),
                 const SizedBox(height: 8),
-                _buildBatteryBox(
-                  context,
+                BatteryBox(
                   icon: FreebuddyIcons.earbudsCase,
                   text: 'Case',
                   level: levels?.levelCase,
@@ -67,109 +67,51 @@ class BatteryCard extends StatelessWidget {
       },
     );
   }
-
-  Widget _buildBatteryBox(
-    BuildContext context, {
-    required IconData icon,
-    required String text,
-    required int? level,
-    required bool? charging,
-  }) {
-    return _BatteryContainer(
-      value: level != null ? level / 100 : null,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 300),
-                  tween: Tween<double>(
-                    begin: 0.5,
-                    end: charging == true ? 1.0 : 0.5,
-                  ),
-                  builder: (context, value, child) => Icon(
-                    icon,
-                    size: 28,
-                    color: Theme.of(context).colorScheme.primary.withAlpha((value * 255).round()),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  text,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: Text(
-                    '${level ?? '-'}%',
-                    key: ValueKey(level),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-                if (charging == true) ...[
-                  const SizedBox(width: 8),
-                  Icon(
-                    Symbols.charger,
-                    fill: 1,
-                    size: 20,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
-class _BatteryContainer extends StatelessWidget {
-  final double? value;
-  final Widget child;
+class BatteryBox extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final int? level;
+  final bool charging;
 
-  const _BatteryContainer({
-    required this.value,
-    required this.child,
+  const BatteryBox({
+    required this.icon,
+    required this.text,
+    required this.level,
+    required this.charging,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha((0.3 * 255).round()),
-      ),
-      child: Stack(
-        children: [
-          if (value != null)
-            Positioned.fill(
-              child: AnimatedAlign(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeOutCubic,
-                alignment: Alignment.centerLeft,
-                child: FractionallySizedBox(
-                  widthFactor: value,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withAlpha((0.15 * 255).round()),
-                    ),
-                  ),
-                ),
-              ),
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(icon, color: theme.colorScheme.primary),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: theme.textTheme.bodyMedium,
+          ),
+        ),
+        Text(
+          level != null ? '$level%' : '--%',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        if (charging)
+          const Padding(
+            padding: EdgeInsets.only(left: 8.0),
+            child: Icon(
+              Symbols.bolt,
+              size: 16,
+              color: Colors.green,
             ),
-          child,
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

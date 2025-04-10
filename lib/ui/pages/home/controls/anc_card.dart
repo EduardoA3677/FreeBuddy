@@ -14,7 +14,10 @@ class AncCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
-      elevation: 0,
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -35,26 +38,17 @@ class AncCard extends StatelessWidget {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildAncButton(
-                      context,
+                    AncButton(
                       icon: Symbols.noise_control_on,
                       label: 'Noise Cancelling',
                       isSelected: mode == AncMode.noiseCancelling,
                       onPressed: () => anc.setAncMode(AncMode.noiseCancelling),
                     ),
-                    _buildAncButton(
-                      context,
+                    AncButton(
                       icon: Symbols.noise_control_off,
                       label: 'Off',
                       isSelected: mode == AncMode.off,
                       onPressed: () => anc.setAncMode(AncMode.off),
-                    ),
-                    _buildAncButton(
-                      context,
-                      icon: Symbols.noise_aware,
-                      label: 'Transparency',
-                      isSelected: mode == AncMode.transparency,
-                      onPressed: () => anc.setAncMode(AncMode.transparency),
                     ),
                   ],
                 );
@@ -65,62 +59,41 @@ class AncCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildAncButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required bool isSelected,
-    required VoidCallback onPressed,
-  }) {
+class AncButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onPressed;
+
+  const AncButton({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onPressed,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final surfaceColor = theme.colorScheme.surfaceContainerHighest;
-    final alpha = (0.3 * 255).round();
-
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: isSelected ? theme.colorScheme.primaryContainer : surfaceColor.withAlpha(alpha),
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: onPressed,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      icon,
-                      size: 24,
-                      color: isSelected
-                          ? theme.colorScheme.onPrimaryContainer
-                          : theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      label,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: isSelected
-                            ? theme.colorScheme.onPrimaryContainer
-                            : theme.colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(
+        icon,
+        color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? theme.colorScheme.primary : theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
     );

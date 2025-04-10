@@ -4,7 +4,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app_settings.dart';
-import '../../common/headphones_connection_ensuring_overlay.dart';
 import 'controls/headphones_controls_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -48,74 +47,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    final size = MediaQuery.of(context).size;
-    final isLandscape = size.width > size.height;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l.appTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: l.settings,
-            onPressed: () => GoRouter.of(context).push('/settings'),
-          ),
-        ],
       ),
-      body: SafeArea(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) => FadeTransition(
-            opacity: _controller,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 0.1),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: _controller,
-                curve: Curves.easeOutCubic,
-              )),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return isLandscape
-                      ? _buildLandscapeLayout(constraints)
-                      : _buildPortraitLayout(constraints);
-                },
-              ),
-            ),
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: HeadphonesControlsWidget(
+          headphones: context.read<AppSettings>().currentHeadphones,
         ),
       ),
-    );
-  }
-
-  Widget _buildPortraitLayout(BoxConstraints constraints) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          children: [
-            HeadphonesConnectionEnsuringOverlay(
-              builder: (context, headphones) => HeadphonesControlsWidget(headphones: headphones),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLandscapeLayout(BoxConstraints constraints) {
-    return Row(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: HeadphonesConnectionEnsuringOverlay(
-              builder: (context, headphones) => HeadphonesControlsWidget(headphones: headphones),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
