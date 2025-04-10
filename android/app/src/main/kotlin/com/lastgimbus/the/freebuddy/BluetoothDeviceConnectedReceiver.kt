@@ -14,6 +14,9 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import dev.fluttercommunity.workmanager.BackgroundWorker
 
+// Ensure FreeBuddyLogger is properly imported or defined
+import com.lastgimbus.the.freebuddy.utils.FreeBuddyLogger
+
 /**
  * This reacts to a new bluetooth device being connected (literally any)
  *
@@ -32,8 +35,11 @@ class BluetoothDeviceConnectedReceiver : BroadcastReceiver() {
                 val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                 } else {
-                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                }                if (device == null) {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                }
+
+                if (device == null) {
                     FreeBuddyLogger.wtf(TAG, "device is null!!")
                     return
                 }
@@ -43,11 +49,10 @@ class BluetoothDeviceConnectedReceiver : BroadcastReceiver() {
                         Manifest.permission.BLUETOOTH_CONNECT
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
-                    FreeBuddyLogger.i(TAG, "No BLUETOOTH_CONNECT permission :(")
+                    FreeBuddyLogger.i(TAG, "No BLUETOOTH_CONNECT permission granted")
                     return
                 }
-                if (device.bluetoothClass.majorDeviceClass != BluetoothClass.Device.Major.AUDIO_VIDEO
-                ) {
+                if (device.bluetoothClass.majorDeviceClass != BluetoothClass.Device.Major.AUDIO_VIDEO) {
                     FreeBuddyLogger.i(TAG, "$device is not AUDIO_VIDEO, skipping...")
                     return
                 }
