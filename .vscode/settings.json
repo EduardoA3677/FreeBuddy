@@ -38,19 +38,6 @@
     "**/android/app/release": true
   },
   // ✍️ GitHub Copilot Core
-  "github.copilot.editor.enableAutoCompletions": true,
-  "github.copilot.editor.enableCodeActions": true,
-  "github.copilot.nextEditSuggestions.enabled": true,
-  "github.copilot.renameSuggestions.triggerAutomatically": true,
-  // 🤖 GitHub Copilot Chat (Agent)
-  "github.copilot.chat.agent.runTasks": true,
-  "github.copilot.chat.agent.thinkingTool": true,
-  "github.copilot.chat.codesearch.enabled": true,
-  "github.copilot.chat.editor.temporalContext.enabled": false,
-  "github.copilot.chat.edits.temporalContext.enabled": false,
-  "github.copilot.chat.reviewSelection.enabled": true,
-  "github.copilot.chat.scopeSelection": true,
-  "github.copilot.chat.search.semanticTextResults": true,
   // 🔤 Diccionario personalizado para evitar errores en palabras técnicas/propias
   "cSpell.words": [
     "Actaully",
@@ -84,14 +71,8 @@
     "xdddd",
     "Xmodem"
   ],
-  "github.copilot.chat.codeGeneration.useInstructionFiles": false,
-  "github.copilot.chat.followUps": "always",
-  "github.copilot.chat.useProjectTemplates": false,
-  "github.copilot.chat.copilotDebugCommand.enabled": false,
-  "github.copilot.chat.startDebugging.enabled": false,
-  "github.copilot.chat.completionContext.typescript.mode": "on",
-  "github.copilot.chat.edits.suggestRelatedFilesFromGitHistory": false,
-  "github.copilot.chat.generateTests.codeLens": true,
-  "github.copilot.chat.languageContext.fix.typescript.enabled": true,
-  "github.copilot.chat.languageContext.typescript.enabled": true
+  "github.copilot.advanced": {
+    "debug.useElectronFetcher": true,
+    "debug.useNodeFetcher": false
+  }
 }

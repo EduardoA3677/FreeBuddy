@@ -4,6 +4,7 @@ import '../huawei/features/settings.dart';
 /// Definition of a Huawei headphones model with its capabilities
 class HuaweiModelDefinition {
   final String name;
+  final String vendor;
   final RegExp idNameRegex;
   final String imageAssetPath;
   final bool supportsAnc;
@@ -15,6 +16,7 @@ class HuaweiModelDefinition {
 
   const HuaweiModelDefinition({
     required this.name,
+    required this.vendor,
     required this.idNameRegex,
     required this.imageAssetPath,
     this.supportsAnc = false,
@@ -31,6 +33,7 @@ class HuaweiModels {
   /// FreeBuds Pro 3 model definition
   static final freeBudsPro3 = HuaweiModelDefinition(
     name: "FreeBuds Pro 3",
+    vendor: "Huawei",
     idNameRegex: RegExp(r'^(?=(HUAWEI FreeBuds Pro 3))', caseSensitive: true),
     imageAssetPath: 'assets/app_icons/ic_launcher.png',
     supportsAnc: true,
@@ -54,6 +57,7 @@ class HuaweiModels {
   /// FreeBuds 4i model definition
   static final freeBuds4i = HuaweiModelDefinition(
     name: "FreeBuds 4i",
+    vendor: "Huawei",
     idNameRegex: RegExp(r'^(?=(HUAWEI FreeBuds 4i))', caseSensitive: true),
     imageAssetPath: 'assets/app_icons/ic_launcher.png',
     supportsAnc: true,

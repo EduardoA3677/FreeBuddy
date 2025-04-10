@@ -46,6 +46,8 @@
   "ancOffDesc": "Wyłącza kontrolę hałasu",
   "ancAwareness": "Transparentność 🔊",
   "ancAwarenessDesc": "Pozwala słyszeć otoczenie",
+  "ancControlError": "Error with loading ancControl",
+
 
   "headphonesControl": "Sterowanie słuchawkami",
   "headphonesControlError": "Błąd wczytywania kontrolek",
