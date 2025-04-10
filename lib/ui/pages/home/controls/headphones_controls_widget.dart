@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../headphones/framework/anc.dart';
 import '../../../../headphones/framework/bluetooth_headphones.dart';
@@ -8,6 +9,7 @@ import '../../../../headphones/framework/headphones_info.dart';
 import '../../../../headphones/framework/headphones_settings.dart';
 import '../../../../headphones/framework/lrc_battery.dart';
 import '../../../../logger.dart';
+import '../../../app_settings.dart';
 import '../../../theme/layouts.dart';
 import 'anc_card.dart';
 import 'battery_card.dart';
@@ -33,6 +35,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final textTheme = theme.textTheme;
     final windowSize = WindowSizeClass.of(context);
     final bottomPadding = MediaQuery.viewPaddingOf(context).bottom;
+    final screenWidth = MediaQuery.of(context).size.width;
     final l = AppLocalizations.of(context)!;
 
     return SafeArea(
@@ -45,15 +48,15 @@ class HeadphonesControlsWidget extends StatelessWidget {
               padding: const EdgeInsets.all(12.0) + EdgeInsets.only(bottom: bottomPadding),
               child: Column(
                 children: [
-                  _buildHeader(textTheme, l),
+                  _buildAppBar(context, textTheme, l),
                   const SizedBox(height: 16),
-                  Expanded(
-                    child: _buildMainContent(windowSize, theme, l),
-                  ),
-                  if (headphones is HeadphonesSettings) ...[
+                  if (headphones is HeadphonesModelInfo) ...[
+                    _buildModelHeader(headphones as HeadphonesModelInfo, textTheme),
                     const SizedBox(height: 16),
-                    _buildSettingsButton(context, l),
                   ],
+                  Expanded(
+                    child: _buildMainContent(windowSize, theme, l, screenWidth),
+                  ),
                 ],
               ),
             );
@@ -73,28 +76,40 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(TextTheme textTheme, AppLocalizations l) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildAppBar(BuildContext context, TextTheme textTheme, AppLocalizations l) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           l.headphonesControl,
           style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 4),
-        // Display model name when available
-        if (headphones is HeadphonesModelInfo)
-          Text(
-            "${(headphones as HeadphonesModelInfo).vendor} ${(headphones as HeadphonesModelInfo).name}",
-            style: textTheme.titleMedium?.copyWith(
-              color: Colors.grey[600],
-            ),
-          ),
+        IconButton(
+          icon: const Icon(Icons.settings),
+          tooltip: l.settings,
+          onPressed: () {
+            // Open app settings
+            showDialog(
+              context: context,
+              builder: (context) => _buildAppSettingsDialog(context, l),
+            );
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildMainContent(WindowSizeClass windowSize, ThemeData theme, AppLocalizations l) {
+  Widget _buildModelHeader(HeadphonesModelInfo modelInfo, TextTheme textTheme) {
+    return Text(
+      "${modelInfo.vendor} ${modelInfo.name}",
+      style: textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _buildMainContent(
+      WindowSizeClass windowSize, ThemeData theme, AppLocalizations l, double screenWidth) {
     log(LogLevel.debug, "Building main content for headphones: ${headphones.runtimeType}");
 
     final contentWidgets = <Widget>[];
@@ -102,10 +117,28 @@ class HeadphonesControlsWidget extends StatelessWidget {
     // Add headphones image if model info is available
     if (headphones is HeadphonesModelInfo) {
       contentWidgets.add(
-        Container(
-          height: 150,
-          margin: const EdgeInsets.only(bottom: 16),
-          child: HeadphonesImage(headphones as HeadphonesModelInfo),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // Make image responsive to screen size
+            final imageHeight = constraints.maxWidth > 600 ? 180.0 : 150.0;
+            return Container(
+              height: imageHeight,
+              margin: const EdgeInsets.only(bottom: 16),
+              child: HeadphonesImage(headphones as HeadphonesModelInfo),
+            );
+          },
+        ),
+      );
+    }
+
+    // Add settings button if available (using Builder to get context)
+    if (headphones is HeadphonesSettings) {
+      contentWidgets.add(
+        Builder(
+          builder: (context) => Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: _buildSettingsButton(context, l),
+          ),
         ),
       );
     }
@@ -114,14 +147,24 @@ class HeadphonesControlsWidget extends StatelessWidget {
     void addBatteryFeature() {
       if (headphones is LRCBattery) {
         log(LogLevel.debug, "Adding battery feature");
-        contentWidgets.add(BatteryCard(headphones as LRCBattery));
+        contentWidgets.add(
+          FractionallySizedBox(
+            widthFactor: screenWidth > 600 ? 0.8 : 0.95,
+            child: BatteryCard(headphones as LRCBattery),
+          ),
+        );
       }
     }
 
     void addANCFeature() {
       if (headphones is Anc) {
         log(LogLevel.debug, "Adding ANC feature");
-        contentWidgets.add(AncCard(headphones as Anc));
+        contentWidgets.add(
+          FractionallySizedBox(
+            widthFactor: screenWidth > 600 ? 0.8 : 0.95,
+            child: AncCard(headphones as Anc),
+          ),
+        );
       }
     }
 
@@ -206,6 +249,41 @@ class HeadphonesControlsWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
+    );
+  }
+
+  Widget _buildAppSettingsDialog(BuildContext context, AppLocalizations l) {
+    final appSettings = Provider.of<AppSettings>(context, listen: false);
+
+    return AlertDialog(
+      title: Text(l.settings),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Sleep mode toggle
+          StreamBuilder<bool>(
+            stream: appSettings.sleepMode,
+            builder: (context, snapshot) {
+              final sleepModeEnabled = snapshot.data ?? false;
+              return SwitchListTile(
+                title: const Text('Sleep Mode'),
+                value: sleepModeEnabled,
+                onChanged: (value) {
+                  appSettings.setSleepMode(value);
+                },
+              );
+            },
+          ),
+          // Add more app settings here as needed
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+      ],
     );
   }
 }

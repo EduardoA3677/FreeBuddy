@@ -14,6 +14,7 @@ class AncCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Card(
       elevation: 1,
@@ -37,31 +38,65 @@ class AncCard extends StatelessWidget {
               stream: anc.ancMode,
               builder: (context, snapshot) {
                 final mode = snapshot.data;
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    AncButton(
-                      icon: Symbols.noise_control_on,
-                      label: l.ancNoiseCancel,
-                      description: l.ancNoiseCancelDesc,
-                      isSelected: mode == AncMode.noiseCancelling,
-                      onPressed: () => anc.setAncMode(AncMode.noiseCancelling),
-                    ),
-                    AncButton(
-                      icon: Symbols.noise_control_off,
-                      label: l.ancOff,
-                      description: l.ancOffDesc,
-                      isSelected: mode == AncMode.off,
-                      onPressed: () => anc.setAncMode(AncMode.off),
-                    ),
-                    AncButton(
-                      icon: Symbols.hearing,
-                      label: l.ancAwareness,
-                      description: l.ancAwarenessDesc,
-                      isSelected: mode == AncMode.transparency,
-                      onPressed: () => anc.setAncMode(AncMode.transparency),
-                    ),
-                  ],
+
+                // Use a responsive layout that adapts to screen width
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isSmallScreen = constraints.maxWidth < 360;
+                    final useVerticalLayout = isSmallScreen || screenWidth < 400;
+
+                    final ancButtons = [
+                      AncButton(
+                        icon: Symbols.noise_control_on,
+                        label: l.ancNoiseCancel,
+                        description: l.ancNoiseCancelDesc,
+                        isSelected: mode == AncMode.noiseCancelling,
+                        onPressed: () {
+                          // Use standard interface instead of direct channel access
+                          anc.setAncMode(AncMode.noiseCancelling);
+                        },
+                      ),
+                      AncButton(
+                        icon: Symbols.noise_control_off,
+                        label: l.ancOff,
+                        description: l.ancOffDesc,
+                        isSelected: mode == AncMode.off,
+                        onPressed: () {
+                          // Use standard interface instead of direct channel access
+                          anc.setAncMode(AncMode.off);
+                        },
+                      ),
+                      AncButton(
+                        icon: Symbols.hearing,
+                        label: l.ancAwareness,
+                        description: l.ancAwarenessDesc,
+                        isSelected: mode == AncMode.transparency,
+                        onPressed: () {
+                          // Use standard interface instead of direct channel access
+                          anc.setAncMode(AncMode.transparency);
+                        },
+                      ),
+                    ];
+
+                    if (useVerticalLayout) {
+                      return Column(
+                        children: ancButtons
+                            .map((button) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: button,
+                                  ),
+                                ))
+                            .toList(),
+                      );
+                    } else {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: ancButtons,
+                      );
+                    }
+                  },
                 );
               },
             ),
@@ -104,29 +139,37 @@ class AncButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: foregroundColor),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: foregroundColor,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          child: LayoutBuilder(builder: (context, constraints) {
+            final isSmallWidth = constraints.maxWidth < 120;
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: foregroundColor),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: foregroundColor,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontSize: isSmallWidth ? 12 : 14,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: foregroundColor.withAlpha(204),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: foregroundColor.withAlpha(204),
+                    fontSize: isSmallWidth ? 10 : 12,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+              ],
+            );
+          }),
         ),
       ),
     );

@@ -38,9 +38,8 @@ class SharedPreferencesAppSettings implements AppSettings {
   SharedPreferencesAppSettings(this.preferences);
   @override
   BluetoothHeadphones get currentHeadphones {
-    // Temporary implementation using a simulator for FreeBuds 4i
-    // This ensures the app UI can display properly until a real implementation is available
-    return HuaweiHeadphonesSim(HuaweiModels.freeBuds4i);
+    // Using FreeBuds Pro 3 model as requested
+    return HuaweiHeadphonesSim(HuaweiModels.freeBudsPro3);
   }
 
   @override
