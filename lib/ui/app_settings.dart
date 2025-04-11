@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../headphones/framework/bluetooth_headphones.dart';
+import '../headphones/huawei/huawei_headphones_sim.dart';
+import '../headphones/model_definition/huawei_models_definition.dart';
 
 abstract class AppSettings {
   Stream<bool> get seenIntroduction;
