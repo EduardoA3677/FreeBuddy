@@ -24,10 +24,4 @@ abstract class BluetoothHeadphones {
   /// Generic battery level, probably got from OS - watch out that this may
   /// never emit cause **some** OSes/headphones still don't support it
   ValueStream<int> get batteryLevel;
-
-  /// Stream indicating whether the headphones are currently connected
-  ValueStream<bool> get isConnected;
-
-  /// Information about the headphone model
-  HeadphonesModelInfo get modelInfo;
 }
