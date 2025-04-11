@@ -78,7 +78,9 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
         }
 
         // Notificar al cubit que los permisos han sido concedidos
-        context.read<HeadphonesConnectionCubit>().requestPermission();
+        if (context.mounted) {
+          context.read<HeadphonesConnectionCubit>().requestPermission();
+        }
       }
     }
   }

@@ -103,12 +103,8 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
       FlutterNativeSplash.remove();
     });
 
-    // Inicializar Bluetooth automáticamente al iniciar la aplicación
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
-      _btBlock.requestPermission();
-      log(LogLevel.info, "Inicialización automática de Bluetooth solicitada");
-    });
+    // No inicializar Bluetooth automáticamente
+    // Los permisos serán solicitados después de la introducción
   }
 
   @override
