@@ -64,9 +64,12 @@
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
             android:name="flutterEmbedding"
-            android:value="2" />
+            android:value="2" />        <service android:name="com.pravera.flutter_foreground_task.service.ForegroundService" />
 
-        <service android:name="com.pravera.flutter_foreground_task.service.ForegroundService" />
+        <service
+            android:name=".BatteryUpdateService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
 
         <receiver
             android:name=".BatteryWidgetReceiver"

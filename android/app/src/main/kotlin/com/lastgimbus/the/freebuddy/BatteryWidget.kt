@@ -57,9 +57,7 @@ class BatteryWidget : GlanceAppWidget() {
         }
         // Added a foreground service to improve live updates
         startForegroundService(context)
-    }
-
-    private fun startForegroundService(context: Context) {
+    }    private fun startForegroundService(context: Context) {
         val intent = Intent(context, BatteryUpdateService::class.java)
         ContextCompat.startForegroundService(context, intent)
     }
