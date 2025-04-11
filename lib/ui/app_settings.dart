@@ -1,8 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../headphones/framework/bluetooth_headphones.dart';
-import '../headphones/huawei/huawei_headphones_sim.dart';
-import '../headphones/model_definition/huawei_models_definition.dart';
 
 abstract class AppSettings {
   Stream<bool> get seenIntroduction;
@@ -19,12 +18,24 @@ abstract class AppSettings {
 
   /// Getter for the current headphones.
   BluetoothHeadphones get currentHeadphones;
+
+  /// Tema de la aplicación
+  Stream<ThemeMode> get themeMode;
+
+  Future<bool> setThemeMode(ThemeMode value);
+
+  /// Modo debug para mostrar logs detallados
+  Stream<bool> get debugMode;
+
+  Future<bool> setDebugMode(bool value);
 }
 
 enum _Prefs {
   seenIntroduction('seenIntroduction', false),
   sleepMode('sleepMode', false),
-  sleepModePreviousSettings('sleepModePreviousSettings', '');
+  sleepModePreviousSettings('sleepModePreviousSettings', ''),
+  themeMode('themeMode', 0), // 0 = ThemeMode.system
+  debugMode('debugMode', false);
 
   const _Prefs(this.key, this.defaultValue);
 
@@ -39,12 +50,33 @@ class SharedPreferencesAppSettings implements AppSettings {
   @override
   BluetoothHeadphones get currentHeadphones {
     // Using FreeBuds Pro 3 model as requested
-    return HuaweiHeadphonesSim(HuaweiModels.freeBudsPro3);
+    throw UnimplementedError('currentHeadphones is not implemented yet.');
   }
 
   @override
   Stream<bool> get seenIntroduction async* {
     yield preferences.getBool(_Prefs.seenIntroduction.key) ?? _Prefs.seenIntroduction.defaultValue;
+  }
+
+  @override
+  Stream<ThemeMode> get themeMode async* {
+    final value = preferences.getInt(_Prefs.themeMode.key) ?? _Prefs.themeMode.defaultValue;
+    yield ThemeMode.values[value];
+  }
+
+  @override
+  Future<bool> setThemeMode(ThemeMode value) async {
+    return preferences.setInt(_Prefs.themeMode.key, value.index);
+  }
+
+  @override
+  Stream<bool> get debugMode async* {
+    yield preferences.getBool(_Prefs.debugMode.key) ?? _Prefs.debugMode.defaultValue;
+  }
+
+  @override
+  Future<bool> setDebugMode(bool value) async {
+    return preferences.setBool(_Prefs.debugMode.key, value);
   }
 
   @override

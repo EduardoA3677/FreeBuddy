@@ -15,28 +15,43 @@ class AppLogger {
       methodCount: 2,
       errorMethodCount: 8,
       lineLength: 120,
-      colors: !Platform.isAndroid, // Desactivar colores para Android logcat
+      colors: true, // Desactivar colores para Android logcat
       printEmojis: false, // Los emojis pueden causar problemas en algunos logcat
       dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart, // Usar formato de fecha recomendado
     ),
     level: Level.trace, // Usar el nivel más detallado
-    output: MultiOutput([
-      ConsoleOutput(),
-      // Output personalizado que asegura visibilidad en logcat
-      if (Platform.isAndroid) AndroidLogcatOutput(),
-    ]),
   );
+  // Buffer para almacenar logs recientes
+  static final List<String> _logBuffer = [];
+  static const int _maxBufferSize = 5000; // Número máximo de entradas de log
+
+  // Método para obtener el contenido actual de los logs
+  static String getLogContent() {
+    return _logBuffer.join('\n');
+  }
+
+  // Método auxiliar para añadir una entrada al buffer de logs
+  static void _addToBuffer(String entry) {
+    _logBuffer.add('[${DateTime.now().toIso8601String()}] $entry');
+    // Mantener el buffer en un tamaño manejable
+    if (_logBuffer.length > _maxBufferSize) {
+      _logBuffer.removeAt(0);
+    }
+  }
+
   static void log(LogLevel level, String message,
       {String? tag, Object? error, StackTrace? stackTrace}) {
     final logMessage =
         "[${tag ?? 'FreeBuddy'}] $message"; // Enhanced Android logging for better logcat visibility
-    if (Platform.isAndroid) {
-      developer.log("FREEBUDDY_LOG: [$level] $logMessage", name: 'FreeBuddy', level: 1000);
-      if (error != null) {
-        developer.log("FREEBUDDY_ERROR: $error", name: 'FreeBuddy', error: error, level: 1000);
-        if (stackTrace != null) {
-          developer.log("FREEBUDDY_STACKTRACE: $stackTrace", name: 'FreeBuddy', level: 1000);
-        }
+
+    // Añadir al buffer interno para exportación
+    final bufferEntry = "[$level] $logMessage";
+    _addToBuffer(bufferEntry);
+
+    if (error != null) {
+      _addToBuffer("ERROR: $error");
+      if (stackTrace != null) {
+        _addToBuffer("STACKTRACE: $stackTrace");
       }
     }
 
@@ -103,31 +118,6 @@ class AppLogger {
         developer.log("FREEBUDDY_FATAL: $errorMsg", name: 'FreeBuddy', error: error, level: 2000);
       }
     });
-  }
-}
-
-// Clase personalizada para asegurar que los logs aparezcan en Android logcat
-class AndroidLogcatOutput extends LogOutput {
-  @override
-  void output(OutputEvent event) {
-    for (var line in event.lines) {
-      // Usar developer.log en lugar de print
-      developer.log("FREEBUDDY_LOGGER: $line", name: 'FreeBuddy');
-    }
-  }
-}
-
-// Clase para manejar múltiples outputs
-class MultiOutput extends LogOutput {
-  final List<LogOutput> outputs;
-
-  MultiOutput(this.outputs);
-
-  @override
-  void output(OutputEvent event) {
-    for (var output in outputs) {
-      output.output(event);
-    }
   }
 }
 

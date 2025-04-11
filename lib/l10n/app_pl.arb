@@ -77,6 +77,18 @@
   "pageIntroWhatIsThis": "FreeBuddy to open-source aplikacja do twoich słuchaweczek 🎧",
   "pageIntroSupported": "Obecnie wspierane są:\n - Huawei FreeBuds Pro 3\n - Huawei FreeBuds 4i\n - Huawei FreeBuds 3i",
   "pageIntroShortPrivacyPolicy": "Ta aplikacja nie zbiera żadnych maili, identyfikatorów, czy innych osobistych danych 🎉 Możesz o tym poczytać tutaj: ",
-  "pageIntroAnyQuestions": "Jeśli masz jakiekolwiek pytania, napisz do mnie śmiało 💌 Wejdź w \"Ustawienia->O aplikacji\" po moje socjale!",
-  "pageIntroQuit": "Oki doki 👍"
+  "pageIntroAnyQuestions": "Jeśli masz jakiekolwiek pytania, napisz do mnie śmiało 💌 Wejdź w \"Ustawienia->O aplikacji\" po moje socjale!",  "pageIntroQuit": "Oki doki 👍",
+
+  "themeSettingsTitle": "Ustawienia Motywu 🎨",
+  "themeSettingsLight": "Jasny Motyw ☀️",
+  "themeSettingsDark": "Ciemny Motyw 🌙",
+  "themeSettingsSystem": "Motyw Systemowy 📱",
+
+  "debugSettingsTitle": "Opcje Debugowania 🛠️",
+  "debugModeEnable": "Włącz Tryb Debugowania 🔍",
+  "debugModeDescription": "Pokaż szczegółowe logi do rozwiązywania problemów",
+  "exportLogs": "Eksportuj Logi 📤",
+  "exportLogsDescription": "Zapisz aktualne logi do pliku",
+  "exportLogsSuccess": "Logi wyeksportowane pomyślnie",
+  "exportLogsError": "Błąd podczas eksportowania logów"
 }

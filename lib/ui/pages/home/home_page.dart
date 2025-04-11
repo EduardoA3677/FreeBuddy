@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../headphones/framework/headphones_info.dart';
 import '../../app_settings.dart';
 import 'controls/headphones_controls_widget.dart';
 
@@ -71,14 +72,30 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Título de bienvenida
+              // Título con el nombre del audífono conectado
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
-                child: Text(
-                  l.headphonesControl,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: StreamBuilder<Object>(
+                  stream: context.read<AppSettings>().currentHeadphones.isConnected,
+                  builder: (context, snapshot) {
+                    final headphones = context.read<AppSettings>().currentHeadphones;
+                    String headphonesName = '';
+
+                    // Determinar el nombre del audífono basado en su modelo
+                    if (headphones is HeadphonesModelInfo) {
+                      headphonesName = headphones.modelInfo.name;
+                    } else {
+                      // Fallback por si no tenemos info del modelo
+                      headphonesName = l.headphonesControl;
+                    }
+
+                    return Text(
+                      headphonesName,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
                 ),
               )
                   .animate(controller: _controller)
@@ -96,13 +113,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ],
           ),
         ),
-      ),
-      // Botón flotante para ir rápidamente a la configuración de los auriculares
+      ), // Botón flotante para ir a la configuración general
       floatingActionButton: FloatingActionButton(
-        onPressed: () => GoRouter.of(context).push('/headphones_settings'),
-        tooltip: l.pageHeadphonesSettingsTitle,
+        onPressed: () => GoRouter.of(context).push('/settings'),
+        tooltip: l.settings,
         elevation: 4,
-        child: const Icon(Symbols.settings),
+        child: const Icon(Symbols.settings_rounded),
       ).animate(controller: _controller).scale(
           begin: const Offset(0.0, 0.0),
           end: const Offset(1.0, 1.0),

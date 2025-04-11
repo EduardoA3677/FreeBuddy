@@ -35,10 +35,9 @@ class BluetoothDeviceConnectedReceiver : BroadcastReceiver() {
                 val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                 } else {
-                    @Suppress("DEPRECATION")
-                    intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                }
 
+                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                }
                 if (device == null) {
                     FreeBuddyLogger.wtf(TAG, "device is null!!")
                     return
@@ -52,7 +51,8 @@ class BluetoothDeviceConnectedReceiver : BroadcastReceiver() {
                     FreeBuddyLogger.i(TAG, "No BLUETOOTH_CONNECT permission granted")
                     return
                 }
-                if (device.bluetoothClass.majorDeviceClass != BluetoothClass.Device.Major.AUDIO_VIDEO) {
+                if (device.bluetoothClass.majorDeviceClass != BluetoothClass.Device.Major.AUDIO_VIDEO)
+                {
                     FreeBuddyLogger.i(TAG, "$device is not AUDIO_VIDEO, skipping...")
                     return
                 }

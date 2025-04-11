@@ -27,7 +27,7 @@ MatchedModel? matchModel(BluetoothDevice matchedDevice) {
               mbb: mbbChannel(io),
             ),
         placeholder: HuaweiHeadphonesSimPlaceholder(model),
-      );
+      ) as MatchedModel;
     }
   }
 

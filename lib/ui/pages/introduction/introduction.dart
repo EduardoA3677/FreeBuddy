@@ -4,6 +4,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../pages/home/no_permission_info_widget.dart';
+
 class FreebuddyIntroduction extends StatelessWidget {
   const FreebuddyIntroduction({super.key});
 
@@ -14,8 +16,7 @@ class FreebuddyIntroduction extends StatelessWidget {
       text: text,
       style: const TextStyle(color: Colors.blue),
       recognizer: TapGestureRecognizer()
-        ..onTap = () =>
-            launchUrlString(url ?? text, mode: LaunchMode.externalApplication),
+        ..onTap = () => launchUrlString(url ?? text, mode: LaunchMode.externalApplication),
     );
   }
 
@@ -35,8 +36,7 @@ class FreebuddyIntroduction extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Spacer(flex: 6),
-              Text(l.pageIntroTitle,
-                  style: tt.displayMedium, textAlign: TextAlign.center),
+              Text(l.pageIntroTitle, style: tt.displayMedium, textAlign: TextAlign.center),
               const Spacer(flex: 12),
               // Rich text with introduction and link to privacy policy
               RichText(
@@ -70,7 +70,12 @@ class FreebuddyIntroduction extends StatelessWidget {
                 children: [
                   const Spacer(),
                   TextButton(
-                    onPressed: () => GoRouter.of(context).pop<bool>(true),
+                    onPressed: () {
+                      // Marcar la introducción como vista
+                      GoRouter.of(context).pop<bool>(true);
+                      // Mostrar la pantalla de permisos después de cerrar la introducción
+                      _showPermissionsScreen(context);
+                    },
                     child: Text(l.pageIntroQuit),
                   ),
                 ],
@@ -79,6 +84,30 @@ class FreebuddyIntroduction extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  // Método para mostrar la pantalla de permisos
+  void _showPermissionsScreen(BuildContext context) {
+    // Usar Navigator para mostrar un diálogo modal con los permisos
+    showDialog(
+      context: context,
+      barrierDismissible: false, // El usuario no puede cerrar el diálogo haciendo clic fuera
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.pageHomeNoPermission),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Usar el widget mejorado de permisos
+                const NoPermissionInfoWidget(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

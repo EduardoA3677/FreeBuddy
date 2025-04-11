@@ -102,6 +102,13 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
       // Asegurarse de eliminar el splash incluso si hay errores
       FlutterNativeSplash.remove();
     });
+
+    // Inicializar Bluetooth automáticamente al iniciar la aplicación
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      _btBlock.requestPermission();
+      log(LogLevel.info, "Inicialización automática de Bluetooth solicitada");
+    });
   }
 
   @override
@@ -168,26 +175,31 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
-      builder: (lightDynamic, darkDynamic) => MaterialApp.router(
-        debugShowCheckedModeBanner: false, // Eliminar la etiqueta de debug
-        routerConfig: router,
-        onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: lightTheme(lightDynamic),
-        darkTheme: darkTheme(darkDynamic),
-        themeMode: ThemeMode.system,
-        // Añadir animaciones de transición mejoradas
-        builder: (context, child) {
-          if (child == null) {
-            // Proporcionar un fallback en caso de que child sea null
-            return const Center(child: CircularProgressIndicator());
-          }
-          // Añadir animación de aparición suave
-          return child
-              .animate()
-              .fadeIn(duration: 300.ms, curve: Curves.easeOutCubic)
-              .slideY(begin: 0.05, end: 0, duration: 300.ms, curve: Curves.easeOutCubic);
+      builder: (lightDynamic, darkDynamic) => StreamBuilder<ThemeMode>(
+        stream: context.read<AppSettings>().themeMode,
+        initialData: ThemeMode.system,
+        builder: (context, snapshot) {
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false, // Eliminar la etiqueta de debug
+            routerConfig: router,
+            onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: lightTheme(lightDynamic),
+            darkTheme: darkTheme(darkDynamic),
+            themeMode: snapshot.data!, // Añadir animaciones de transición mejoradas
+            builder: (context, child) {
+              if (child == null) {
+                // Proporcionar un fallback en caso de que child sea null
+                return const Center(child: CircularProgressIndicator());
+              }
+              // Añadir animación de aparición suave
+              return child
+                  .animate()
+                  .fadeIn(duration: 300.ms, curve: Curves.easeOutCubic)
+                  .slideY(begin: 0.05, end: 0, duration: 300.ms, curve: Curves.easeOutCubic);
+            },
+          );
         },
       ),
     );
