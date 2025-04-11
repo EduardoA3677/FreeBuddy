@@ -89,12 +89,12 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
   }
 
   void _setupSplashRemoval() {
-    // Eliminar splash cuando los auriculares se conecten o después de 1.5 segundos
+    // Eliminar splash cuando los auriculares se conecten o después de 1 segundo
     _btBlock.stream
         .firstWhere((e) => e is HeadphonesConnectedOpen)
         .timeout(
           const Duration(seconds: 1),
-          onTimeout: () => const HeadphonesNotPaired(), // Solo un placeholder
+          onTimeout: () => const HeadphonesNotPaired(),
         )
         .then((_) {
       FlutterNativeSplash.remove();

@@ -23,15 +23,34 @@ class AppLogger {
   );
   // Buffer para almacenar logs recientes
   static final List<String> _logBuffer = [];
-  static const int _maxBufferSize = 5000; // Número máximo de entradas de log
+  static const int _maxBufferSize =
+      1000; // Reducido de 5000 a 1000 para evitar desbordamiento de memoria
+  static LogLevel _bufferLogLevel = LogLevel.info; // Por defecto solo registrar info y superiores
 
   // Método para obtener el contenido actual de los logs
   static String getLogContent() {
     return _logBuffer.join('\n');
   }
 
+  // Configura qué nivel de logs se guardan en el buffer
+  static void setBufferLogLevel(LogLevel level) {
+    _bufferLogLevel = level;
+    log(LogLevel.debug, "Nivel de log en buffer cambiado a: $level");
+  }
+
+  // Limpiar el buffer de logs cuando sea necesario
+  static void clearLogBuffer() {
+    _logBuffer.clear();
+    log(LogLevel.debug, "Buffer de logs limpiado");
+  }
+
   // Método auxiliar para añadir una entrada al buffer de logs
-  static void _addToBuffer(String entry) {
+  static void _addToBuffer(String entry, LogLevel level) {
+    // Solo almacenar logs del nivel configurado o superior
+    if (level.index < _bufferLogLevel.index) {
+      return;
+    }
+
     _logBuffer.add('[${DateTime.now().toIso8601String()}] $entry');
     // Mantener el buffer en un tamaño manejable
     if (_logBuffer.length > _maxBufferSize) {
@@ -46,12 +65,14 @@ class AppLogger {
 
     // Añadir al buffer interno para exportación
     final bufferEntry = "[$level] $logMessage";
-    _addToBuffer(bufferEntry);
+    _addToBuffer(bufferEntry, level);
 
     if (error != null) {
-      _addToBuffer("ERROR: $error");
+      _addToBuffer("ERROR: $error", level);
       if (stackTrace != null) {
-        _addToBuffer("STACKTRACE: $stackTrace");
+        // Limitar el tamaño del stacktrace para evitar consumo excesivo de memoria
+        final limitedStackTrace = stackTrace.toString().split('\n').take(20).join('\n');
+        _addToBuffer("STACKTRACE: $limitedStackTrace", level);
       }
     }
 
