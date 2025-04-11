@@ -104,9 +104,7 @@ class MbbCommand {
     final divided = <Uint8List>[];
     if (smartDivide) {
       while (payload.length >= 8) {
-        divided.add(
-          payload.sublist(0, MbbUtils.getLengthFromLengthByte(payload[2])),
-        );
+        divided.add(payload.sublist(0, MbbUtils.getLengthFromLengthByte(payload[2])));
         payload = payload.sublist(MbbUtils.getLengthFromLengthByte(payload[2]));
       }
     } else {
@@ -152,18 +150,15 @@ class MbbCommand {
 
 StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) => rfcomm.transform(
       StreamChannelTransformer(
-        StreamTransformer.fromHandlers(handleData: (data, stream) {
-          try {
-            logg.d('MBB RAW DATA RECEIVED: ${data.length} bytes');
-            final commands = MbbCommand.fromPayload(data);
-            for (final cmd in commands) {
+        StreamTransformer.fromHandlers(
+          handleData: (data, stream) {
+            for (final cmd in MbbCommand.fromPayload(data)) {
+              // FILTER THE SHIT OUT
               if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
               stream.add(cmd);
             }
-          } catch (e) {
-            logg.e('Error parsing MBB command', error: e);
-          }
-        }),
+          },
+        ),
         StreamSinkTransformer.fromHandlers(
           handleData: (data, sink) => rfcomm.sink.add(data.toPayload()),
         ),

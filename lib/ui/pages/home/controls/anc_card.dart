@@ -5,9 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../headphones/framework/anc.dart';
 
-/// Tarjeta de control de cancelación de ruido (ANC)
-///
-/// Muestra las opciones disponibles para los modos de ANC con una visualización mejorada
+/// Card with anc controls
 class AncCard extends StatelessWidget {
   final Anc anc;
 
@@ -98,51 +96,21 @@ class AncCard extends StatelessWidget {
                         label: l.ancNoiseCancel,
                         description: l.ancNoiseCancelDesc,
                         isSelected: mode == AncMode.noiseCancelling,
-                        onPressed: () {
-                          // Capture the current context to avoid BuildContext across async gaps
-                          final currentContext = context;
-                          anc.setAncMode(AncMode.noiseCancelling).catchError((error) {
-                            if (currentContext.mounted) {
-                              ScaffoldMessenger.of(currentContext).showSnackBar(
-                                SnackBar(content: Text(l.ancControlError)),
-                              );
-                            }
-                          });
-                        },
+                        onPressed: () => anc.setAncMode(AncMode.noiseCancelling),
                       ),
                       AncModeOption(
                         icon: Symbols.noise_control_off,
                         label: l.ancOff,
                         description: l.ancOffDesc,
                         isSelected: mode == AncMode.off,
-                        onPressed: () {
-                          // Capture the current context to avoid BuildContext across async gaps
-                          final currentContext = context;
-                          anc.setAncMode(AncMode.off).catchError((error) {
-                            if (currentContext.mounted) {
-                              ScaffoldMessenger.of(currentContext).showSnackBar(
-                                SnackBar(content: Text(l.ancControlError)),
-                              );
-                            }
-                          });
-                        },
+                        onPressed: () => anc.setAncMode(AncMode.off),
                       ),
                       AncModeOption(
                         icon: Symbols.hearing,
                         label: l.ancAwareness,
                         description: l.ancAwarenessDesc,
                         isSelected: mode == AncMode.transparency,
-                        onPressed: () {
-                          // Capture the current context to avoid BuildContext across async gaps
-                          final currentContext = context;
-                          anc.setAncMode(AncMode.transparency).catchError((error) {
-                            if (currentContext.mounted) {
-                              ScaffoldMessenger.of(currentContext).showSnackBar(
-                                SnackBar(content: Text(l.ancControlError)),
-                              );
-                            }
-                          });
-                        },
+                        onPressed: () => anc.setAncMode(AncMode.transparency),
                       ),
                     ];
 
@@ -210,14 +178,14 @@ class AncModeOption extends StatelessWidget {
   final String label;
   final String description;
   final bool isSelected;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const AncModeOption({
     required this.icon,
     required this.label,
     required this.description,
     required this.isSelected,
-    required this.onPressed,
+    this.onPressed,
     super.key,
   });
   @override
