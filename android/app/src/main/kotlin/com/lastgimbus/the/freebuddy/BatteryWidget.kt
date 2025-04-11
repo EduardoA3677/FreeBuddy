@@ -4,7 +4,6 @@ import HomeWidgetGlanceState
 import HomeWidgetGlanceStateDefinition
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -21,7 +20,6 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextDefaults
 import androidx.glance.unit.ColorProvider
-import androidx.core.content.ContextCompat
 import kotlin.math.max
 
 
@@ -55,11 +53,6 @@ class BatteryWidget : GlanceAppWidget() {
         provideContent {
             GlanceContent(context, currentState())
         }
-        // Added a foreground service to improve live updates
-        startForegroundService(context)
-    }    private fun startForegroundService(context: Context) {
-        val intent = Intent(context, BatteryUpdateService::class.java)
-        ContextCompat.startForegroundService(context, intent)
     }
 
     @SuppressLint("RestrictedApi")

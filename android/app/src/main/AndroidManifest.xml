@@ -52,7 +52,9 @@
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode">
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
 
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
@@ -71,11 +73,6 @@
         <service
             android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
             android:exported="false" />
-
-        <service
-            android:name=".BatteryUpdateService"
-            android:exported="false"
-            android:foregroundServiceType="connectedDevice" />
 
         <receiver
             android:name=".BatteryWidgetReceiver"

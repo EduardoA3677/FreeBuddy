@@ -57,7 +57,7 @@ Future<bool> routineUpdateCallback() async {
     }
     final batteryData =
         await (headphones.headphones as LRCBattery).lrcBattery.first.timeout(commonTimeout);
-    loggI.d("udpating widget from bgn: $batteryData");
+    log(LogLevel.debug, "udpating widget from bgn: $batteryData");
     await updateBatteryHomeWidget(batteryData);
     await cubit.close(); // remember to close cubit to deregister port name
     return true;
@@ -74,7 +74,9 @@ void callbackDispatcher() {
 
   // this $task is a name, not id?? wtf??
   Workmanager().executeTask((task, inputData) {
-    loggI.d("Running periodic task $task"
+    log(
+        LogLevel.debug,
+        "Running periodic task $task"
         "${inputData != null ? " - input data: $inputData" : ""}");
     try {
       return switch (task) {
@@ -82,7 +84,7 @@ void callbackDispatcher() {
         String() => throw Exception("No such task named $task"),
       };
     } catch (e, s) {
-      loggI.e("Periodic task $task failed", error: e, stackTrace: s);
+      log(LogLevel.error, "Periodic task $task failed", error: e, stackTrace: s);
       return Future.value(false);
     }
   });

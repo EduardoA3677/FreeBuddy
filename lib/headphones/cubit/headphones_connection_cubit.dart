@@ -116,7 +116,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
           _connection = _bluetooth.connectRfcomm(dev, sppUuid);
           break;
         } catch (_) {
-          loggI.w('Error when connecting socket: ${i + 1}/$connectTries tries');
+          log(LogLevel.warning, 'Error when connecting socket: ${i + 1}/$connectTries tries');
           if (!(dev.isConnected.valueOrNull ?? false)) {
             // this may happen because connecting may take some time
             // ...which is, well, not indicated by connectRfcomm being async...
@@ -124,7 +124,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
             // ...
             // how am i even supposed to? do this on another isolate??
             // well, maybe... 🙄 ehhh
-            loggI.w("...i's because device is not connected, dummy 😌");
+            log(LogLevel.warning, "...i's because device is not connected, dummy 😌");
             rethrow;
           }
           if (i + 1 >= connectTries) rethrow;
@@ -141,7 +141,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       // hopefully this happens *before* next stream event with data 🤷
       // so that it nicely goes again and we emit HeadphonesDisconnected()
     } catch (e, s) {
-      loggI.e("Error while connecting to socket", error: e, stackTrace: s);
+      log(LogLevel.error, "Error while connecting to socket", error: e, stackTrace: s);
     }
     await _connection?.sink.close();
     _connection = null;
@@ -198,7 +198,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
         super(const HeadphonesNotPaired()) {
     final rolex = Stopwatch()..start();
     _initInit().then(
-      (_) => loggI.d("_initInit() took ${rolex.elapsedMilliseconds}ms"),
+      (_) => log(LogLevel.debug, "_initInit() took ${rolex.elapsedMilliseconds}ms"),
     );
   }
 
@@ -212,9 +212,9 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
           "Found already running cubit while init() - "
           "will wait $killOtherCubitTimeout and then kill it");
       if (await _checkUntilNoPort(killOtherCubitTimeout)) {
-        loggI.i("Gone already, no need for war crimes 😇");
+        log(LogLevel.info, "Gone already, no need for war crimes 😇");
       } else {
-        loggI.i("Killing other cubit...");
+        log(LogLevel.info, "Killing other cubit...");
         // ### Important thoughts ###
         //
         // I think it's a good way to stop background tasks, because when cubit
@@ -224,7 +224,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
         //
         // But, leaving those notes here, in case, some day, they don't.
         if (!await killOtherCubit()) {
-          loggI.f("Failed to kill other cubit 😵... well, anyway...");
+          log(LogLevel.fatal, "Failed to kill other cubit 😵... well, anyway...");
         }
       }
     }
@@ -238,7 +238,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       if (message is SendPort) message.send(true);
       // kill urself
       if (message == _killUrself) {
-        loggI.w("Killing myself bc other cubit asked to 😖");
+        log(LogLevel.warning, "Killing myself bc other cubit asked to 😖");
         close();
       }
     });
@@ -255,7 +255,7 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
           "again. Weird.");
       return;
     }
-    loggI.d("Starting init...");
+    log(LogLevel.debug, "Starting init...");
     // last check in case it's a call from requestPermission()
     // this would prob mean user went through all permission asking stuff, and
     // _initInit() is stilllll running... 😵‍💫

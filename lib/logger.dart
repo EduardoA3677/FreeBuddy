@@ -16,7 +16,7 @@ class AppLogger {
       errorMethodCount: 8,
       lineLength: 120,
       colors: true, // Desactivar colores para Android logcat
-      printEmojis: false, // Los emojis pueden causar problemas en algunos logcat
+      printEmojis: true, // Los emojis pueden causar problemas en algunos logcat
       dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart, // Usar formato de fecha recomendado
     ),
     level: Level.trace, // Usar el nivel más detallado
@@ -25,7 +25,8 @@ class AppLogger {
   static final List<String> _logBuffer = [];
   static const int _maxBufferSize =
       1000; // Reducido de 5000 a 1000 para evitar desbordamiento de memoria
-  static LogLevel _bufferLogLevel = LogLevel.info; // Por defecto solo registrar info y superiores
+  static LogLevel _bufferLogLevel =
+      LogLevel.verbose; // Por defecto solo registrar info y superiores
 
   // Método para obtener el contenido actual de los logs
   static String getLogContent() {
