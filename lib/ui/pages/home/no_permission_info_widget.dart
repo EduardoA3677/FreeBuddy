@@ -37,7 +37,6 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
     ];
 
     try {
-      // Agrega location solo si no se ha concedido bluetoothScan
       if (await Permission.bluetoothScan.status != PermissionStatus.granted &&
           await Permission.location.status != PermissionStatus.permanentlyDenied) {
         permissions.add(Permission.location);
@@ -51,8 +50,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
     } catch (_) {}
 
     try {
-      if (await Permission.ignoreBatteryOptimizations.status !=
-          PermissionStatus.permanentlyDenied) {
+      if (await Permission.ignoreBatteryOptimizations.status != PermissionStatus.permanentlyDenied) {
         permissions.add(Permission.ignoreBatteryOptimizations);
       }
     } catch (_) {}
@@ -78,6 +76,30 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
         if (context.mounted) {
           context.read<HeadphonesConnectionCubit>().requestPermission();
         }
+      }
+    }
+  }
+
+  Future<void> _requestAllPermissions() async {
+    setState(() {
+      _isRequestingPermissions = true;
+    });
+
+    try {
+      await context.read<HeadphonesConnectionCubit>().requestPermission();
+
+      for (var permission in _pendingPermissions) {
+        await permission.request();
+      }
+
+      await _checkPendingPermissions();
+    } catch (e, stackTrace) {
+      log(LogLevel.error, 'Error al solicitar permisos', error: e, stackTrace: stackTrace);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRequestingPermissions = false;
+        });
       }
     }
   }
@@ -125,29 +147,5 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
         ),
       ),
     );
-  }
-
-  Future<void> _requestAllPermissions() async {
-    setState(() {
-      _isRequestingPermissions = true;
-    });
-
-    try {
-      await context.read<HeadphonesConnectionCubit>().requestPermission();
-
-      for (var permission in _pendingPermissions) {
-        await permission.request();
-      }
-
-      await _checkPendingPermissions();
-    } catch (e, stackTrace) {
-      log(LogLevel.error, 'Error al solicitar permisos', error: e, stackTrace: stackTrace);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isRequestingPermissions = false;
-        });
-      }
-    }
   }
 }
