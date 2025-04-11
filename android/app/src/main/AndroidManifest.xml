@@ -2,33 +2,35 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base permissions -->
+    <!-- Permisos esenciales -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- Bluetooth permissions -->
+    <!-- Bluetooth (Android 12+) -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
 
-    <!-- Foreground service permissions -->
+    <!-- Servicios en primer plano -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
         tools:targetApi="34" />
+
+    <!-- Notificaciones (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Storage permissions -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Permisos de almacenamiento (Android 13+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- Solo se requiere en Android 10+ si necesitas acceso completo al almacenamiento -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
-    <!-- Location permissions -->
+    <!-- Localización (para escaneo Bluetooth en algunos casos) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <!-- Battery optimization -->
+    <!-- Optimización de batería -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
@@ -38,7 +40,7 @@
         android:theme="@style/LaunchTheme"
         android:hardwareAccelerated="true"
         android:enableOnBackInvokedCallback="true"
-        tools:targetApi="33">
+        tools:targetApi="34">
 
         <activity
             android:name=".MainActivity"
