@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../app_settings.dart';
 import 'controls/headphones_controls_widget.dart';
+import 'no_permission_info_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -42,8 +44,56 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       final success = await GoRouter.of(ctx).push('/introduction') as bool?;
       if (success ?? false) {
         await settings.setSeenIntroduction(true);
+        // Después de ver la introducción y marcarla como vista,
+        // verificar los permisos necesarios
+        if (ctx.mounted) {
+          _checkPermissions();
+        }
+      }
+    } else {
+      // Si ya se vio la introducción, verificar los permisos
+      _checkPermissions();
+    }
+  }
+
+  void _checkPermissions() async {
+    // Verificar si todos los permisos ya están concedidos
+    final hasAllPermissions = await _hasAllRequiredPermissions();
+    if (!hasAllPermissions && mounted) {
+      // Mostrar diálogo de permisos si falta alguno
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Text(AppLocalizations.of(context)!.pageHomeNoPermission),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                NoPermissionInfoWidget(),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<bool> _hasAllRequiredPermissions() async {
+    final requiredPermissions = [
+      Permission.bluetooth,
+      Permission.bluetoothConnect,
+      Permission.bluetoothScan,
+      Permission.location,
+    ];
+
+    for (var permission in requiredPermissions) {
+      if (!(await permission.isGranted)) {
+        return false;
       }
     }
+    return true;
   }
 
   @override

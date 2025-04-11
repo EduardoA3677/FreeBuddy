@@ -27,7 +27,8 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
   Future<void> _checkPendingPermissions() async {
     setState(() {
       _isRequestingPermissions = true;
-    }); // Lista completa de permisos que necesita la app
+    });
+    // Lista completa de permisos que necesita la app
     final permissions = [
       Permission.bluetooth,
       Permission.bluetoothConnect,
@@ -68,32 +69,16 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
       setState(() {
         _isRequestingPermissions = false;
       });
-    }
-  }
 
-  Future<void> _requestAllPermissions() async {
-    setState(() {
-      _isRequestingPermissions = true;
-    });
+      // Si no hay permisos pendientes, notificar a la UI que todo está listo
+      if (_pendingPermissions.isEmpty) {
+        // Cerrar el diálogo si estamos dentro de uno
+        if (ModalRoute.of(context)?.isCurrent == false) {
+          Navigator.of(context).pop(true);
+        }
 
-    try {
-      // Primero solicitar permisos de Bluetooth a través del cubit
-      await context.read<HeadphonesConnectionCubit>().requestPermission();
-
-      // Luego solicitar los permisos adicionales
-      for (var permission in _pendingPermissions) {
-        await permission.request();
-      }
-
-      // Verificar nuevamente cuáles siguen pendientes
-      await _checkPendingPermissions();
-    } catch (e, stackTrace) {
-      log(LogLevel.error, 'Error al solicitar permisos', error: e, stackTrace: stackTrace);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isRequestingPermissions = false;
-        });
+        // Notificar al cubit que los permisos han sido concedidos
+        context.read<HeadphonesConnectionCubit>().requestPermission();
       }
     }
   }
@@ -141,5 +126,32 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
         ),
       ),
     );
+  }
+
+  Future<void> _requestAllPermissions() async {
+    setState(() {
+      _isRequestingPermissions = true;
+    });
+
+    try {
+      // Primero solicitar permisos de Bluetooth a través del cubit
+      await context.read<HeadphonesConnectionCubit>().requestPermission();
+
+      // Luego solicitar los permisos adicionales
+      for (var permission in _pendingPermissions) {
+        await permission.request();
+      }
+
+      // Verificar nuevamente cuáles siguen pendientes
+      await _checkPendingPermissions();
+    } catch (e, stackTrace) {
+      log(LogLevel.error, 'Error al solicitar permisos', error: e, stackTrace: stackTrace);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRequestingPermissions = false;
+        });
+      }
+    }
   }
 }

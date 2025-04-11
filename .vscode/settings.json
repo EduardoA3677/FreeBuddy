@@ -1,7 +1,5 @@
 {
   // 🐦 Flutter SDK & Dart paths
-  "dart.flutterSdkPath": "C:\\Users\\ralva\\Documents\\flutter\\flutter",
-  "dart.sdkPath": "C:\\Users\\ralva\\Documents\\flutter\\flutter\\bin\\cache\\dart-sdk",
   // 💡 Flutter/Dart productivity
   "dart.lineLength": 100,
   "dart.completeFunctionCalls": true,
