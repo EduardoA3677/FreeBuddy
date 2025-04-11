@@ -1,0 +1,79 @@
+name: Build FreeBuddy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag'
+        required: false
+        default: 'v0.2.0'
+      build_format:
+        description: 'Choose the build format'
+        required: false
+        default: 'both'
+        type: choice
+        options:
+          - 'apk'
+          - 'aab'
+          - 'both'
+
+jobs:
+  build:
+    runs-on: self-hosted
+    container: ghcr.io/cirruslabs/flutter:stable
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python
+        run: |
+          apt-get update
+          apt-get install -y python3 python3-pip
+          ln -s /usr/bin/python3 /usr/bin/python
+
+      - name: Set tag
+        id: set_tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG=$(date +'%Y%m%d%H%M%S')  # Usar timestamp como tag si no viene de dispatch
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Build APK & AAB with signing
+        uses: NiklasLehnfeld/flutter-android-build-action@v2
+        id: android-build
+        with:
+          release: true
+          keystore: ${{ secrets.KEYSTORE }}
+          keystore-pwd: ${{ secrets.KEYSTORE_PWD }}
+          key-pwd: ${{ secrets.KEY_PWD }}
+
+      - name: Prepare APK artifact
+        if: ${{ github.event.inputs.build_format == 'apk' || github.event.inputs.build_format == 'both' || github.event_name == 'push' }}
+        run: |
+          mkdir -p output-apk
+          mv "${{ steps.android-build.outputs.apk-path }}" "output-apk/FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk"
+
+      - name: Prepare AAB artifact
+        if: ${{ github.event.inputs.build_format == 'aab' || github.event.inputs.build_format == 'both' || github.event_name == 'push' }}
+        run: |
+          mkdir -p output-aab
+          mv "${{ steps.android-build.outputs.aab-path }}" "output-aab/FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab"
+
+      - name: Upload APK artifact
+        if: ${{ github.event.inputs.build_format == 'apk' || github.event.inputs.build_format == 'both' || github.event_name == 'push' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: FreeBuddy-APK-${{ steps.set_tag.outputs.tag }}
+          path: output-apk/
+
+      - name: Upload AAB artifact
+        if: ${{ github.event.inputs.build_format == 'aab' || github.event.inputs.build_format == 'both' || github.event_name == 'push' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: FreeBuddy-AAB-${{ steps.set_tag.outputs.tag }}
+          path: output-aab/
