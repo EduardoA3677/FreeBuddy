@@ -28,35 +28,35 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
     setState(() {
       _isRequestingPermissions = true;
     });
-    // Lista completa de permisos que necesita la app
-    final permissions = [
+
+    final permissions = <Permission>[
       Permission.bluetooth,
       Permission.bluetoothConnect,
       Permission.bluetoothScan,
-      Permission.location,
-      Permission.storage,
-      Permission.notification,
+      Permission.notification, // Android 13+
     ];
 
-    // Agregar permisos opcionales según disponibilidad
+    try {
+      // Agrega location solo si no se ha concedido bluetoothScan
+      if (await Permission.bluetoothScan.status != PermissionStatus.granted &&
+          await Permission.location.status != PermissionStatus.permanentlyDenied) {
+        permissions.add(Permission.location);
+      }
+    } catch (_) {}
+
     try {
       if (await Permission.manageExternalStorage.status != PermissionStatus.permanentlyDenied) {
         permissions.add(Permission.manageExternalStorage);
       }
-    } catch (_) {
-      // Permiso no disponible en este dispositivo
-    }
+    } catch (_) {}
 
     try {
       if (await Permission.ignoreBatteryOptimizations.status !=
           PermissionStatus.permanentlyDenied) {
         permissions.add(Permission.ignoreBatteryOptimizations);
       }
-    } catch (_) {
-      // Permiso no disponible en este dispositivo
-    }
+    } catch (_) {}
 
-    // Verificar cuáles permisos aún no han sido concedidos
     _pendingPermissions = [];
     for (var permission in permissions) {
       final status = await permission.status;
@@ -70,14 +70,11 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
         _isRequestingPermissions = false;
       });
 
-      // Si no hay permisos pendientes, notificar a la UI que todo está listo
       if (_pendingPermissions.isEmpty) {
-        // Cerrar el diálogo si estamos dentro de uno
         if (ModalRoute.of(context)?.isCurrent == false) {
           Navigator.of(context).pop(true);
         }
 
-        // Notificar al cubit que los permisos han sido concedidos
         if (context.mounted) {
           context.read<HeadphonesConnectionCubit>().requestPermission();
         }
@@ -136,15 +133,12 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
     });
 
     try {
-      // Primero solicitar permisos de Bluetooth a través del cubit
       await context.read<HeadphonesConnectionCubit>().requestPermission();
 
-      // Luego solicitar los permisos adicionales
       for (var permission in _pendingPermissions) {
         await permission.request();
       }
 
-      // Verificar nuevamente cuáles siguen pendientes
       await _checkPendingPermissions();
     } catch (e, stackTrace) {
       log(LogLevel.error, 'Error al solicitar permisos', error: e, stackTrace: stackTrace);
