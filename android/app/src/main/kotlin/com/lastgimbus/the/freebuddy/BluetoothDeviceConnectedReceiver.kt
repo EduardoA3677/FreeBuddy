@@ -1,4 +1,3 @@
-
 package com.lastgimbus.the.freebuddy
 
 import android.Manifest
