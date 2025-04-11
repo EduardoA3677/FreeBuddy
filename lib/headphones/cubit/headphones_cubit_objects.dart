@@ -1,5 +1,6 @@
 import '../framework/bluetooth_headphones.dart';
 
+/// Base class for headphone connection states
 abstract class HeadphonesConnectionState {
   const HeadphonesConnectionState();
 }

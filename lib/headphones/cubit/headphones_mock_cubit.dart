@@ -10,12 +10,11 @@ import 'headphones_cubit_objects.dart';
 class HeadphonesMockCubit extends Cubit<HeadphonesConnectionState>
     implements HeadphonesConnectionCubit {
   HeadphonesMockCubit()
-      : super(HeadphonesDisconnected(
-            HuaweiHeadphonesSimPlaceholder(HuaweiModels.freeBudsPro3))) {
+      : super(HeadphonesDisconnected(HuaweiHeadphonesSimPlaceholder(HuaweiModels.freeBudsPro3))) {
     // i do this because otherwise initial data isn't even emitted and
     // [BlocListener]s don't work >:(
-    Future.microtask(() => emit(HeadphonesConnectedOpen(
-        HuaweiHeadphonesSim(HuaweiModels.freeBudsPro3))));
+    Future.microtask(
+        () => emit(HeadphonesConnectedOpen(HuaweiHeadphonesSim(HuaweiModels.freeBudsPro3))));
   }
   @override
   Future<void> connect() async {}
@@ -28,6 +27,4 @@ class HeadphonesMockCubit extends Cubit<HeadphonesConnectionState>
 
   @override
   Future<void> requestPermission() async {}
-
-  // No es necesario hacer nada adicional
 }
