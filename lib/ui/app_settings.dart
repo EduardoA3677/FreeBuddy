@@ -50,7 +50,7 @@ class SharedPreferencesAppSettings implements AppSettings {
   @override
   BluetoothHeadphones get currentHeadphones {
     // Using FreeBuds Pro 3 model as requested
-    throw UnimplementedError('currentHeadphones is not implemented yet.');
+    return HuaweiHeadphonesSim(HuaweiModels.freeBudsPro3);
   }
 
   @override
