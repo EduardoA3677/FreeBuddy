@@ -101,9 +101,32 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> with Wi
     });
 
     try {
-      await context.read<HeadphonesConnectionCubit>().requestPermission();
+      final results = <Permission, PermissionStatus>{};
 
-      await Future.wait(_pendingPermissions.map((p) => p.request()));
+      for (final permission in _pendingPermissions) {
+        final result = await permission.request();
+        results[permission] = result;
+      }
+
+      final denied = results.entries
+          .where((entry) => !entry.value.isGranted)
+          .map((entry) => entry.key)
+          .toList();
+
+      if (denied.isEmpty) {
+        if (mounted) {
+          context.read<HeadphonesConnectionCubit>().requestPermission();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Todos los permisos fueron concedidos')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Faltan permisos: ${denied.map((e) => e.toString().split('.').last).join(', ')}')),
+          );
+        }
+      }
 
       await _checkPendingPermissions();
     } catch (e, stackTrace) {
