@@ -17,6 +17,7 @@ ThemeData lightTheme({ColorScheme? dynamicScheme}) => _customize(
             ),
         useMaterial3: useMaterial3,
       ),
+      isDark: false,
     );
 
 /// Tema oscuro basado en Material You con esquema dinámico opcional
@@ -29,6 +30,7 @@ ThemeData darkTheme({ColorScheme? dynamicScheme}) => _customize(
             ),
         useMaterial3: useMaterial3,
       ),
+      isDark: true,
     );
 
 /// Devuelve el tema dinámico según el sistema
@@ -38,31 +40,27 @@ ThemeData get dynamicTheme {
 }
 
 /// Aplica personalizaciones al tema
-ThemeData _customize(ThemeData theme) {
+ThemeData _customize(ThemeData theme, {required bool isDark}) {
   final tt = theme.textTheme;
   final cs = theme.colorScheme;
-
-  // Se eliminó la definición de borderSide que añadía bordes a las cards
 
   return theme.copyWith(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     splashFactory: InkSparkle.splashFactory,
     cardTheme: CardTheme(
-      color: cs.surfaceContainerHighest.withAlpha(240), // Fondo más oscuro dentro del borde
-      elevation: 2.5,
-      shadowColor: cs.shadow.withAlpha(100),
+      color: isDark ? cs.surfaceVariant : cs.surfaceContainerHighest, // Ajuste de colores
+      elevation: isDark ? 3.0 : 2.0,
+      shadowColor: cs.shadow.withAlpha(isDark ? 120 : 80),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        // Se eliminó la propiedad side para quitar los bordes
+        borderRadius: BorderRadius.circular(16),
       ),
       clipBehavior: Clip.antiAlias,
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          // Se eliminó la propiedad side para quitar los bordes
         ),
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         elevation: 2,
@@ -74,7 +72,6 @@ ThemeData _customize(ThemeData theme) {
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          // Se eliminó la propiedad side para quitar los bordes
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         elevation: 1.5,
@@ -140,7 +137,6 @@ ThemeData _customize(ThemeData theme) {
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        // Se eliminó la propiedad side para quitar los bordes
       ),
       iconColor: cs.primary,
       titleTextStyle: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
@@ -160,7 +156,7 @@ ThemeData _customize(ThemeData theme) {
     ),
     checkboxTheme: CheckboxThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-      side: BorderSide(color: cs.outline, width: 1.5), // Se mantiene el borde en checkboxes
+      side: BorderSide(color: cs.outline, width: 1.5), // Borde en checkboxes
     ),
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith(
