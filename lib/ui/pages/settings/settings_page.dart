@@ -16,6 +16,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final settings = context.read<AppSettings>();
 
     return Scaffold(
       appBar: AppBar(
@@ -33,11 +34,11 @@ class SettingsPage extends StatelessWidget {
           children: [
             _buildSectionHeader(context, l.themeSettingsTitle),
             const SizedBox(height: 12),
-            _buildThemeSettings(context),
+            _buildThemeSettings(context, settings),
             const SizedBox(height: 24),
             _buildSectionHeader(context, l.debugSettingsTitle),
             const SizedBox(height: 12),
-            _buildDebugSettings(context),
+            _buildDebugSettings(context, settings),
             const SizedBox(height: 24),
             _buildAboutButton(context, l),
           ],
@@ -60,9 +61,8 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeSettings(BuildContext context) {
+  Widget _buildThemeSettings(BuildContext context, AppSettings settings) {
     final l = AppLocalizations.of(context)!;
-    final settings = context.read<AppSettings>();
 
     return StreamBuilder<ThemeMode>(
       stream: settings.themeMode,
@@ -79,10 +79,7 @@ class SettingsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RadioListTile<ThemeMode>(
-                  title: Text(
-                    l.themeSettingsSystem,
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  title: Text(l.themeSettingsSystem),
                   value: ThemeMode.system,
                   groupValue: currentTheme,
                   onChanged: (value) {
@@ -92,10 +89,7 @@ class SettingsPage extends StatelessWidget {
                   },
                 ),
                 RadioListTile<ThemeMode>(
-                  title: Text(
-                    l.themeSettingsLight,
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  title: Text(l.themeSettingsLight),
                   value: ThemeMode.light,
                   groupValue: currentTheme,
                   onChanged: (value) {
@@ -105,10 +99,7 @@ class SettingsPage extends StatelessWidget {
                   },
                 ),
                 RadioListTile<ThemeMode>(
-                  title: Text(
-                    l.themeSettingsDark,
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  title: Text(l.themeSettingsDark),
                   value: ThemeMode.dark,
                   groupValue: currentTheme,
                   onChanged: (value) {
@@ -125,9 +116,8 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDebugSettings(BuildContext context) {
+  Widget _buildDebugSettings(BuildContext context, AppSettings settings) {
     final l = AppLocalizations.of(context)!;
-    final settings = context.read<AppSettings>();
 
     return Card(
       elevation: 4,
@@ -144,14 +134,8 @@ class SettingsPage extends StatelessWidget {
                 final isDebugEnabled = snapshot.data ?? false;
 
                 return SwitchListTile(
-                  title: Text(
-                    l.debugModeEnable,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  subtitle: Text(
-                    l.debugModeDescription,
-                    style: TextStyle(fontSize: 14),
-                  ),
+                  title: Text(l.debugModeEnable),
+                  subtitle: Text(l.debugModeDescription),
                   value: isDebugEnabled,
                   onChanged: (value) => settings.setDebugMode(value),
                 );
@@ -159,14 +143,8 @@ class SettingsPage extends StatelessWidget {
             ),
             const Divider(),
             ListTile(
-              title: Text(
-                l.exportLogs,
-                style: TextStyle(fontSize: 16),
-              ),
-              subtitle: Text(
-                l.exportLogsDescription,
-                style: TextStyle(fontSize: 14),
-              ),
+              title: Text(l.exportLogs),
+              subtitle: Text(l.exportLogsDescription),
               trailing: const Icon(Symbols.download),
               onTap: () => _exportLogs(context),
             ),
@@ -198,34 +176,52 @@ class SettingsPage extends StatelessWidget {
     final snackBar = ScaffoldMessenger.of(context);
 
     try {
-      // Obtener el directorio adecuado para guardar el archivo
-      final directory =
-          await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
-      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '_');
-      final filePath = '${directory.path}/freebuddy_logs_$timestamp.log';
+      final fileName = await _getFileNameAndPath(context);
+      if (fileName == null) return;
 
-      // Obtener los logs y escribirlos en el archivo
       final logContents = AppLogger.getLogContent();
-      final file = File(filePath);
+      final file = File(fileName);
       await file.writeAsString(logContents);
 
-      // Mostrar mensaje de éxito
       snackBar.showSnackBar(SnackBar(
-        content: Text('${l.exportLogsSuccess}: $filePath'),
+        content: Text('${l.exportLogsSuccess}: $fileName'),
         backgroundColor: Colors.green,
       ));
-
-      // Registrar el evento de éxito en los logs
-      log(LogLevel.info, 'Logs exported to: $filePath');
     } catch (e, stackTrace) {
-      // Mostrar mensaje de error en caso de fallo
       snackBar.showSnackBar(SnackBar(
         content: Text('${l.exportLogsError}: ${e.toString()}'),
         backgroundColor: Colors.red,
       ));
-
-      // Registrar el error en los logs con detalle
-      log(LogLevel.error, 'Error exporting logs', error: e, stackTrace: stackTrace);
     }
+  }
+
+  Future<String?> _getFileNameAndPath(BuildContext context) async {
+    final directory = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
+    return showDialog<String>(
+      context: context,
+      builder: (context) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.exportLogsDialog),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: 'log.txt'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                final fileName = controller.text.trim();
+                Navigator.pop(context, '${directory.path}/$fileName');
+              },
+              child: Text(AppLocalizations.of(context)!.save),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
