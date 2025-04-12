@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../logger.dart';
 import '../../app_settings.dart';
@@ -174,15 +175,55 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  Future<String?> _getFileNameAndPath(BuildContext context) async {
+    final initialDirectory = (await getExternalStorageDirectory())?.path ??
+        (await getApplicationDocumentsDirectory()).path;
+
+    if (!context.mounted) return null;
+
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.exportLogsDialog),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(hintText: 'log.txt'),
+              ),
+              const SizedBox(height: 12),
+              Text('Directory: $initialDirectory'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, null),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                final fileName = controller.text.trim();
+                Navigator.pop(dialogContext, '$initialDirectory/$fileName');
+              },
+              child: Text(AppLocalizations.of(context)!.save),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _exportLogs(BuildContext context) async {
     final l = AppLocalizations.of(context)!;
     final snackBar = ScaffoldMessenger.of(context);
 
     try {
-      final result = await FilePicker.platform.getDirectoryPath();
-      if (result == null) return; // User canceled the picker
+      final filePath = await _getFileNameAndPath(context);
+      if (filePath == null || filePath.isEmpty) return; // User canceled the dialog
 
-      final filePath = '$result/log.txt';
       final logContents = AppLogger.getLogContent();
       final file = File(filePath);
       await file.writeAsString(logContents);
