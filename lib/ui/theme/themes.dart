@@ -42,13 +42,14 @@ ThemeData _customize(ThemeData theme) {
   final tt = theme.textTheme;
   final cs = theme.colorScheme;
 
-  final borderSide = isMobile ? BorderSide(color: cs.outline, width: 2.5) : BorderSide.none;
+  final borderSide =
+      isMobile ? BorderSide(color: cs.outline, width: 1.5) : BorderSide.none; // Grosor reducido
 
   return theme.copyWith(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     splashFactory: InkSparkle.splashFactory,
     cardTheme: CardTheme(
-      color: cs.surfaceContainerHighest.withAlpha(255),
+      color: cs.surfaceContainerHighest.withAlpha(240), // Fondo más oscuro dentro del borde
       elevation: 2.5,
       shadowColor: cs.shadow.withAlpha(100),
       shape: RoundedRectangleBorder(

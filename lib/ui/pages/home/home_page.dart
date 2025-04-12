@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -12,8 +11,6 @@ import '../../app_settings.dart';
 import 'controls/headphones_controls_widget.dart';
 import 'no_permission_info_widget.dart';
 
-// imports omitidos por brevedad
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -21,23 +18,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 500),
-    vsync: this,
-  );
-
+class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _controller.forward();
     Future.microtask(_handleStartupFlow);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   Future<void> _handleStartupFlow() async {
@@ -124,13 +109,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       HeadphonesDisconnected() => _DisconnectedWidget(theme: theme, l: l),
                       HeadphonesNotPaired() => _NotPairedWidget(theme: theme, l: l),
                       _ => const _LoadingWidget()
-                    }
-                        .animate(controller: _controller)
-                        .fadeIn(
-                          duration: 600.ms,
-                          delay: 200.ms,
-                          curve: Curves.easeOutQuad,
-                        );
+                    };
                   },
                 ),
               ),
@@ -157,20 +136,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ),
         icon: const Icon(Symbols.settings, weight: 300),
-      )
-          .animate(controller: _controller)
-          .scale(
-            begin: const Offset(0.8, 0.8), // Tamaño más pequeño al inicio
-            end: const Offset(1.1, 1.1), // Tamaño un poco mayor al final
-            duration: 500.ms, // Duración más larga para un efecto suave
-            curve: Curves.easeOut, // Curva suave
-          )
-          .rotate(
-            begin: 0.0, // Inicia sin rotación
-            end: 0.1, // Rota ligeramente
-            duration: 500.ms, // Duración igual para mantener sincronizado el efecto
-            curve: Curves.easeOut,
-          ),
+      ),
     );
   }
 }
@@ -309,11 +275,7 @@ class _StateMessageCard extends StatelessWidget {
             action,
           ],
         ),
-      ).animate().fadeIn(duration: 400.ms).scale(
-            begin: const Offset(0.9, 0.9),
-            end: const Offset(1.0, 1.0),
-            duration: 400.ms,
-          ),
+      ),
     );
   }
 }

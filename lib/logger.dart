@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
@@ -21,6 +20,7 @@ class AppLogger {
     ),
     level: Level.trace, // Usar el nivel más detallado
   );
+
   // Buffer para almacenar logs recientes
   static final List<String> _logBuffer = [];
   static const int _maxBufferSize =
@@ -102,6 +102,15 @@ class AppLogger {
     }
   }
 
+  // Método para exportar logs a un archivo
+  static Future<void> exportLogsToFile(String filename) async {
+    final logContent = getLogContent();
+    final file = File(filename);
+    await file.writeAsString(logContent);
+    log(LogLevel.info, "Logs exportados exitosamente a $filename");
+  }
+
+  // Configuración de manejo global de errores
   static void setupGlobalErrorHandling() {
     FlutterError.onError = (FlutterErrorDetails details) {
       // Log in better format for Flutter errors

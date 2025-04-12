@@ -179,12 +179,11 @@ class SettingsPage extends StatelessWidget {
   Widget _buildAboutButton(BuildContext context, AppLocalizations l) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: FilledButton(
+      child: ElevatedButton(
         onPressed: () => GoRouter.of(context).push('/settings/about'),
-        style: ButtonStyle(
-          padding:
-              WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 24)),
-          backgroundColor: WidgetStateProperty.all(Colors.blue),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         child: Text(
           l.pageAboutTitle,
@@ -199,27 +198,33 @@ class SettingsPage extends StatelessWidget {
     final snackBar = ScaffoldMessenger.of(context);
 
     try {
+      // Obtener el directorio adecuado para guardar el archivo
       final directory =
           await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '_');
       final filePath = '${directory.path}/freebuddy_logs_$timestamp.log';
 
+      // Obtener los logs y escribirlos en el archivo
       final logContents = AppLogger.getLogContent();
       final file = File(filePath);
       await file.writeAsString(logContents);
 
+      // Mostrar mensaje de éxito
       snackBar.showSnackBar(SnackBar(
         content: Text('${l.exportLogsSuccess}: $filePath'),
         backgroundColor: Colors.green,
       ));
 
+      // Registrar el evento de éxito en los logs
       log(LogLevel.info, 'Logs exported to: $filePath');
     } catch (e, stackTrace) {
+      // Mostrar mensaje de error en caso de fallo
       snackBar.showSnackBar(SnackBar(
         content: Text('${l.exportLogsError}: ${e.toString()}'),
         backgroundColor: Colors.red,
       ));
 
+      // Registrar el error en los logs con detalle
       log(LogLevel.error, 'Error exporting logs', error: e, stackTrace: stackTrace);
     }
   }
