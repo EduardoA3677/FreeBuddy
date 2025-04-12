@@ -30,6 +30,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final windowSize = WindowSizeClass.of(context);
     final bottomPadding = MediaQuery.viewPaddingOf(context).bottom;
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final l = AppLocalizations.of(context)!;
 
     return SafeArea(
@@ -40,7 +41,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
               padding: const EdgeInsets.all(12.0) + EdgeInsets.only(bottom: bottomPadding),
-              child: _buildMainContent(windowSize, theme, l, screenWidth),
+              child: _buildMainContent(windowSize, theme, l, screenWidth, screenHeight),
             );
           } catch (e, stackTrace) {
             log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
@@ -58,8 +59,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent(
-      WindowSizeClass windowSize, ThemeData theme, AppLocalizations l, double screenWidth) {
+  Widget _buildMainContent(WindowSizeClass windowSize, ThemeData theme, AppLocalizations l,
+      double screenWidth, double screenHeight) {
     log(LogLevel.debug, "Building main content for headphones: ${headphones.runtimeType}");
 
     // Dispositivo Huawei info
@@ -73,12 +74,17 @@ class HeadphonesControlsWidget extends StatelessWidget {
       }
     }
 
-    // Determina si es pantalla pequeña
+    // Determina categorías de tamaño de pantalla de forma más precisa
+    final isExtraSmallScreen = screenWidth < 320;
     final isSmallScreen = screenWidth < 400;
-    final isWideScreen = screenWidth > 600;
+    final isWideScreen = screenWidth >= 600;
+
+    // Calcula proporciones adaptativas para la imagen
+    final imageHeightRatio = isSmallScreen ? 0.15 : (isWideScreen ? 0.25 : 0.2);
+    final imageMaxHeight = screenHeight * imageHeightRatio;
 
     try {
-      // Usar un diseño fixed sin scrolling con un contenedor estilizado
+      // Usar un SingleChildScrollView para evitar problemas de desbordamiento en pantallas pequeñas
       return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -92,45 +98,49 @@ class HeadphonesControlsWidget extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(24),
         ),
-        child: Column(
-          children: [
-            // Device Name with modern styling and badge
-            Container(
-              margin: const EdgeInsets.only(top: 16),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.shadow.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Text(
-                deviceName,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onPrimaryContainer,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Device Name with modern styling and badge
+              Container(
+                margin: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                textAlign: TextAlign.center,
-              ),
-            )
-                .animate()
-                .fadeIn(duration: 500.ms)
-                .slideY(begin: -0.1, end: 0, duration: 500.ms, curve: Curves.easeOutBack),
+                child: Text(
+                  deviceName,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onPrimaryContainer,
+                    fontSize: isExtraSmallScreen ? 20 : (isSmallScreen ? 22 : 24),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              )
+                  .animate()
+                  .fadeIn(duration: 500.ms)
+                  .slideY(begin: -0.1, end: 0, duration: 500.ms, curve: Curves.easeOutBack),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // Headphones Image with improved container
-            if (headphones is HeadphonesModelInfo)
-              Flexible(
-                flex: isSmallScreen ? 2 : 3,
-                child: Container(
+              // Headphones Image with improved container and adaptive sizing
+              if (headphones is HeadphonesModelInfo)
+                Container(
+                  height:
+                      isExtraSmallScreen ? 100 : (isSmallScreen ? 130 : (isWideScreen ? 180 : 150)),
                   constraints: BoxConstraints(
-                    maxHeight: isSmallScreen ? 140 : (isWideScreen ? 200 : 170),
+                    maxHeight: imageMaxHeight,
                   ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
@@ -144,7 +154,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 20),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(28),
                     child: HeadphonesImage(headphones as HeadphonesModelInfo)
@@ -158,15 +168,12 @@ class HeadphonesControlsWidget extends StatelessWidget {
                         ),
                   ),
                 ),
-              ),
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-
-            // Main Content Area with card-like container
-            Expanded(
-              flex: isSmallScreen ? 7 : 6,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              // Main Content Area with card-like container - adaptativo para diferentes tamaños
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: isExtraSmallScreen ? 4 : 8, vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 16),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(24),
@@ -185,8 +192,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
                   .animate()
                   .fadeIn(duration: 500.ms, delay: 300.ms)
                   .slideY(begin: 0.1, end: 0, duration: 500.ms),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     } catch (e, stackTrace) {
@@ -215,7 +222,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (hasBatteryFeature)
           Expanded(
@@ -243,7 +250,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  // Layout for smaller screens - cards stacked with minimized heights
+  // Layout for smaller screens - cards stacked vertically with proper spacing
   Widget _buildCompactLayout(
       ThemeData theme, AppLocalizations l, double screenWidth, bool isSmallScreen) {
     final hasAncFeature = headphones is Anc;
@@ -258,29 +265,31 @@ class HeadphonesControlsWidget extends StatelessWidget {
       );
     }
 
+    // Espacio adaptativo entre tarjetas
+    final cardSpacing = isSmallScreen ? 12.0 : 16.0;
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (hasBatteryFeature)
-          Expanded(
-            flex: isSmallScreen ? 1 : 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: BatteryCard(headphones as LRCBattery)
-                  .animate()
-                  .fadeIn(duration: 500.ms, delay: 200.ms)
-                  .slideY(begin: 0.05, end: 0, duration: 400.ms),
-            ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8.0 : 12.0, vertical: 4.0),
+            child: BatteryCard(headphones as LRCBattery)
+                .animate()
+                .fadeIn(duration: 500.ms, delay: 200.ms)
+                .slideY(begin: 0.05, end: 0, duration: 400.ms),
           ),
+
+        // Espacio adaptativo entre tarjetas
+        if (hasAncFeature && hasBatteryFeature) SizedBox(height: cardSpacing),
+
         if (hasAncFeature)
-          Expanded(
-            flex: isSmallScreen ? 1 : 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: AncCard(headphones as Anc)
-                  .animate()
-                  .fadeIn(duration: 500.ms, delay: 300.ms)
-                  .slideY(begin: 0.05, end: 0, duration: 400.ms),
-            ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8.0 : 12.0, vertical: 4.0),
+            child: AncCard(headphones as Anc)
+                .animate()
+                .fadeIn(duration: 500.ms, delay: 300.ms)
+                .slideY(begin: 0.05, end: 0, duration: 400.ms),
           ),
       ],
     );
