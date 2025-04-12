@@ -6,8 +6,6 @@ import '../../../../gen/freebuddy_icons.dart';
 import '../../../../headphones/framework/lrc_battery.dart';
 import '../../../../headphones/huawei/features/battery_feature.dart';
 
-/// Tarjeta de batería con estilo moderno Material 3
-/// Rediseñada con un enfoque más limpio y visual
 class BatteryCard extends StatelessWidget {
   final LRCBattery lrcBattery;
 
@@ -33,6 +31,7 @@ class BatteryCard extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+          color: theme.colorScheme.surface,
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
@@ -41,7 +40,7 @@ class BatteryCard extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: [
                   theme.colorScheme.surface,
-                  theme.colorScheme.surface.withValues(alpha: 240),
+                  theme.colorScheme.surface.withAlpha(240),
                 ],
               ),
             ),
@@ -49,13 +48,12 @@ class BatteryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Diseño moderno para el encabezado
                 Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
+                        color: theme.colorScheme.primaryContainer.withAlpha(180),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -90,15 +88,12 @@ class BatteryCard extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 Divider(
                   height: 32,
                   indent: 8,
                   endIndent: 8,
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  color: theme.colorScheme.outlineVariant.withAlpha(128),
                 ),
-
-                // Indicadores de batería con diseño mejorado
                 if (!hasData)
                   _buildLoadingState(theme, isSmallDevice)
                 else
@@ -146,7 +141,6 @@ class BatteryCard extends StatelessWidget {
     );
   }
 
-  // Estado de carga cuando no hay datos disponibles
   Widget _buildLoadingState(ThemeData theme, bool isSmall) {
     return Center(
       child: Column(
@@ -157,7 +151,7 @@ class BatteryCard extends StatelessWidget {
             height: isSmall ? 30 : 40,
             child: CircularProgressIndicator(
               strokeWidth: 3,
-              color: theme.colorScheme.primary.withValues(alpha: 0.7),
+              color: theme.colorScheme.primary.withAlpha(180),
             ),
           ),
           const SizedBox(height: 16),
@@ -175,7 +169,6 @@ class BatteryCard extends StatelessWidget {
   }
 }
 
-/// Indicador de batería con diseño visual mejorado
 class BatteryIndicator extends StatelessWidget {
   final IconData icon;
   final String text;
@@ -196,21 +189,19 @@ class BatteryIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Colores modernos para los niveles de batería
     Color getBatteryColor() {
       if (level == null) return theme.colorScheme.surfaceContainerHighest;
       if (level! < 20) {
         return theme.colorScheme.error;
       } else if (level! < 40) {
-        return theme.colorScheme.error.withValues(alpha: 0.7);
+        return theme.colorScheme.error.withAlpha(180);
       } else if (level! < 70) {
         return theme.colorScheme.tertiary;
       } else {
-        return Colors.green; // Cambié el color a verde para las barras
+        return Colors.green;
       }
     }
 
-    // Determinar el ancho de la barra según nivel
     final barWidth = level != null ? (level! / 100) : 0.0;
 
     return Column(
@@ -218,7 +209,6 @@ class BatteryIndicator extends StatelessWidget {
       children: [
         Row(
           children: [
-            // Icono con fondo
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
@@ -231,9 +221,7 @@ class BatteryIndicator extends StatelessWidget {
                 size: fontSize + 2,
               ),
             ),
-
             const SizedBox(width: 12),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,10 +233,7 @@ class BatteryIndicator extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-
                   const SizedBox(height: 4),
-
-                  // Información de porcentaje y carga
                   Row(
                     children: [
                       Expanded(
@@ -265,7 +250,7 @@ class BatteryIndicator extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha: 0.15),
+                            color: Colors.green.withAlpha(40),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -300,10 +285,7 @@ class BatteryIndicator extends StatelessWidget {
             ),
           ],
         ),
-
         const SizedBox(height: 8),
-
-        // Barra de progreso con estilo moderno
         Container(
           height: 8,
           width: double.infinity,
@@ -317,17 +299,10 @@ class BatteryIndicator extends StatelessWidget {
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 700),
                   curve: Curves.easeOutCubic,
-                  width: MediaQuery.of(context).size.width * 0.65 * barWidth,
+                  width: barWidth * MediaQuery.of(context).size.width * 0.6,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     color: getBatteryColor(),
-                    boxShadow: [
-                      BoxShadow(
-                        color: getBatteryColor().withValues(alpha: 0.5),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
                   ),
                 ),
             ],
