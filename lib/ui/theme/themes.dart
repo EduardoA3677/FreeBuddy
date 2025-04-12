@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/foundation.dart';
 
 bool get useMaterial3 => true;
+
+bool get isMobile =>
+    defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
 /// Tema claro basado en Material You con esquema dinámico opcional
 ThemeData lightTheme({ColorScheme? dynamicScheme}) => _customize(
@@ -38,19 +42,28 @@ ThemeData _customize(ThemeData theme) {
   final tt = theme.textTheme;
   final cs = theme.colorScheme;
 
+  final borderSide = isMobile ? BorderSide(color: cs.outline, width: 2.5) : BorderSide.none;
+
   return theme.copyWith(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     splashFactory: InkSparkle.splashFactory,
     cardTheme: CardTheme(
+      color: cs.surfaceContainerHighest.withAlpha(255),
       elevation: 2.5,
       shadowColor: cs.shadow.withAlpha(100),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: borderSide,
+      ),
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.symmetric(vertical: 10),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: borderSide,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         elevation: 2,
         shadowColor: cs.primary.withAlpha(100),
@@ -59,7 +72,10 @@ ThemeData _customize(ThemeData theme) {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: borderSide,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         elevation: 1.5,
         backgroundColor: cs.surfaceContainerHigh.withAlpha(220),
@@ -71,7 +87,7 @@ ThemeData _customize(ThemeData theme) {
       style: OutlinedButton.styleFrom(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        side: BorderSide(width: 1.5, color: cs.primary.withAlpha(180)),
+        side: BorderSide(width: isMobile ? 2.0 : 1.5, color: cs.primary.withAlpha(180)),
         foregroundColor: cs.primary,
       ),
     ),
@@ -80,15 +96,15 @@ ThemeData _customize(ThemeData theme) {
       fillColor: cs.surfaceContainerLowest.withAlpha(230),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: borderSide,
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: cs.outline.withAlpha(80), width: 1),
+        borderSide: BorderSide(color: cs.outline.withAlpha(180), width: isMobile ? 2 : 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: cs.primary, width: 1.5),
+        borderSide: BorderSide(color: cs.primary, width: isMobile ? 2.5 : 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       floatingLabelBehavior: FloatingLabelBehavior.auto,
@@ -122,7 +138,10 @@ ThemeData _customize(ThemeData theme) {
     ),
     listTileTheme: ListTileThemeData(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: borderSide,
+      ),
       iconColor: cs.primary,
       titleTextStyle: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
     ),
@@ -133,13 +152,15 @@ ThemeData _customize(ThemeData theme) {
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected) ? cs.onPrimary : cs.outline),
-      trackColor: WidgetStateProperty.resolveWith((states) =>
-          states.contains(WidgetState.selected) ? cs.primary : cs.surfaceContainerHighest),
+        (states) => states.contains(WidgetState.selected) ? cs.onPrimary : cs.outline,
+      ),
+      trackColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? cs.primary : cs.surfaceContainerHighest,
+      ),
     ),
     checkboxTheme: CheckboxThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-      side: BorderSide(width: 1.5, color: cs.outline),
+      side: borderSide,
     ),
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith(

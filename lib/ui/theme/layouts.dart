@@ -1,26 +1,33 @@
 import 'package:flutter/cupertino.dart';
 
-/// Helper enum to quickly determine current size
+/// An enum to categorize the current window size class based on width.
 ///
-/// You're probably wondering what are "window size classes" - it's a
-/// opinionated and very convenient way to put all different screen sizes into
-/// three categories, determined by screen width:
-/// - compact - typical vertical phone
-/// - medium - small tablet/foldable or horizontal phone
-/// - expanded - big tablet/computer
+/// Window size classes are a convenient way to define UI breakpoints:
+/// - [compact]: Phones in portrait mode or very small devices.
+/// - [medium]: Foldables, small tablets, or phones in landscape mode.
+/// - [expanded]: Larger tablets or desktop screens.
 ///
+/// Reference:
 /// https://m3.material.io/foundations/layout/applying-layout/window-size-classes
 enum WindowSizeClass {
   compact,
   medium,
   expanded;
 
-  static WindowSizeClass of(BuildContext context) =>
-      switch (MediaQuery.of(context).size.width) {
-        < 600 => WindowSizeClass.compact,
-        >= 600 && < 840 => WindowSizeClass.medium,
-        >= 840 => WindowSizeClass.expanded,
-        // 🤷
-        _ => WindowSizeClass.compact,
-      };
+  /// Determines the [WindowSizeClass] for the current screen width.
+  ///
+  /// - `compact`: width < 600
+  /// - `medium`: 600 ≤ width < 840
+  /// - `expanded`: width ≥ 840
+  static WindowSizeClass of(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
+    if (width < 600) {
+      return WindowSizeClass.compact;
+    } else if (width < 840) {
+      return WindowSizeClass.medium;
+    } else {
+      return WindowSizeClass.expanded;
+    }
+  }
 }

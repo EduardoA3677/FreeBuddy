@@ -18,18 +18,25 @@ class SettingsPage extends StatelessWidget {
     final l = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.settings)),
+      appBar: AppBar(
+        title: Text(
+          l.settings,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
+        ),
+        centerTitle: true,
+        elevation: 2,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionHeader(context, l.themeSettingsTitle),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             _buildThemeSettings(context),
             const SizedBox(height: 24),
             _buildSectionHeader(context, l.debugSettingsTitle),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             _buildDebugSettings(context),
             const SizedBox(height: 24),
             _buildAboutButton(context, l),
@@ -41,10 +48,14 @@ class SettingsPage extends StatelessWidget {
 
   Widget _buildSectionHeader(BuildContext context, String title) {
     final theme = Theme.of(context);
-    return Text(
-      title,
-      style: theme.textTheme.titleLarge?.copyWith(
-        fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
       ),
     );
   }
@@ -60,14 +71,18 @@ class SettingsPage extends StatelessWidget {
         final currentTheme = snapshot.data ?? ThemeMode.system;
 
         return Card(
-          elevation: 2,
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RadioListTile<ThemeMode>(
-                  title: Text(l.themeSettingsSystem),
+                  title: Text(
+                    l.themeSettingsSystem,
+                    style: TextStyle(fontSize: 16),
+                  ),
                   value: ThemeMode.system,
                   groupValue: currentTheme,
                   onChanged: (value) {
@@ -77,7 +92,10 @@ class SettingsPage extends StatelessWidget {
                   },
                 ),
                 RadioListTile<ThemeMode>(
-                  title: Text(l.themeSettingsLight),
+                  title: Text(
+                    l.themeSettingsLight,
+                    style: TextStyle(fontSize: 16),
+                  ),
                   value: ThemeMode.light,
                   groupValue: currentTheme,
                   onChanged: (value) {
@@ -87,7 +105,10 @@ class SettingsPage extends StatelessWidget {
                   },
                 ),
                 RadioListTile<ThemeMode>(
-                  title: Text(l.themeSettingsDark),
+                  title: Text(
+                    l.themeSettingsDark,
+                    style: TextStyle(fontSize: 16),
+                  ),
                   value: ThemeMode.dark,
                   groupValue: currentTheme,
                   onChanged: (value) {
@@ -109,7 +130,8 @@ class SettingsPage extends StatelessWidget {
     final settings = context.read<AppSettings>();
 
     return Card(
-      elevation: 2,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -122,8 +144,14 @@ class SettingsPage extends StatelessWidget {
                 final isDebugEnabled = snapshot.data ?? false;
 
                 return SwitchListTile(
-                  title: Text(l.debugModeEnable),
-                  subtitle: Text(l.debugModeDescription),
+                  title: Text(
+                    l.debugModeEnable,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  subtitle: Text(
+                    l.debugModeDescription,
+                    style: TextStyle(fontSize: 14),
+                  ),
                   value: isDebugEnabled,
                   onChanged: (value) => settings.setDebugMode(value),
                 );
@@ -131,8 +159,14 @@ class SettingsPage extends StatelessWidget {
             ),
             const Divider(),
             ListTile(
-              title: Text(l.exportLogs),
-              subtitle: Text(l.exportLogsDescription),
+              title: Text(
+                l.exportLogs,
+                style: TextStyle(fontSize: 16),
+              ),
+              subtitle: Text(
+                l.exportLogsDescription,
+                style: TextStyle(fontSize: 14),
+              ),
               trailing: const Icon(Symbols.download),
               onTap: () => _exportLogs(context),
             ),
@@ -143,11 +177,19 @@ class SettingsPage extends StatelessWidget {
   }
 
   Widget _buildAboutButton(BuildContext context, AppLocalizations l) {
-    return FilledButton(
-      onPressed: () => GoRouter.of(context).push('/settings/about'),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(l.pageAboutTitle),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: FilledButton(
+        onPressed: () => GoRouter.of(context).push('/settings/about'),
+        style: ButtonStyle(
+          padding:
+              WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 24)),
+          backgroundColor: WidgetStateProperty.all(Colors.blue),
+        ),
+        child: Text(
+          l.pageAboutTitle,
+          style: TextStyle(fontSize: 18),
+        ),
       ),
     );
   }

@@ -12,7 +12,7 @@ import '../../app_settings.dart';
 import 'controls/headphones_controls_widget.dart';
 import 'no_permission_info_widget.dart';
 
-// imports omitidos por brevedad (son los mismos)
+// imports omitidos por brevedad
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           l.appTitle,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 22,
+            fontSize: 24,
             letterSpacing: -0.3,
           ),
         ),
@@ -141,24 +141,35 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/headphones_settings'),
         tooltip: l.pageHeadphonesSettingsTitle,
-        elevation: 3,
+        elevation: 6, // Mayor elevación para un efecto más prominente
         backgroundColor: theme.colorScheme.secondary,
         foregroundColor: theme.colorScheme.onSecondary,
-        extendedIconLabelSpacing: 12,
+        extendedIconLabelSpacing: 16, // Mayor espacio entre el ícono y el texto
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12), // Bordes más redondeados
         ),
         label: Text(
           l.pageHeadphonesSettingsTitle,
-          style: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.3),
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+            fontSize: 16, // Ajuste en el tamaño del texto
+          ),
         ),
         icon: const Icon(Symbols.settings, weight: 300),
-      ).animate(controller: _controller).scale(
-            begin: const Offset(0, 0),
-            end: const Offset(1, 1),
-            duration: 400.ms,
-            delay: 400.ms,
-            curve: Curves.elasticOut,
+      )
+          .animate(controller: _controller)
+          .scale(
+            begin: const Offset(0.8, 0.8), // Tamaño más pequeño al inicio
+            end: const Offset(1.1, 1.1), // Tamaño un poco mayor al final
+            duration: 500.ms, // Duración más larga para un efecto suave
+            curve: Curves.easeOut, // Curva suave
+          )
+          .rotate(
+            begin: 0.0, // Inicia sin rotación
+            end: 0.1, // Rota ligeramente
+            duration: 500.ms, // Duración igual para mantener sincronizado el efecto
+            curve: Curves.easeOut,
           ),
     );
   }
@@ -182,8 +193,8 @@ class _DisconnectedWidget extends StatelessWidget {
         icon: const Icon(Symbols.bluetooth_searching),
         label: Text(l.connect),
         style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
@@ -209,8 +220,8 @@ class _NotPairedWidget extends StatelessWidget {
         label: Text(l.configureBluetooth),
         style: FilledButton.styleFrom(
           backgroundColor: theme.colorScheme.secondary,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
@@ -230,8 +241,8 @@ class _LoadingWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(
-            width: 64,
-            height: 64,
+            width: 48,
+            height: 48,
             child: CircularProgressIndicator(strokeWidth: 3),
           ),
           const SizedBox(height: 24),
@@ -268,14 +279,14 @@ class _StateMessageCard extends StatelessWidget {
 
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
               color: theme.colorScheme.shadow.withValues(alpha: 0.1),
-              blurRadius: 10,
+              blurRadius: 8,
               offset: const Offset(0, 4),
             ),
           ],
@@ -283,13 +294,13 @@ class _StateMessageCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 72, weight: 300, color: iconColor),
-            const SizedBox(height: 24),
+            Icon(icon, size: 60, weight: 300, color: iconColor),
+            const SizedBox(height: 20),
             Text(
               title,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                fontSize: 22,
+                fontSize: 20,
                 letterSpacing: -0.3,
               ),
               textAlign: TextAlign.center,

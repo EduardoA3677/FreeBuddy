@@ -38,7 +38,7 @@ class BatteryCard extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: [
                   theme.colorScheme.surface,
-                  theme.colorScheme.surface.withAlpha(240),
+                  theme.colorScheme.surface.withValues(alpha: 240),
                 ],
               ),
             ),

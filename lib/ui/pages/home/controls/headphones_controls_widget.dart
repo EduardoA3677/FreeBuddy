@@ -16,9 +16,6 @@ import 'anc_card.dart';
 import 'battery_card.dart';
 import 'headphones_image.dart';
 
-/// Widget principal con controles para auriculares
-/// Contiene indicadores de batería, botones de ANC, configuración, etc.
-/// Solo necesita recibir el objeto [headphones] para mostrar toda la información
 class HeadphonesControlsWidget extends StatelessWidget {
   final BluetoothHeadphones headphones;
 
@@ -65,7 +62,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
       double screenWidth, double screenHeight) {
     log(LogLevel.debug, "Building main content for headphones: ${headphones.runtimeType}");
 
-    // Dispositivo Huawei info
     HuaweiModelDefinition? modelDef;
     String deviceName = "";
 
@@ -76,17 +72,14 @@ class HeadphonesControlsWidget extends StatelessWidget {
       }
     }
 
-    // Determina categorías de tamaño de pantalla de forma más precisa
     final isExtraSmallScreen = screenWidth < 320;
     final isSmallScreen = screenWidth < 400;
     final isWideScreen = screenWidth >= 600;
 
-    // Calcula proporciones adaptativas para la imagen
     final imageHeightRatio = isSmallScreen ? 0.15 : (isWideScreen ? 0.25 : 0.2);
     final imageMaxHeight = screenHeight * imageHeightRatio;
 
     try {
-      // Usar un SingleChildScrollView para evitar problemas de desbordamiento en pantallas pequeñas
       return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -105,7 +98,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Device Name with modern styling and badge
               Container(
                 margin: const EdgeInsets.only(top: 16),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -133,10 +125,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
                   .animate()
                   .fadeIn(duration: 500.ms)
                   .slideY(begin: -0.1, end: 0, duration: 500.ms, curve: Curves.easeOutBack),
-
               const SizedBox(height: 20),
-
-              // Headphones Image with improved container and adaptive sizing
               if (headphones is HeadphonesModelInfo)
                 Container(
                   height:
@@ -171,8 +160,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
                   ),
                 ),
               const SizedBox(height: 20),
-
-              // Main Content Area with card-like container - adaptativo para diferentes tamaños
               Container(
                 margin: EdgeInsets.symmetric(horizontal: isExtraSmallScreen ? 4 : 8, vertical: 16),
                 padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 16),
@@ -209,7 +196,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
     }
   }
 
-  // Layout for wider screens - cards side by side
   Widget _buildWideLayout(ThemeData theme, AppLocalizations l, double screenWidth) {
     final hasAncFeature = headphones is Anc;
     final hasBatteryFeature = headphones is LRCBattery;
@@ -252,7 +238,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  // Layout for smaller screens - cards stacked vertically with proper spacing
   Widget _buildCompactLayout(
       ThemeData theme, AppLocalizations l, double screenWidth, bool isSmallScreen) {
     final hasAncFeature = headphones is Anc;
