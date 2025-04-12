@@ -42,8 +42,8 @@ ThemeData _customize(ThemeData theme) {
   final tt = theme.textTheme;
   final cs = theme.colorScheme;
 
-  final borderSide =
-      isMobile ? BorderSide(color: cs.outline, width: 1.5) : BorderSide.none; // Grosor reducido
+  // Quitamos la definición de borderSide, ya que no queremos bordes en las cards
+  final borderSide = BorderSide.none;
 
   return theme.copyWith(
     visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -54,7 +54,7 @@ ThemeData _customize(ThemeData theme) {
       shadowColor: cs.shadow.withAlpha(100),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: borderSide,
+        side: borderSide, // Usamos borderSide.none para quitar el borde
       ),
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.symmetric(vertical: 10),
