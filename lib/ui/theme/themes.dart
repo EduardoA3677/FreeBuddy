@@ -15,7 +15,7 @@ ThemeData lightTheme({ColorScheme? dynamicScheme}) => _customize(
               seedColor: const Color(0xFF6750A4),
               brightness: Brightness.light,
             ),
-        useMaterial3: useMaterial3,
+        useMaterial3: true,
       ),
       isDark: false,
     );
@@ -28,7 +28,7 @@ ThemeData darkTheme({ColorScheme? dynamicScheme}) => _customize(
               seedColor: const Color(0xFF6750A4),
               brightness: Brightness.dark,
             ),
-        useMaterial3: useMaterial3,
+        useMaterial3: true,
       ),
       isDark: true,
     );
