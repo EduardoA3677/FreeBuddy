@@ -4,25 +4,20 @@ import 'package:async/async.dart';
 
 abstract class AppSettings {
   Stream<bool> get seenIntroduction;
-
   Future<bool> setSeenIntroduction(bool value);
 
   Stream<bool> get sleepMode;
-
   Future<bool> setSleepMode(bool value);
 
   Stream<String> get sleepModePreviousSettings;
-
   Future<bool> setSleepModePreviousSettings(String value);
 
   /// Modo debug para mostrar logs detallados
   Stream<bool> get debugMode;
-
   Future<bool> setDebugMode(bool value);
 
   /// Modo del tema de la aplicación (system, light, dark)
   Stream<ThemeMode> get themeMode;
-
   Future<bool> setThemeMode(ThemeMode value);
 }
 
@@ -31,17 +26,15 @@ enum _Prefs {
   sleepMode('sleepMode', false),
   sleepModePreviousSettings('sleepModePreviousSettings', ''),
   debugMode('debugMode', false),
-  themeMode('themeMode', 0); // 0 = ThemeMode.system, 1 = ThemeMode.light, 2 = ThemeMode.dark
+  themeMode('themeMode', 0); // 0 = ThemeMode.system, 1 = light, 2 = dark
 
   const _Prefs(this.key, this.defaultValue);
-
   final String key;
   final dynamic defaultValue;
 }
 
 class SharedPreferencesAppSettings implements AppSettings {
   SharedPreferencesAppSettings(this.preferences);
-
   final Future<StreamingSharedPreferences> preferences;
 
   Future<Preference<bool>> get _seenIntroduction => preferences.then((p) =>
@@ -86,35 +79,21 @@ class SharedPreferencesAppSettings implements AppSettings {
   Future<bool> setDebugMode(bool value) => _debugMode.then((v) => v.setValue(value));
 
   @override
-  Stream<ThemeMode> get themeMode =>
-      LazyStream(() => _themeMode).map((value) => _intToThemeMode(value));
+  Stream<ThemeMode> get themeMode => LazyStream(() => _themeMode).map(_intToThemeMode);
 
   @override
   Future<bool> setThemeMode(ThemeMode value) =>
       _themeMode.then((pref) => pref.setValue(_themeModeToInt(value)));
 
-  // Convertir de int a ThemeMode
-  ThemeMode _intToThemeMode(int value) {
-    switch (value) {
-      case 1:
-        return ThemeMode.light;
-      case 2:
-        return ThemeMode.dark;
-      case 0:
-      case _:
-        return ThemeMode.system;
-    }
-  }
+  ThemeMode _intToThemeMode(int value) => switch (value) {
+        1 => ThemeMode.light,
+        2 => ThemeMode.dark,
+        _ => ThemeMode.system,
+      };
 
-  // Convertir de ThemeMode a int
-  int _themeModeToInt(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.light:
-        return 1;
-      case ThemeMode.dark:
-        return 2;
-      case ThemeMode.system:
-        return 0;
-    }
-  }
+  int _themeModeToInt(ThemeMode mode) => switch (mode) {
+        ThemeMode.light => 1,
+        ThemeMode.dark => 2,
+        ThemeMode.system => 0,
+      };
 }

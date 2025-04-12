@@ -22,24 +22,15 @@ import 'ui/theme/themes.dart';
 late final StreamingSharedPreferences _preferences;
 
 void main() async {
-  // Asegurarse de que el binding de widgets esté inicializado
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inicializar el sistema de logging para capturar todos los errores
   AppLogger.setupGlobalErrorHandling();
-
-  // Registrar inicio de la aplicación
   log(LogLevel.info, "FreeBuddy iniciando...");
-
-  // Preservar la pantalla de splash mientras se inicializa la app
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsBinding.instance);
 
   try {
-    // Inicializar preferencias compartidas
     _preferences = await StreamingSharedPreferences.instance;
     log(LogLevel.debug, "Preferencias inicializadas correctamente");
 
-    // Iniciar la aplicación con el MyAppWrapper para gestionar el ciclo de vida
     runApp(
       Provider<AppSettings>(
         create: (context) => SharedPreferencesAppSettings(Future.value(_preferences)),
@@ -48,7 +39,6 @@ void main() async {
     );
   } catch (e, stackTrace) {
     log(LogLevel.critical, "Error al iniciar la aplicación", error: e, stackTrace: stackTrace);
-    // Reintentar con una configuración mínima para mostrar el error al usuario
     runApp(const MaterialApp(
       home: Scaffold(
         body: Center(
@@ -79,7 +69,6 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
   }
 
   Future<void> _initPreferences() async {
-    // Simulamos una pequeña carga para dar tiempo a la inicialización
     await Future.delayed(const Duration(milliseconds: 300));
     if (mounted) {
       setState(() {
@@ -89,7 +78,6 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
   }
 
   void _setupSplashRemoval() {
-    // Eliminar splash cuando los auriculares se conecten o después de 1 segundo
     _btBlock.stream
         .firstWhere((e) => e is HeadphonesConnectedOpen)
         .timeout(
@@ -99,17 +87,12 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
         .then((_) {
       FlutterNativeSplash.remove();
     }).catchError((error) {
-      // Asegurarse de eliminar el splash incluso si hay errores
       FlutterNativeSplash.remove();
     });
-
-    // No inicializar Bluetooth automáticamente
-    // Los permisos serán solicitados después de la introducción
   }
 
   @override
   Widget build(BuildContext context) {
-    // Mostrar un indicador de carga mientras se inicializan las preferencias
     if (!_isPrefsInitialized) {
       return MaterialApp(
         home: Scaffold(
@@ -117,10 +100,8 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Indicador de carga con estilo mejorado
                 const CircularProgressIndicator(),
                 const SizedBox(height: 16),
-                // Mensaje informativo para el usuario
                 Text(
                   'Iniciando FreeBuddy...',
                   style: TextStyle(
@@ -135,7 +116,6 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
       );
     }
 
-    // Una vez inicializado, configurar los providers y la estructura principal
     return Provider<AppSettings>(
       create: (context) => SharedPreferencesAppSettings(Future.value(_preferences)),
       child: MultiBlocProvider(
@@ -176,20 +156,18 @@ class MyApp extends StatelessWidget {
         initialData: ThemeMode.system,
         builder: (context, snapshot) {
           return MaterialApp.router(
-            debugShowCheckedModeBanner: false, // Eliminar la etiqueta de debug
+            debugShowCheckedModeBanner: false,
             routerConfig: router,
             onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            theme: lightTheme(lightDynamic),
-            darkTheme: darkTheme(darkDynamic),
-            themeMode: snapshot.data!, // Añadir animaciones de transición mejoradas
+            theme: lightTheme(dynamicScheme: lightDynamic),
+            darkTheme: darkTheme(dynamicScheme: darkDynamic),
+            themeMode: snapshot.data!,
             builder: (context, child) {
               if (child == null) {
-                // Proporcionar un fallback en caso de que child sea null
                 return const Center(child: CircularProgressIndicator());
               }
-              // Añadir animación de aparición suave
               return child
                   .animate()
                   .fadeIn(duration: 300.ms, curve: Curves.easeOutCubic)
