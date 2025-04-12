@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../../headphones/framework/headphones_info.dart';
 
 class HeadphonesImage extends StatelessWidget {
@@ -23,32 +22,54 @@ class HeadphonesImage extends StatelessWidget {
               maxHeight: maxSize,
             ),
             padding: EdgeInsets.all(padding),
-            child: StreamBuilder(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: StreamBuilder<String?>(
               stream: modelInfo.imageAssetPath,
-              builder: (_, snap) => AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: snap.data != null
-                    ? Image.asset(
-                        snap.data!,
-                        key: ValueKey(snap.data),
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.medium,
-                      )
-                    : Container(
-                        key: const ValueKey('placeholder'),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest
-                              .withAlpha((0.3 * 255).round()),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-              ),
+              builder: (_, snap) {
+                final imagePath = snap.data;
+
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: imagePath != null
+                      ? Image.asset(
+                          imagePath,
+                          key: ValueKey(imagePath),
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
+                        )
+                      : _buildPlaceholder(context),
+                );
+              },
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildPlaceholder(BuildContext context) {
+    return Container(
+      key: const ValueKey('placeholder'),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha((0.3 * 255).round()),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.headphones, // Placeholder icon for image
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          size: 48,
+        ),
+      ),
     );
   }
 }

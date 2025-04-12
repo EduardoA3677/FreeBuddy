@@ -20,6 +20,9 @@ class AncCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -32,7 +35,7 @@ class AncCard extends StatelessWidget {
             ],
           ),
         ),
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -48,7 +51,7 @@ class AncCard extends StatelessWidget {
                   child: Icon(
                     Symbols.noise_aware,
                     color: theme.colorScheme.secondary,
-                    size: isSmallDevice ? 20 : 24,
+                    size: isSmallDevice ? 22 : 28,
                   ),
                 ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack, delay: 100.ms),
                 const SizedBox(width: 12),
@@ -69,7 +72,7 @@ class AncCard extends StatelessWidget {
                         'Adjust noise cancellation settings',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
-                          fontSize: isSmallDevice ? 12 : 13,
+                          fontSize: isSmallDevice ? 12 : 14,
                         ),
                       ),
                     ],

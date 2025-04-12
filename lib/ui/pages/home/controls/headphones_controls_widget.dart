@@ -17,7 +17,6 @@ import 'battery_card.dart';
 import 'headphones_image.dart';
 
 /// Widget principal con controles para auriculares
-///
 /// Contiene indicadores de batería, botones de ANC, configuración, etc.
 /// Solo necesita recibir el objeto [headphones] para mostrar toda la información
 class HeadphonesControlsWidget extends StatelessWidget {
@@ -35,10 +34,6 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final l = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l.headphonesControl),
-        backgroundColor: theme.colorScheme.primary,
-      ),
       body: SafeArea(
         child: Builder(
           builder: (context) {

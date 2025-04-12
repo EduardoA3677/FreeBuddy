@@ -7,7 +7,6 @@ import '../../../../headphones/framework/lrc_battery.dart';
 import '../../../../headphones/huawei/features/battery_feature.dart';
 
 /// Tarjeta de batería con estilo moderno Material 3
-///
 /// Rediseñada con un enfoque más limpio y visual
 class BatteryCard extends StatelessWidget {
   final LRCBattery lrcBattery;
@@ -204,7 +203,7 @@ class BatteryIndicator extends StatelessWidget {
       } else if (level! < 70) {
         return theme.colorScheme.tertiary;
       } else {
-        return theme.colorScheme.primary.withGreen((theme.colorScheme.primary.g + 30).toInt());
+        return Colors.green; // Cambié el color a verde para las barras
       }
     }
 

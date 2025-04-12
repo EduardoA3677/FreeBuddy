@@ -32,13 +32,7 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 8),
             _buildDebugSettings(context),
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: () => GoRouter.of(context).push('/settings/about'),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(l.pageAboutTitle),
-              ),
-            ),
+            _buildAboutButton(context, l),
           ],
         ),
       ),
@@ -148,6 +142,16 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  Widget _buildAboutButton(BuildContext context, AppLocalizations l) {
+    return FilledButton(
+      onPressed: () => GoRouter.of(context).push('/settings/about'),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(l.pageAboutTitle),
+      ),
+    );
+  }
+
   Future<void> _exportLogs(BuildContext context) async {
     final l = AppLocalizations.of(context)!;
     final snackBar = ScaffoldMessenger.of(context);
@@ -155,7 +159,6 @@ class SettingsPage extends StatelessWidget {
     try {
       final directory =
           await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
-
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '_');
       final filePath = '${directory.path}/freebuddy_logs_$timestamp.log';
 
