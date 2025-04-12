@@ -15,7 +15,8 @@ class NoPermissionInfoWidget extends StatefulWidget {
   State<NoPermissionInfoWidget> createState() => _NoPermissionInfoWidgetState();
 }
 
-class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> with WidgetsBindingObserver {
+class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
+    with WidgetsBindingObserver {
   bool _isRequestingPermissions = false;
   List<Permission> _pendingPermissions = [];
 
@@ -49,6 +50,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> with Wi
       Permission.bluetoothConnect,
       Permission.bluetoothScan,
       Permission.notification,
+      Permission.manageExternalStorage, // Added storage permission
     ];
 
     try {
@@ -59,13 +61,8 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> with Wi
     } catch (_) {}
 
     try {
-      if (await Permission.manageExternalStorage.status != PermissionStatus.permanentlyDenied) {
-        permissions.add(Permission.manageExternalStorage);
-      }
-    } catch (_) {}
-
-    try {
-      if (await Permission.ignoreBatteryOptimizations.status != PermissionStatus.permanentlyDenied) {
+      if (await Permission.ignoreBatteryOptimizations.status !=
+          PermissionStatus.permanentlyDenied) {
         permissions.add(Permission.ignoreBatteryOptimizations);
       }
     } catch (_) {}
@@ -123,7 +120,9 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> with Wi
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Faltan permisos: ${denied.map((e) => e.toString().split('.').last).join(', ')}')),
+            SnackBar(
+                content: Text(
+                    'Faltan permisos: ${denied.map((e) => e.toString().split('.').last).join(', ')}')),
           );
         }
       }
