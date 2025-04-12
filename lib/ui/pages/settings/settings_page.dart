@@ -184,11 +184,13 @@ class SettingsPage extends StatelessWidget {
       final file = File(filePath);
       await file.writeAsString(logContents);
 
+      if (!context.mounted) return;
       snackBar.showSnackBar(SnackBar(
         content: Text('${l.exportLogsSuccess}: $filePath'),
         backgroundColor: Colors.green,
       ));
-    } catch (e, stackTrace) {
+    } catch (e) {
+      if (!context.mounted) return;
       snackBar.showSnackBar(SnackBar(
         content: Text('${l.exportLogsError}: $e'),
         backgroundColor: Colors.red,
@@ -200,9 +202,11 @@ class SettingsPage extends StatelessWidget {
     final initialDirectory = (await getExternalStorageDirectory())?.path ??
         (await getApplicationDocumentsDirectory()).path;
 
+    if (!context.mounted) return null;
+
     return showDialog<String>(
       context: context,
-      builder: (context) {
+      builder: (BuildContext dialogContext) {
         final controller = TextEditingController();
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.exportLogsDialog),
@@ -219,13 +223,13 @@ class SettingsPage extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context, null),
+              onPressed: () => Navigator.pop(dialogContext, null),
               child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
                 final fileName = controller.text.trim();
-                Navigator.pop(context, '$initialDirectory/$fileName');
+                Navigator.pop(dialogContext, '$initialDirectory/$fileName');
               },
               child: Text(AppLocalizations.of(context)!.save),
             ),
