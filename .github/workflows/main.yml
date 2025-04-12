@@ -43,12 +43,9 @@ jobs:
           sudo apt-get install -y wget libc6-x32 libc6-i386
           wget https://download.oracle.com/java/17/archive/jdk-17.0.12_linux-x64_bin.deb
           sudo dpkg -i jdk-17.0.12_linux-x64_bin.deb
-          sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-17/bin/java 0;
-          sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk-17/bin/javac 0;
-          sudo update-alternatives --set java /usr/lib/jvm/jdk-17/bin/java;
-          sudo update-alternatives --set javac /usr/lib/jvm/jdk-17/bin/javac
+          sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-17.0.12-oracle-x64/bin/java 0;
+          sudo update-alternatives --set java /usr/lib/jvm/jdk-17.0.12-oracle-x64/bin/java;
           java -version
-          javac -version
       - name: Build APK & AAB with signing
         uses: NiklasLehnfeld/flutter-android-build-action@v2
         id: android-build

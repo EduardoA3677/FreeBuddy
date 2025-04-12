@@ -181,50 +181,32 @@ class SettingsPage extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         final controller = TextEditingController();
-        String? selectedDirectory;
 
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(AppLocalizations.of(context)!.exportLogsDialog),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: controller,
-                    decoration: const InputDecoration(hintText: 'log.txt'),
-                  ),
-                  const SizedBox(height: 12),
-                  if (selectedDirectory != null) Text('Directory: $selectedDirectory'),
-                  TextButton(
-                    onPressed: () async {
-                      final result = await FilePicker.platform.getDirectoryPath();
-                      if (result != null) {
-                        setState(() {
-                          selectedDirectory = result;
-                        });
-                      }
-                    },
-                    child: Text(AppLocalizations.of(context)!.selectDirectory),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext, null),
-                  child: Text(AppLocalizations.of(context)!.cancel),
-                ),
-                TextButton(
-                  onPressed: () {
-                    if (selectedDirectory != null) {
-                      Navigator.pop(dialogContext, selectedDirectory);
-                    }
-                  },
-                  child: Text(AppLocalizations.of(context)!.save),
-                ),
-              ],
-            );
-          },
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.exportLogsDialog),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'log.txt'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, null),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            TextButton(
+              onPressed: () async {
+                final fileName = controller.text.trim();
+                if (fileName.isNotEmpty) {
+                  final result = await FilePicker.platform.saveFile(
+                    dialogTitle: AppLocalizations.of(context)!.selectSaveLocation,
+                    fileName: fileName,
+                  );
+                  Navigator.pop(dialogContext, result);
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.save),
+            ),
+          ],
         );
       },
     );
