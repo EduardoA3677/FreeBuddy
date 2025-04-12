@@ -191,11 +191,11 @@ class BatteryIndicator extends StatelessWidget {
     final theme = Theme.of(context);
 
     Color getBatteryColor() {
-      if (level == null) return Colors.transparent;
-      if (level! < 20) return theme.colorScheme.error;
-      if (level! < 40) return theme.colorScheme.error.withAlpha(180);
-      if (level! < 70) return theme.colorScheme.tertiary;
-      return Colors.green;
+      if (level == null || level == 0) return theme.colorScheme.error;
+      if (level! < 20) return theme.colorScheme.error.withAlpha(180);
+      if (level! < 40) return theme.colorScheme.tertiary;
+      if (level! < 70) return theme.colorScheme.primary.withAlpha(180);
+      return theme.colorScheme.primary;
     }
 
     final barFill = level != null ? (level!.clamp(0, 100) / 100.0) : 0.0;
@@ -239,9 +239,7 @@ class BatteryIndicator extends StatelessWidget {
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             fontSize: fontSize - 1,
-                            color: level != null
-                                ? getBatteryColor()
-                                : theme.colorScheme.onSurfaceVariant,
+                            color: getBatteryColor(),
                           ),
                         ),
                       ),
@@ -249,7 +247,7 @@ class BatteryIndicator extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Colors.green.withAlpha(40),
+                            color: theme.colorScheme.primary.withAlpha(40),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -258,25 +256,19 @@ class BatteryIndicator extends StatelessWidget {
                               Icon(
                                 Symbols.bolt,
                                 size: fontSize - 2,
-                                color: Colors.green.shade600,
+                                color: theme.colorScheme.primary,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 'Charging',
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: Colors.green.shade600,
+                                  color: theme.colorScheme.primary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
-                        ).animate().scale(
-                              duration: 2.seconds,
-                              curve: Curves.easeInOut,
-                              begin: Offset(1.0, 1.0),
-                              end: Offset(1.05, 1.05),
-                              alignment: Alignment.center,
-                            ),
+                        ),
                     ],
                   ),
                 ],
@@ -294,16 +286,15 @@ class BatteryIndicator extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              if (level != null)
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 700),
-                  curve: Curves.easeOutCubic,
-                  width: MediaQuery.of(context).size.width * 0.6 * barFill,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    color: getBatteryColor(),
-                  ),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 700),
+                curve: Curves.easeOutCubic,
+                width: MediaQuery.of(context).size.width * 0.6 * barFill,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  color: getBatteryColor(),
                 ),
+              ),
             ],
           ),
         ),
