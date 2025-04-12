@@ -24,6 +24,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
   final BluetoothHeadphones headphones;
 
   const HeadphonesControlsWidget({super.key, required this.headphones});
+  
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -33,28 +34,34 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final l = AppLocalizations.of(context)!;
 
-    return SafeArea(
-      child: Builder(
-        builder: (context) {
-          try {
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.all(12.0) + EdgeInsets.only(bottom: bottomPadding),
-              child: _buildMainContent(windowSize, theme, l, screenWidth, screenHeight),
-            );
-          } catch (e, stackTrace) {
-            log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
-                error: e, stackTrace: stackTrace);
-            return _buildErrorContent(
-              l.headphonesControlError,
-              l.headphonesControlErrorDesc,
-              l,
-              onRetry: () => (context as Element).markNeedsBuild(),
-              theme: theme,
-            );
-          }
-        },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l.headphonesControls),
+        backgroundColor: theme.colorScheme.primary,
+      ),
+      body: SafeArea(
+        child: Builder(
+          builder: (context) {
+            try {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.all(12.0) + EdgeInsets.only(bottom: bottomPadding),
+                child: _buildMainContent(windowSize, theme, l, screenWidth, screenHeight),
+              );
+            } catch (e, stackTrace) {
+              log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
+                  error: e, stackTrace: stackTrace);
+              return _buildErrorContent(
+                l.headphonesControlError,
+                l.headphonesControlErrorDesc,
+                l,
+                onRetry: () => (context as Element).markNeedsBuild(),
+                theme: theme,
+              );
+            }
+          },
+        ),
       ),
     );
   }
@@ -265,91 +272,56 @@ class HeadphonesControlsWidget extends StatelessWidget {
       );
     }
 
-    // Espacio adaptativo entre tarjetas
-    final cardSpacing = isSmallScreen ? 12.0 : 16.0;
-
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
         if (hasBatteryFeature)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8.0 : 12.0, vertical: 4.0),
-            child: BatteryCard(headphones as LRCBattery)
-                .animate()
-                .fadeIn(duration: 500.ms, delay: 200.ms)
-                .slideY(begin: 0.05, end: 0, duration: 400.ms),
-          ),
-
-        // Espacio adaptativo entre tarjetas
-        if (hasAncFeature && hasBatteryFeature) SizedBox(height: cardSpacing),
-
+          BatteryCard(headphones as LRCBattery)
+              .animate()
+              .fadeIn(duration: 500.ms, delay: 200.ms)
+              .slideY(begin: -0.05, end: 0, duration: 400.ms),
+        const SizedBox(height: 16),
         if (hasAncFeature)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8.0 : 12.0, vertical: 4.0),
-            child: AncCard(headphones as Anc)
-                .animate()
-                .fadeIn(duration: 500.ms, delay: 300.ms)
-                .slideY(begin: 0.05, end: 0, duration: 400.ms),
-          ),
+          AncCard(headphones as Anc)
+              .animate()
+              .fadeIn(duration: 500.ms, delay: 200.ms)
+              .slideY(begin: 0.05, end: 0, duration: 400.ms),
       ],
     );
   }
 
   Widget _buildErrorContent(
-    String title,
-    String message,
-    AppLocalizations l, {
-    VoidCallback? onRetry,
-    required ThemeData theme,
-  }) {
+      String title, String description, AppLocalizations l, {required ThemeData theme, Function()? onRetry}) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Symbols.headset_off,
-                  size: 64,
-                  color: theme.colorScheme.error,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  title,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.error,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  message,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 204),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                if (onRetry != null) ...[
-                  const SizedBox(height: 24),
-                  FilledButton.icon(
-                    onPressed: onRetry,
-                    icon: const Icon(Symbols.refresh),
-                    label: Text(l.headphonesControlRetry),
-                  ),
-                ],
-              ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Symbols.error_outline,
+            size: 56,
+            color: theme.colorScheme.error,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            title,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: theme.colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
             ),
           ),
-        )
-            .animate()
-            .fadeIn(duration: 300.ms)
-            .scale(begin: const Offset(0.9, 0.9), end: const Offset(1.0, 1.0), duration: 300.ms),
+          const SizedBox(height: 12),
+          Text(
+            description,
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          if (onRetry != null)
+            ElevatedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: Text(l.retry),
+            ),
+        ],
       ),
     );
   }
