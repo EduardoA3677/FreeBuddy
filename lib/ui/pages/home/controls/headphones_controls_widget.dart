@@ -24,7 +24,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
   final BluetoothHeadphones headphones;
 
   const HeadphonesControlsWidget({super.key, required this.headphones});
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -36,7 +36,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l.headphonesControls),
+        title: Text(l.headphonesControl),
         backgroundColor: theme.colorScheme.primary,
       ),
       body: SafeArea(
@@ -289,8 +289,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorContent(
-      String title, String description, AppLocalizations l, {required ThemeData theme, Function()? onRetry}) {
+  Widget _buildErrorContent(String title, String description, AppLocalizations l,
+      {required ThemeData theme, Function()? onRetry}) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -319,7 +319,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: Text(l.retry),
+              label: Text(l.headphonesControlRetry),
             ),
         ],
       ),
