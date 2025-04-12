@@ -346,52 +346,28 @@ class AncModeOption extends StatelessWidget {
                     style: TextStyle(
                       color: foregroundColor,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      fontSize: isSmallWidth ? 13 : 15,
+                      fontSize: isSmallWidth ? 14 : 16,
                     ),
-                    textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 6),
-
-                  // Description text
-                  Text(
-                    description,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: foregroundColor.withAlpha(204),
-                      fontSize: isSmallWidth ? 10 : 12,
-                      height: 1.3,
-                    ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
-
-                  // Modern visual indicator for selected state
-                  if (isSelected) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      width: 36,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        borderRadius: BorderRadius.circular(2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.4),
-                            blurRadius: 4,
-                          )
-                        ],
+                  // Description for clarity
+                  if (!isSmallWidth) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 12,
                       ),
-                    ).animate().fadeIn(duration: 200.ms),
-                  ],
+                    ),
+                  ]
                 ],
               );
             }),
           ),
         ),
       ),
-    )
-        .animate(target: isSelected ? 1 : 0)
-        .elevation(begin: 0, end: elevation, curve: Curves.easeOutQuad, duration: 300.ms);
+    );
   }
 }
