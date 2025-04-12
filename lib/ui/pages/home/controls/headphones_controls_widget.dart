@@ -38,7 +38,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOutCubic,
-                padding: const EdgeInsets.all(12.0) + EdgeInsets.only(bottom: bottomPadding),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0) +
+                    EdgeInsets.only(bottom: bottomPadding),
                 child: _buildMainContent(windowSize, theme, l, screenWidth, screenHeight),
               );
             } catch (e, stackTrace) {
@@ -76,7 +77,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final isSmallScreen = screenWidth < 400;
     final isWideScreen = screenWidth >= 600;
 
-    final imageHeightRatio = isSmallScreen ? 0.15 : (isWideScreen ? 0.25 : 0.2);
+    final imageHeightRatio = isSmallScreen ? 0.2 : (isWideScreen ? 0.28 : 0.22);
     final imageMaxHeight = screenHeight * imageHeightRatio;
 
     try {
@@ -86,12 +87,19 @@ class HeadphonesControlsWidget extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
+              theme.colorScheme.surfaceContainerHighest,
               theme.colorScheme.surface,
-              theme.scaffoldBackgroundColor,
             ],
             stops: const [0.0, 1.0],
           ),
           borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.shadow.withAlpha(100),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -102,13 +110,13 @@ class HeadphonesControlsWidget extends StatelessWidget {
                 margin: const EdgeInsets.only(top: 16),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(20),
+                  color: theme.colorScheme.primaryContainer.withAlpha(220),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: theme.colorScheme.shadow.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      color: theme.colorScheme.shadow.withAlpha(50),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -134,14 +142,14 @@ class HeadphonesControlsWidget extends StatelessWidget {
                     maxHeight: imageMaxHeight,
                   ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(28),
+                    color: theme.colorScheme.surface.withAlpha(220),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                        color: theme.colorScheme.shadow.withAlpha(60),
                         blurRadius: 12,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 4),
+                        spreadRadius: 4,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
@@ -164,12 +172,12 @@ class HeadphonesControlsWidget extends StatelessWidget {
                 margin: EdgeInsets.symmetric(horizontal: isExtraSmallScreen ? 4 : 8, vertical: 16),
                 padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 12 : 16),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surface.withValues(alpha: 0.7),
+                  color: theme.colorScheme.surface.withAlpha(230),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: theme.colorScheme.shadow.withValues(alpha: 0.07),
-                      blurRadius: 10,
+                      color: theme.colorScheme.shadow.withAlpha(80),
+                      blurRadius: 12,
                       offset: const Offset(0, -2),
                     ),
                   ],
@@ -219,8 +227,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: BatteryCard(headphones as LRCBattery)
                   .animate()
-                  .fadeIn(duration: 500.ms, delay: 200.ms)
-                  .slideX(begin: -0.05, end: 0, duration: 400.ms),
+                  .fadeIn(duration: 500.ms)
+                  .slideY(begin: -0.005, end: 0, duration: 400.ms),
             ),
           ),
         if (hasAncFeature)
@@ -230,8 +238,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: AncCard(headphones as Anc)
                   .animate()
-                  .fadeIn(duration: 500.ms, delay: 200.ms)
-                  .slideX(begin: 0.05, end: 0, duration: 400.ms),
+                  .fadeIn(duration: 500.ms)
+                  .slideY(begin: -0.005, end: 0, duration: 400.ms),
             ),
           ),
       ],

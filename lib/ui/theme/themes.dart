@@ -48,7 +48,7 @@ ThemeData _customize(ThemeData theme, {required bool isDark}) {
     visualDensity: VisualDensity.adaptivePlatformDensity,
     splashFactory: InkSparkle.splashFactory,
     cardTheme: CardTheme(
-      color: isDark ? cs.surfaceVariant : cs.surfaceContainerHighest, // Ajuste de colores
+      color: isDark ? cs.surfaceContainerHighest : cs.surfaceContainerHighest, // Ajuste de colores
       elevation: isDark ? 3.0 : 2.0,
       shadowColor: cs.shadow.withAlpha(isDark ? 120 : 80),
       shape: RoundedRectangleBorder(
