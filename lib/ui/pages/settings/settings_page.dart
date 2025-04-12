@@ -162,8 +162,10 @@ class SettingsPage extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
           backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor:
+              Theme.of(context).colorScheme.onPrimary, // Ensures text and icon are visible
         ),
-        icon: const Icon(Icons.info),
+        icon: const Icon(Symbols.info), // Updated to use Symbols for the icon
         label: Text(
           l.pageAboutTitle,
           style: const TextStyle(fontSize: 18),
