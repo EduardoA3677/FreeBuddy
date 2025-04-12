@@ -57,6 +57,16 @@
   "headphonesControlNoFeaturesDesc": "Nie znaleziono obsługiwanych funkcji dla tych słuchawek.",
   "headphonesDisconnected": "Headphones Disconnected",
   "headphonesNotPaired": "Headphones not Paired",
+  "pageHomeNoPermission": "Wymagane uprawnienia",
+  "headphonesDisconnected": "Słuchawki odłączone",
+  "headphonesNotPaired": "Nie znaleziono sparowanych słuchawek",
+  "pageHeadphonesSettingsTitle": "Ustawienia słuchawek",
+  "connectingToHeadphones": "Łączenie ze słuchawkami...",
+  "homeConnect": "Połącz",
+  "configureBluetooth": "Skonfiguruj Bluetooth",
+  "homeConfiguration": "Konfiguracja",
+  "connect": "Connect",
+
 
   "settings": "Ustawienia",
   "privacyPolicy": "Polityka prywatności",

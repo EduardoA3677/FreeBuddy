@@ -56,6 +56,16 @@
   "headphonesControlNoFeaturesDesc": "No supported features were found for your headphones.",
   "headphonesDisconnected": "Headphones Disconnected",
   "headphonesNotPaired": "Headphones not Paired",
+  "pageHomeNoPermission": "Permission required",
+  "headphonesDisconnected": "Headphones disconnected",
+  "headphonesNotPaired": "No paired headphones found",
+  "pageHeadphonesSettingsTitle": "Headphones settings",
+  "connectingToHeadphones": "Connecting to your headphones...",
+  "homeConnect": "Connect",
+  "configureBluetooth": "Configure Bluetooth",
+  "homeConfiguration": "Configuration",
+  "connect": "Connect",
+
 
   "settings": "Settings",
   "privacyPolicy": "Privacy policy",
