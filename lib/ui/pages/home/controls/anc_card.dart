@@ -293,15 +293,14 @@ class AncModeOption extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: theme.colorScheme.shadow.withValues(alpha: 0.15),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                )
-              ]
-            : null,
+        boxShadow: [
+          if (elevation > 0)
+            BoxShadow(
+              color: theme.colorScheme.shadow.withValues(alpha: 0.15),
+              blurRadius: elevation * 2,
+              offset: Offset(0, elevation),
+            ),
+        ],
         border: Border.all(
           color: isSelected ? theme.colorScheme.primary : Colors.transparent,
           width: 2,
