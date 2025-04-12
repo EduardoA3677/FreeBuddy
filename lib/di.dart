@@ -7,10 +7,9 @@ import 'headphones/cubit/headphones_connection_cubit.dart';
 import 'headphones/cubit/headphones_mock_cubit.dart';
 
 /// Flag to determine if we should use mock headphones
-/// Returns true if USE_HEADPHONES_MOCK is enabled or if we're not on Android
-bool isMock = kIsWeb || !Platform.isAndroid || const bool.fromEnvironment('USE_HEADPHONES_MOCK');
+bool isMock = (!kIsWeb && Platform.isAndroid && !const bool.fromEnvironment('USE_HEADPHONES_MOCK'));
 
-/// Gets real or mock headphones connection cubit based on platform and configuration
+/// Gets real or fake connection cubit
 HeadphonesConnectionCubit getHeadphonesCubit() => isMock
-    ? HeadphonesMockCubit()
-    : HeadphonesConnectionCubit(bluetooth: TheLastBluetooth.instance);
+    ? HeadphonesConnectionCubit(bluetooth: TheLastBluetooth.instance)
+    : HeadphonesMockCubit();

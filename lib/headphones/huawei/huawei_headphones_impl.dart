@@ -25,10 +25,7 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   final StreamChannel<MbbCommand> _mbb;
   // Stream controllers
   final _bluetoothAliasCtrl = BehaviorSubject<String>();
-  // Initialize with an empty battery levels object to avoid null display issues
-  final _lrcBatteryCtrl = BehaviorSubject<LRCBatteryLevels>.seeded(
-    const LRCBatteryLevels(null, null, null, false, false, false),
-  );
+  final _lrcBatteryCtrl = BehaviorSubject<LRCBatteryLevels>();
   final _ancModeCtrl = BehaviorSubject<AncMode>();
   final _settingsCtrl = BehaviorSubject<HuaweiHeadphonesSettings>();
   // Features

@@ -54,6 +54,8 @@
   "headphonesControlRetry": "Retry",
   "headphonesControlNoFeatures": "No compatible features found",
   "headphonesControlNoFeaturesDesc": "No supported features were found for your headphones.",
+  "headphonesDisconnected": "Headphones Disconnected",
+  "headphonesNotPaired": "Headphones not Paired",
 
   "settings": "Settings",
   "privacyPolicy": "Privacy policy",

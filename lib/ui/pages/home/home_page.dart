@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../headphones/cubit/headphones_connection_cubit.dart';
+import '../../../headphones/cubit/headphones_cubit_objects.dart';
+import '../../../headphones/framework/bluetooth_headphones.dart';
 import '../../app_settings.dart';
 import 'controls/headphones_controls_widget.dart';
 import 'no_permission_info_widget.dart';
@@ -137,8 +140,53 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
               // Widget principal con los controles
               Expanded(
-                child: HeadphonesControlsWidget(
-                  headphones: context.read<AppSettings>().currentHeadphones,
+                child: BlocBuilder<HeadphonesConnectionCubit, HeadphonesConnectionState>(
+                  builder: (context, state) {
+                    if (state is HeadphonesConnectedOpen) {
+                      // Extraer información del modelo si es un dispositivo Huawei
+                      BluetoothHeadphones headphones = state.headphones;
+
+                      // Mostrar el widget de control de auriculares
+                      return HeadphonesControlsWidget(
+                        headphones: headphones,
+                      );
+                    } else if (state is HeadphonesDisconnected) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Symbols.headset_off, size: 64, color: theme.colorScheme.error),
+                            const SizedBox(height: 16),
+                            Text(
+                              l.headphonesDisconnected,
+                              style: theme.textTheme.titleLarge,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      );
+                    } else if (state is HeadphonesNotPaired) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Symbols.headset_off, size: 64, color: theme.colorScheme.error),
+                            const SizedBox(height: 16),
+                            Text(
+                              l.headphonesNotPaired,
+                              style: theme.textTheme.titleLarge,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // Estado de carga o esperando
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
                 ),
               )
                   .animate(controller: _controller)

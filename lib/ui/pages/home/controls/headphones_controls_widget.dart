@@ -7,6 +7,9 @@ import '../../../../headphones/framework/anc.dart';
 import '../../../../headphones/framework/bluetooth_headphones.dart';
 import '../../../../headphones/framework/headphones_info.dart';
 import '../../../../headphones/framework/lrc_battery.dart';
+import '../../../../headphones/huawei/huawei_headphones_base.dart';
+import '../../../../headphones/huawei/huawei_headphones_impl.dart';
+import '../../../../headphones/model_definition/huawei_models_definition.dart';
 import '../../../../logger.dart';
 import '../../../theme/layouts.dart';
 import 'anc_card.dart';
@@ -60,6 +63,31 @@ class HeadphonesControlsWidget extends StatelessWidget {
     log(LogLevel.debug, "Building main content for headphones: ${headphones.runtimeType}");
 
     final contentWidgets = <Widget>[];
+
+    // Extraer información del modelo si es un dispositivo Huawei
+    HuaweiModelDefinition? modelDef;
+    if (headphones is HuaweiHeadphonesBase) {
+      // Eliminamos la variable no utilizada
+      if (headphones is HuaweiHeadphonesImpl) {
+        modelDef = (headphones as HuaweiHeadphonesImpl).modelDefinition;
+      }
+
+      // Agregar un texto con el vendor y nombre del modelo
+      if (modelDef != null) {
+        contentWidgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              '${modelDef.vendor} ${modelDef.name}',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+    }
 
     // Añadir imagen de auriculares si hay información del modelo
     if (headphones is HeadphonesModelInfo) {

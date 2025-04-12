@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
 
 import 'di.dart' as di;
 import 'headphones/cubit/headphones_connection_cubit.dart';
@@ -19,7 +19,7 @@ import 'ui/app_settings.dart';
 import 'ui/navigation/router.dart';
 import 'ui/theme/themes.dart';
 
-late final SharedPreferences _preferences;
+late final StreamingSharedPreferences _preferences;
 
 void main() async {
   // Asegurarse de que el binding de widgets esté inicializado
@@ -36,13 +36,13 @@ void main() async {
 
   try {
     // Inicializar preferencias compartidas
-    _preferences = await SharedPreferences.getInstance();
+    _preferences = await StreamingSharedPreferences.instance;
     log(LogLevel.debug, "Preferencias inicializadas correctamente");
 
     // Iniciar la aplicación con el MyAppWrapper para gestionar el ciclo de vida
     runApp(
       Provider<AppSettings>(
-        create: (_) => SharedPreferencesAppSettings(_preferences),
+        create: (context) => SharedPreferencesAppSettings(Future.value(_preferences)),
         child: const MyAppWrapper(),
       ),
     );
@@ -137,7 +137,7 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
 
     // Una vez inicializado, configurar los providers y la estructura principal
     return Provider<AppSettings>(
-      create: (context) => SharedPreferencesAppSettings(_preferences),
+      create: (context) => SharedPreferencesAppSettings(Future.value(_preferences)),
       child: MultiBlocProvider(
         providers: [BlocProvider.value(value: _btBlock)],
         child: BlocListener<HeadphonesConnectionCubit, HeadphonesConnectionState>(

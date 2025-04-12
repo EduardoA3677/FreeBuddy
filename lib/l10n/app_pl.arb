@@ -55,6 +55,8 @@
   "headphonesControlRetry": "Spróbuj ponownie",
   "headphonesControlNoFeatures": "Brak kompatybilnych funkcji",
   "headphonesControlNoFeaturesDesc": "Nie znaleziono obsługiwanych funkcji dla tych słuchawek.",
+  "headphonesDisconnected": "Headphones Disconnected",
+  "headphonesNotPaired": "Headphones not Paired",
 
   "settings": "Ustawienia",
   "privacyPolicy": "Polityka prywatności",

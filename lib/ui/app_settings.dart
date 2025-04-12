@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../headphones/framework/bluetooth_headphones.dart';
-import '../headphones/huawei/huawei_headphones_sim.dart';
-import '../headphones/model_definition/huawei_models_definition.dart';
+import 'package:streaming_shared_preferences/streaming_shared_preferences.dart';
+import 'package:async/async.dart';
 
 abstract class AppSettings {
   Stream<bool> get seenIntroduction;
@@ -18,26 +15,23 @@ abstract class AppSettings {
 
   Future<bool> setSleepModePreviousSettings(String value);
 
-  /// Getter for the current headphones.
-  BluetoothHeadphones get currentHeadphones;
-
-  /// Tema de la aplicación
-  Stream<ThemeMode> get themeMode;
-
-  Future<bool> setThemeMode(ThemeMode value);
-
   /// Modo debug para mostrar logs detallados
   Stream<bool> get debugMode;
 
   Future<bool> setDebugMode(bool value);
+
+  /// Modo del tema de la aplicación (system, light, dark)
+  Stream<ThemeMode> get themeMode;
+
+  Future<bool> setThemeMode(ThemeMode value);
 }
 
 enum _Prefs {
   seenIntroduction('seenIntroduction', false),
   sleepMode('sleepMode', false),
   sleepModePreviousSettings('sleepModePreviousSettings', ''),
-  themeMode('themeMode', 0), // 0 = ThemeMode.system
-  debugMode('debugMode', false);
+  debugMode('debugMode', false),
+  themeMode('themeMode', 0); // 0 = ThemeMode.system, 1 = ThemeMode.light, 2 = ThemeMode.dark
 
   const _Prefs(this.key, this.defaultValue);
 
@@ -46,64 +40,81 @@ enum _Prefs {
 }
 
 class SharedPreferencesAppSettings implements AppSettings {
-  final SharedPreferences preferences;
-
   SharedPreferencesAppSettings(this.preferences);
-  @override
-  BluetoothHeadphones get currentHeadphones {
-    // Using FreeBuds Pro 3 model as requested
-    return HuaweiHeadphonesSim(HuaweiModels.freeBudsPro3);
-  }
+
+  final Future<StreamingSharedPreferences> preferences;
+
+  Future<Preference<bool>> get _seenIntroduction => preferences.then((p) =>
+      p.getBool(_Prefs.seenIntroduction.key, defaultValue: _Prefs.seenIntroduction.defaultValue));
+
+  Future<Preference<bool>> get _sleepMode => preferences
+      .then((p) => p.getBool(_Prefs.sleepMode.key, defaultValue: _Prefs.sleepMode.defaultValue));
+
+  Future<Preference<String>> get _sleepModePreviousSettings =>
+      preferences.then((p) => p.getString(_Prefs.sleepModePreviousSettings.key,
+          defaultValue: _Prefs.sleepModePreviousSettings.defaultValue));
+
+  Future<Preference<bool>> get _debugMode => preferences
+      .then((p) => p.getBool(_Prefs.debugMode.key, defaultValue: _Prefs.debugMode.defaultValue));
+
+  Future<Preference<int>> get _themeMode => preferences
+      .then((p) => p.getInt(_Prefs.themeMode.key, defaultValue: _Prefs.themeMode.defaultValue));
 
   @override
-  Stream<bool> get seenIntroduction async* {
-    yield preferences.getBool(_Prefs.seenIntroduction.key) ?? _Prefs.seenIntroduction.defaultValue;
-  }
+  Stream<bool> get seenIntroduction => LazyStream(() => _seenIntroduction);
 
   @override
-  Stream<ThemeMode> get themeMode async* {
-    final value = preferences.getInt(_Prefs.themeMode.key) ?? _Prefs.themeMode.defaultValue;
-    yield ThemeMode.values[value];
-  }
+  Future<bool> setSeenIntroduction(bool value) => _seenIntroduction.then((v) => v.setValue(value));
 
   @override
-  Future<bool> setThemeMode(ThemeMode value) async {
-    return preferences.setInt(_Prefs.themeMode.key, value.index);
-  }
+  Stream<bool> get sleepMode => LazyStream(() => _sleepMode);
 
   @override
-  Stream<bool> get debugMode async* {
-    yield preferences.getBool(_Prefs.debugMode.key) ?? _Prefs.debugMode.defaultValue;
-  }
+  Future<bool> setSleepMode(bool value) => _sleepMode.then((v) => v.setValue(value));
 
   @override
-  Future<bool> setDebugMode(bool value) async {
-    return preferences.setBool(_Prefs.debugMode.key, value);
-  }
+  Stream<String> get sleepModePreviousSettings => LazyStream(() => _sleepModePreviousSettings);
 
   @override
-  Future<bool> setSeenIntroduction(bool value) async {
-    return preferences.setBool(_Prefs.seenIntroduction.key, value);
-  }
+  Future<bool> setSleepModePreviousSettings(String value) =>
+      _sleepModePreviousSettings.then((v) => v.setValue(value));
 
   @override
-  Stream<bool> get sleepMode async* {
-    yield preferences.getBool(_Prefs.sleepMode.key) ?? _Prefs.sleepMode.defaultValue;
-  }
+  Stream<bool> get debugMode => LazyStream(() => _debugMode);
 
   @override
-  Future<bool> setSleepMode(bool value) async {
-    return preferences.setBool(_Prefs.sleepMode.key, value);
-  }
+  Future<bool> setDebugMode(bool value) => _debugMode.then((v) => v.setValue(value));
 
   @override
-  Stream<String> get sleepModePreviousSettings async* {
-    yield preferences.getString(_Prefs.sleepModePreviousSettings.key) ??
-        _Prefs.sleepModePreviousSettings.defaultValue;
-  }
+  Stream<ThemeMode> get themeMode =>
+      LazyStream(() => _themeMode).map((value) => _intToThemeMode(value));
 
   @override
-  Future<bool> setSleepModePreviousSettings(String value) async {
-    return preferences.setString(_Prefs.sleepModePreviousSettings.key, value);
+  Future<bool> setThemeMode(ThemeMode value) =>
+      _themeMode.then((pref) => pref.setValue(_themeModeToInt(value)));
+
+  // Convertir de int a ThemeMode
+  ThemeMode _intToThemeMode(int value) {
+    switch (value) {
+      case 1:
+        return ThemeMode.light;
+      case 2:
+        return ThemeMode.dark;
+      case 0:
+      case _:
+        return ThemeMode.system;
+    }
+  }
+
+  // Convertir de ThemeMode a int
+  int _themeModeToInt(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.light:
+        return 1;
+      case ThemeMode.dark:
+        return 2;
+      case ThemeMode.system:
+        return 0;
+    }
   }
 }
