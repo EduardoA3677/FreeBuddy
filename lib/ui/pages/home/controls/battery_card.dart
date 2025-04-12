@@ -29,10 +29,13 @@ class BatteryCard extends StatelessWidget {
         final hasData = levels != null;
 
         return Card(
-          elevation: hasData ? 2 : 1,
+          elevation: hasData ? 4 : 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
