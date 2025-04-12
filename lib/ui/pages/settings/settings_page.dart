@@ -195,7 +195,8 @@ class SettingsPage extends StatelessWidget {
                     decoration: const InputDecoration(hintText: 'log.txt'),
                   ),
                   const SizedBox(height: 12),
-                  if (selectedDirectory != null) Text('Directory: $selectedDirectory'),
+                  if (selectedDirectory != null)
+                    Text('Directory: $selectedDirectory'),
                   TextButton(
                     onPressed: () async {
                       final result = await FilePicker.platform.getDirectoryPath();
@@ -216,9 +217,8 @@ class SettingsPage extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    final fileName = controller.text.trim();
-                    if (selectedDirectory != null && fileName.isNotEmpty) {
-                      Navigator.pop(dialogContext, '$selectedDirectory/$fileName');
+                    if (selectedDirectory != null) {
+                      Navigator.pop(dialogContext, selectedDirectory);
                     }
                   },
                   child: Text(AppLocalizations.of(context)!.save),
@@ -236,9 +236,11 @@ class SettingsPage extends StatelessWidget {
     final snackBar = ScaffoldMessenger.of(context);
 
     try {
-      final filePath = await _getFileNameAndPath(context);
-      if (filePath == null || filePath.isEmpty) return; // User canceled the dialog
+      final directoryPath = await _getFileNameAndPath(context);
+      if (directoryPath == null || directoryPath.isEmpty) return; // User canceled the dialog
 
+      final fileName = 'log_${DateTime.now().toIso8601String()}.txt';
+      final filePath = '$directoryPath/$fileName';
       final logContents = AppLogger.getLogContent();
       final file = File(filePath);
       await file.writeAsString(logContents);
