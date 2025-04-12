@@ -108,13 +108,24 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       appBar: AppBar(
         title: Text(
           l.appTitle,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            letterSpacing: -0.3,
+          ),
         ),
+        elevation: 0,
+        scrolledUnderElevation: 1.0,
+        centerTitle: false,
+        backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.9),
         actions: [
           IconButton(
-            icon: const Icon(Symbols.settings),
+            icon: const Icon(Symbols.settings, weight: 300),
             tooltip: l.settings,
             onPressed: () => GoRouter.of(context).push('/settings'),
+            style: IconButton.styleFrom(
+              foregroundColor: theme.colorScheme.primary,
+            ),
           ),
         ],
       ),
@@ -138,38 +149,127 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       );
                     } else if (state is HeadphonesDisconnected) {
                       return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Symbols.headset_off, size: 64, color: theme.colorScheme.error),
-                            const SizedBox(height: 16),
-                            Text(
-                              l.headphonesDisconnected,
-                              style: theme.textTheme.titleLarge,
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(24.0),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.errorContainer.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Symbols.headset_off,
+                                  size: 72, weight: 300, color: theme.colorScheme.error),
+                              const SizedBox(height: 24),
+                              Text(
+                                l.headphonesDisconnected,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 22,
+                                  letterSpacing: -0.3,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              FilledButton.icon(
+                                onPressed: () =>
+                                    context.read<HeadphonesConnectionCubit>().connect(),
+                                icon: const Icon(Symbols.bluetooth_searching),
+                                label: Text('Conectar'),
+                                style: FilledButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ).animate().fadeIn(duration: 400.ms).scale(
+                            begin: Offset(0.9, 0.9), end: Offset(1.0, 1.0), duration: 400.ms),
                       );
                     } else if (state is HeadphonesNotPaired) {
+                      return Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(24.0),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Symbols.bluetooth_disabled,
+                                  size: 72, weight: 300, color: theme.colorScheme.onSurfaceVariant),
+                              const SizedBox(height: 24),
+                              Text(
+                                l.headphonesNotPaired,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 22,
+                                  letterSpacing: -0.3,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              FilledButton.icon(
+                                onPressed: () => context
+                                    .read<HeadphonesConnectionCubit>()
+                                    .openBluetoothSettings(),
+                                icon: const Icon(Symbols.settings_bluetooth),
+                                label: Text('Configurar Bluetooth'),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.secondary,
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ).animate().fadeIn(duration: 400.ms).scale(
+                            begin: Offset(0.9, 0.9), end: Offset(1.0, 1.0), duration: 400.ms),
+                      );
+                    } else {
+                      // Estado de carga o esperando
                       return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Symbols.headset_off, size: 64, color: theme.colorScheme.error),
-                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: 64,
+                              height: 64,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
                             Text(
-                              l.headphonesNotPaired,
-                              style: theme.textTheme.titleLarge,
-                              textAlign: TextAlign.center,
+                              'Conectando con tus auriculares...',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              ),
                             ),
                           ],
                         ),
-                      );
-                    } else {
-                      // Estado de carga o esperando
-                      return const Center(
-                        child: CircularProgressIndicator(),
                       );
                     }
                   },
@@ -182,11 +282,24 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
       ),
       // Botón flotante para ir rápidamente a la configuración de los auriculares
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => GoRouter.of(context).push('/headphones_settings'),
         tooltip: l.pageHeadphonesSettingsTitle,
-        elevation: 4,
-        child: const Icon(Symbols.settings),
+        elevation: 3,
+        backgroundColor: theme.colorScheme.secondary,
+        foregroundColor: theme.colorScheme.onSecondary,
+        extendedIconLabelSpacing: 12,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        label: Text(
+          'Configuración',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
+          ),
+        ),
+        icon: const Icon(Symbols.settings, weight: 300),
       ).animate(controller: _controller).scale(
           begin: const Offset(0.0, 0.0),
           end: const Offset(1.0, 1.0),
