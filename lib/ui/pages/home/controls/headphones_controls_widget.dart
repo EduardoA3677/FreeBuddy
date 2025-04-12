@@ -78,49 +78,116 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final isWideScreen = screenWidth > 600;
 
     try {
-      // Usar un diseño fixed sin scrolling
-      return Column(
-        children: [
-          // Device Name - Prominently displayed at top
-          Text(
-            deviceName,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
-            ),
-            textAlign: TextAlign.center,
-          ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0, duration: 400.ms),
-
-          const SizedBox(height: 12),
-
-          // Headphones Image (if available)
-          if (headphones is HeadphonesModelInfo)
-            Flexible(
-              flex: isSmallScreen ? 2 : 3,
-              child: Container(
-                constraints:
-                    BoxConstraints(maxHeight: isSmallScreen ? 120 : (isWideScreen ? 180 : 150)),
-                child: HeadphonesImage(headphones as HeadphonesModelInfo)
-                    .animate()
-                    .fadeIn(duration: 600.ms)
-                    .scale(
-                        begin: const Offset(0.9, 0.9),
-                        end: const Offset(1.0, 1.0),
-                        duration: 500.ms,
-                        curve: Curves.easeOutQuad),
-              ),
-            ),
-
-          const SizedBox(height: 8),
-
-          // Main Content Area - Adaptive Layout based on screen size
-          Expanded(
-            flex: isSmallScreen ? 7 : 6,
-            child: isWideScreen
-                ? _buildWideLayout(theme, l, screenWidth)
-                : _buildCompactLayout(theme, l, screenWidth, isSmallScreen),
+      // Usar un diseño fixed sin scrolling con un contenedor estilizado
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              theme.colorScheme.surface,
+              theme.scaffoldBackgroundColor,
+            ],
+            stops: const [0.0, 1.0],
           ),
-        ],
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+          children: [
+            // Device Name with modern styling and badge
+            Container(
+              margin: const EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                deviceName,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onPrimaryContainer,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
+                .animate()
+                .fadeIn(duration: 500.ms)
+                .slideY(begin: -0.1, end: 0, duration: 500.ms, curve: Curves.easeOutBack),
+
+            const SizedBox(height: 20),
+
+            // Headphones Image with improved container
+            if (headphones is HeadphonesModelInfo)
+              Flexible(
+                flex: isSmallScreen ? 2 : 3,
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: isSmallScreen ? 140 : (isWideScreen ? 200 : 170),
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.shadow.withValues(alpha: 0.08),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: HeadphonesImage(headphones as HeadphonesModelInfo)
+                        .animate()
+                        .fadeIn(duration: 800.ms)
+                        .scale(
+                          begin: const Offset(0.85, 0.85),
+                          end: const Offset(1.0, 1.0),
+                          duration: 800.ms,
+                          curve: Curves.easeOutCubic,
+                        ),
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: 20),
+
+            // Main Content Area with card-like container
+            Expanded(
+              flex: isSmallScreen ? 7 : 6,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.shadow.withValues(alpha: 0.07),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: isWideScreen
+                    ? _buildWideLayout(theme, l, screenWidth)
+                    : _buildCompactLayout(theme, l, screenWidth, isSmallScreen),
+              )
+                  .animate()
+                  .fadeIn(duration: 500.ms, delay: 300.ms)
+                  .slideY(begin: 0.1, end: 0, duration: 500.ms),
+            ),
+          ],
+        ),
       );
     } catch (e, stackTrace) {
       log(LogLevel.error, "Error building content layout", error: e, stackTrace: stackTrace);
