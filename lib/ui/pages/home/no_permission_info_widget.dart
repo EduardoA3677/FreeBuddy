@@ -15,14 +15,28 @@ class NoPermissionInfoWidget extends StatefulWidget {
   State<NoPermissionInfoWidget> createState() => _NoPermissionInfoWidgetState();
 }
 
-class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
+class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> with WidgetsBindingObserver {
   bool _isRequestingPermissions = false;
   List<Permission> _pendingPermissions = [];
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkPendingPermissions();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkPendingPermissions();
+    }
   }
 
   Future<void> _checkPendingPermissions() async {
@@ -34,7 +48,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
       Permission.bluetooth,
       Permission.bluetoothConnect,
       Permission.bluetoothScan,
-      Permission.notification, // Android 13+
+      Permission.notification,
     ];
 
     try {
@@ -51,8 +65,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
     } catch (_) {}
 
     try {
-      if (await Permission.ignoreBatteryOptimizations.status !=
-          PermissionStatus.permanentlyDenied) {
+      if (await Permission.ignoreBatteryOptimizations.status != PermissionStatus.permanentlyDenied) {
         permissions.add(Permission.ignoreBatteryOptimizations);
       }
     } catch (_) {}
@@ -71,7 +84,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
       });
 
       if (_pendingPermissions.isEmpty) {
-        if (ModalRoute.of(context)?.isCurrent == false) {
+        if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop(true);
         }
 
@@ -90,9 +103,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
     try {
       await context.read<HeadphonesConnectionCubit>().requestPermission();
 
-      for (var permission in _pendingPermissions) {
-        await permission.request();
-      }
+      await Future.wait(_pendingPermissions.map((p) => p.request()));
 
       await _checkPendingPermissions();
     } catch (e, stackTrace) {
@@ -124,8 +135,8 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              t.colorScheme.tertiaryContainer.withValues(alpha: 0.9),
-              t.colorScheme.tertiaryContainer.withValues(alpha: 0.6),
+              t.colorScheme.tertiaryContainer.withAlpha(230),
+              t.colorScheme.tertiaryContainer.withAlpha(153),
             ],
           ),
         ),
@@ -136,7 +147,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: t.colorScheme.tertiary.withValues(alpha: 0.15),
+                color: t.colorScheme.tertiary.withAlpha(38),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -161,7 +172,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
             Text(
               'Se necesitan permisos para conectar tus auriculares',
               style: tt.bodyMedium?.copyWith(
-                color: t.colorScheme.onTertiaryContainer.withValues(alpha: 0.8),
+                color: t.colorScheme.onTertiaryContainer.withAlpha(204),
               ),
               textAlign: TextAlign.center,
             ),
@@ -202,7 +213,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget> {
               ),
               style: ElevatedButton.styleFrom(
                 foregroundColor: t.colorScheme.tertiary,
-                backgroundColor: t.colorScheme.surface.withValues(alpha: 0.9),
+                backgroundColor: t.colorScheme.surface.withAlpha(230),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
