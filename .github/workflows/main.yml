@@ -41,8 +41,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y wget libc6-x32 libc6-i386
-          wget https://download.oracle.com/otn/java/jdk/17.0.14+8/be06627d646e48edb99d94ff6c4c9841/jdk-17.0.14_linux-x64_bin.deb?AuthParam=1744492592_24e9bb06e859190a8f9f49eadf82007d
-          sudo dpkg -i jdk-17.0.14_linux-x64_bin.deb
+          wget https://download.oracle.com/java/17/archive/jdk-17.0.12_linux-x64_bin.deb
+          sudo dpkg -i jdk-17.0.12_linux-x64_bin.deb
           sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-17/bin/java 0;
           sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk-17/bin/javac 0;
           sudo update-alternatives --set java /usr/lib/jvm/jdk-17/bin/java;
