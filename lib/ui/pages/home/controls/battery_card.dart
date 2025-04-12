@@ -1,3 +1,4 @@
+// ... importaciones
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -190,19 +191,14 @@ class BatteryIndicator extends StatelessWidget {
     final theme = Theme.of(context);
 
     Color getBatteryColor() {
-      if (level == null) return theme.colorScheme.surfaceContainerHighest;
-      if (level! < 20) {
-        return theme.colorScheme.error;
-      } else if (level! < 40) {
-        return theme.colorScheme.error.withAlpha(180);
-      } else if (level! < 70) {
-        return theme.colorScheme.tertiary;
-      } else {
-        return Colors.green;
-      }
+      if (level == null) return Colors.transparent;
+      if (level! < 20) return theme.colorScheme.error;
+      if (level! < 40) return theme.colorScheme.error.withAlpha(180);
+      if (level! < 70) return theme.colorScheme.tertiary;
+      return Colors.green;
     }
 
-    final barWidth = level != null ? (level! / 100) : 0.0;
+    final barFill = level != null ? (level!.clamp(0, 100) / 100.0) : 0.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,6 +227,7 @@ class BatteryIndicator extends StatelessWidget {
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontSize: fontSize,
                       fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -238,11 +235,13 @@ class BatteryIndicator extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          level != null ? '$level%' : '--',
+                          level != null ? '$level%' : '--%',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             fontSize: fontSize - 1,
-                            color: getBatteryColor(),
+                            color: level != null
+                                ? getBatteryColor()
+                                : theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -293,13 +292,13 @@ class BatteryIndicator extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
             color: theme.colorScheme.surfaceContainerHighest,
           ),
-          child: Row(
+          child: Stack(
             children: [
               if (level != null)
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 700),
                   curve: Curves.easeOutCubic,
-                  width: barWidth * MediaQuery.of(context).size.width * 0.6,
+                  width: MediaQuery.of(context).size.width * 0.6 * barFill,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     color: getBatteryColor(),
