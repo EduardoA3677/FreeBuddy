@@ -6,7 +6,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../../logger.dart';
 import '../../app_settings.dart';
@@ -176,39 +175,57 @@ class SettingsPage extends StatelessWidget {
   }
 
   Future<String?> _getFileNameAndPath(BuildContext context) async {
-    final result = await FilePicker.platform.getDirectoryPath();
-    if (result == null || !context.mounted) return null; // User canceled the picker
+    if (!context.mounted) return null;
 
     return showDialog<String>(
       context: context,
       builder: (BuildContext dialogContext) {
         final controller = TextEditingController();
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.exportLogsDialog),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: controller,
-                decoration: const InputDecoration(hintText: 'log.txt'),
+        String? selectedDirectory;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context)!.exportLogsDialog),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: controller,
+                    decoration: const InputDecoration(hintText: 'log.txt'),
+                  ),
+                  const SizedBox(height: 12),
+                  if (selectedDirectory != null) Text('Directory: $selectedDirectory'),
+                  TextButton(
+                    onPressed: () async {
+                      final result = await FilePicker.platform.getDirectoryPath();
+                      if (result != null) {
+                        setState(() {
+                          selectedDirectory = result;
+                        });
+                      }
+                    },
+                    child: Text(AppLocalizations.of(context)!.selectDirectory),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              Text('Directory: $result'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, null),
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                final fileName = controller.text.trim();
-                Navigator.pop(dialogContext, '$result/$fileName');
-              },
-              child: Text(AppLocalizations.of(context)!.save),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, null),
+                  child: Text(AppLocalizations.of(context)!.cancel),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final fileName = controller.text.trim();
+                    if (selectedDirectory != null && fileName.isNotEmpty) {
+                      Navigator.pop(dialogContext, '$selectedDirectory/$fileName');
+                    }
+                  },
+                  child: Text(AppLocalizations.of(context)!.save),
+                ),
+              ],
+            );
+          },
         );
       },
     );
