@@ -195,8 +195,7 @@ class SettingsPage extends StatelessWidget {
                     decoration: const InputDecoration(hintText: 'log.txt'),
                   ),
                   const SizedBox(height: 12),
-                  if (selectedDirectory != null)
-                    Text('Directory: $selectedDirectory'),
+                  if (selectedDirectory != null) Text('Directory: $selectedDirectory'),
                   TextButton(
                     onPressed: () async {
                       final result = await FilePicker.platform.getDirectoryPath();
