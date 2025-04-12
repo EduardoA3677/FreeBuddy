@@ -7,7 +7,7 @@
   // ✨ Formato y limpieza de código
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
-  "editor.defaultFormatter": "Dart-Code.dart-code",
+  "editor.defaultFormatter": null,
   "editor.tabSize": 2,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always"
@@ -61,6 +61,11 @@
   "github.copilot.chat.search.semanticTextResults": true,
   "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.chat.reviewSelection.enabled": true,
-  "github.copilot.chat.newWorkspaceCreation.enabled": true
+  "github.copilot.chat.newWorkspaceCreation.enabled": true,
+  "github.copilot.chat.scopeSelection": true,
+  "github.copilot.chat.copilotDebugCommand.enabled": false,
+  "github.copilot.chat.startDebugging.enabled": false,
+  "github.copilot.chat.generateTests.codeLens": true,
+  "chat.agent.maxRequests": 20
 
 }
