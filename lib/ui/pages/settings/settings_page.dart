@@ -157,15 +157,16 @@ class SettingsPage extends StatelessWidget {
   Widget _buildAboutButton(BuildContext context, AppLocalizations l) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: ElevatedButton(
+      child: ElevatedButton.icon(
         onPressed: () => GoRouter.of(context).push('/settings/about'),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
-        child: Text(
+        icon: const Icon(Icons.info),
+        label: Text(
           l.pageAboutTitle,
-          style: TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18),
         ),
       ),
     );
@@ -176,36 +177,45 @@ class SettingsPage extends StatelessWidget {
     final snackBar = ScaffoldMessenger.of(context);
 
     try {
-      final fileName = await _getFileNameAndPath(context);
-      if (fileName == null) return;
+      final filePath = await _getFileNameAndPath(context);
+      if (filePath == null) return;
 
       final logContents = AppLogger.getLogContent();
-      final file = File(fileName);
+      final file = File(filePath);
       await file.writeAsString(logContents);
 
       snackBar.showSnackBar(SnackBar(
-        content: Text('${l.exportLogsSuccess}: $fileName'),
+        content: Text('${l.exportLogsSuccess}: $filePath'),
         backgroundColor: Colors.green,
       ));
     } catch (e, stackTrace) {
       snackBar.showSnackBar(SnackBar(
-        content: Text('${l.exportLogsError}: ${e.toString()}'),
+        content: Text('${l.exportLogsError}: $e'),
         backgroundColor: Colors.red,
       ));
     }
   }
 
   Future<String?> _getFileNameAndPath(BuildContext context) async {
-    final directory = await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory();
+    final initialDirectory = (await getExternalStorageDirectory())?.path ??
+        (await getApplicationDocumentsDirectory()).path;
+
     return showDialog<String>(
       context: context,
       builder: (context) {
         final controller = TextEditingController();
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.exportLogsDialog),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(hintText: 'log.txt'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(hintText: 'log.txt'),
+              ),
+              const SizedBox(height: 12),
+              Text('Directory: $initialDirectory'),
+            ],
           ),
           actions: [
             TextButton(
@@ -215,7 +225,7 @@ class SettingsPage extends StatelessWidget {
             TextButton(
               onPressed: () {
                 final fileName = controller.text.trim();
-                Navigator.pop(context, '${directory.path}/$fileName');
+                Navigator.pop(context, '$initialDirectory/$fileName');
               },
               child: Text(AppLocalizations.of(context)!.save),
             ),
