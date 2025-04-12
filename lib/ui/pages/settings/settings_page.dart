@@ -201,7 +201,9 @@ class SettingsPage extends StatelessWidget {
                     dialogTitle: AppLocalizations.of(context)!.selectSaveLocation,
                     fileName: fileName,
                   );
-                  Navigator.pop(dialogContext, result);
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext, result);
+                  }
                 }
               },
               child: Text(AppLocalizations.of(context)!.save),

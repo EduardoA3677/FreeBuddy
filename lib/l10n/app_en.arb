@@ -94,7 +94,7 @@
   "themeSettingsLight": "Light Theme ☀️",
   "themeSettingsDark": "Dark Theme 🌙",
   "themeSettingsSystem": "System Theme 📱",
-  "selectDirectory": "Select directory 📂",
+  "selectSaveLocation": "Select directory 📂",
   "debugSettingsTitle": "Debug Options 🛠️",
   "debugModeEnable": "Enable Debug Mode 🔍",
   "debugModeDescription": "Show detailed logs for troubleshooting 📝",

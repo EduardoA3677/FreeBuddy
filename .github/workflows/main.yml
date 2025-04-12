@@ -46,6 +46,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-17.0.12-oracle-x64/bin/java 0;
           sudo update-alternatives --set java /usr/lib/jvm/jdk-17.0.12-oracle-x64/bin/java;
           java -version
+
       - name: Build APK & AAB with signing
         uses: NiklasLehnfeld/flutter-android-build-action@v2
         id: android-build
