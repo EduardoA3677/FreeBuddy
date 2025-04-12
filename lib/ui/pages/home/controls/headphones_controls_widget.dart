@@ -62,100 +62,83 @@ class HeadphonesControlsWidget extends StatelessWidget {
       WindowSizeClass windowSize, ThemeData theme, AppLocalizations l, double screenWidth) {
     log(LogLevel.debug, "Building main content for headphones: ${headphones.runtimeType}");
 
-    final contentWidgets = <Widget>[];
-
-    // Extraer información del modelo si es un dispositivo Huawei
+    // Dispositivo Huawei info
     HuaweiModelDefinition? modelDef;
+    String deviceName = "";
+
     if (headphones is HuaweiHeadphonesBase) {
-      // Eliminamos la variable no utilizada
       if (headphones is HuaweiHeadphonesImpl) {
         modelDef = (headphones as HuaweiHeadphonesImpl).modelDefinition;
-      }
-
-      // Agregar un texto con el vendor y nombre del modelo
-      if (modelDef != null) {
-        contentWidgets.add(
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Text(
-              '${modelDef.vendor} ${modelDef.name}',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
+        deviceName = '${modelDef.vendor} ${modelDef.name}';
       }
     }
 
-    // Añadir imagen de auriculares si hay información del modelo
-    if (headphones is HeadphonesModelInfo) {
-      contentWidgets.add(
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // Imagen responsiva según el tamaño de pantalla
-            final imageHeight = constraints.maxWidth > 600 ? 180.0 : 150.0;
-            return Container(
-              height: imageHeight,
-              margin: const EdgeInsets.only(bottom: 16),
-              child: HeadphonesImage(headphones as HeadphonesModelInfo)
-                  .animate()
-                  .fadeIn(duration: 600.ms)
-                  .scale(
-                      begin: const Offset(0.9, 0.9),
-                      end: const Offset(1.0, 1.0),
-                      duration: 500.ms,
-                      curve: Curves.easeOutQuad),
-            );
-          },
-        ),
-      );
-    }
-
-    // Agregar las funciones (sincrónicas)
-    void addBatteryFeature() {
-      if (headphones is LRCBattery) {
-        log(LogLevel.debug, "Adding battery feature");
-        contentWidgets.add(
-          FractionallySizedBox(
-            widthFactor: screenWidth > 600 ? 0.8 : 0.98,
-            child: BatteryCard(headphones as LRCBattery)
-                .animate()
-                .fadeIn(duration: 800.ms, delay: 200.ms)
-                .slideY(begin: 0.05, end: 0, duration: 600.ms, curve: Curves.easeOutQuad),
-          ),
-        );
-      }
-    }
-
-    void addANCFeature() {
-      if (headphones is Anc) {
-        log(LogLevel.debug, "Adding ANC feature");
-        contentWidgets.add(
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: FractionallySizedBox(
-              widthFactor: screenWidth > 600 ? 0.8 : 0.98,
-              child: AncCard(headphones as Anc)
-                  .animate()
-                  .fadeIn(duration: 800.ms, delay: 400.ms)
-                  .slideY(begin: 0.05, end: 0, duration: 600.ms, curve: Curves.easeOutQuad),
-            ),
-          ),
-        );
-      }
-    }
+    // Determina si es pantalla pequeña
+    final isSmallScreen = screenWidth < 400;
+    final isWideScreen = screenWidth > 600;
 
     try {
-      // Añadir funciones secuencialmente
-      addBatteryFeature();
-      addANCFeature();
-    } catch (e, stackTrace) {
-      log(LogLevel.error, "Error loading feature cards", error: e, stackTrace: stackTrace);
-    }
+      // Usar un diseño fixed sin scrolling
+      return Column(
+        children: [
+          // Device Name - Prominently displayed at top
+          Text(
+            deviceName,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+            textAlign: TextAlign.center,
+          ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0, duration: 400.ms),
 
-    if (contentWidgets.isEmpty) {
+          const SizedBox(height: 12),
+
+          // Headphones Image (if available)
+          if (headphones is HeadphonesModelInfo)
+            Flexible(
+              flex: isSmallScreen ? 2 : 3,
+              child: Container(
+                constraints:
+                    BoxConstraints(maxHeight: isSmallScreen ? 120 : (isWideScreen ? 180 : 150)),
+                child: HeadphonesImage(headphones as HeadphonesModelInfo)
+                    .animate()
+                    .fadeIn(duration: 600.ms)
+                    .scale(
+                        begin: const Offset(0.9, 0.9),
+                        end: const Offset(1.0, 1.0),
+                        duration: 500.ms,
+                        curve: Curves.easeOutQuad),
+              ),
+            ),
+
+          const SizedBox(height: 8),
+
+          // Main Content Area - Adaptive Layout based on screen size
+          Expanded(
+            flex: isSmallScreen ? 7 : 6,
+            child: isWideScreen
+                ? _buildWideLayout(theme, l, screenWidth)
+                : _buildCompactLayout(theme, l, screenWidth, isSmallScreen),
+          ),
+        ],
+      );
+    } catch (e, stackTrace) {
+      log(LogLevel.error, "Error building content layout", error: e, stackTrace: stackTrace);
+      return _buildErrorContent(
+        l.headphonesControlNoFeatures,
+        l.headphonesControlNoFeaturesDesc,
+        l,
+        theme: theme,
+      );
+    }
+  }
+
+  // Layout for wider screens - cards side by side
+  Widget _buildWideLayout(ThemeData theme, AppLocalizations l, double screenWidth) {
+    final hasAncFeature = headphones is Anc;
+    final hasBatteryFeature = headphones is LRCBattery;
+
+    if (!hasAncFeature && !hasBatteryFeature) {
       return _buildErrorContent(
         l.headphonesControlNoFeatures,
         l.headphonesControlNoFeaturesDesc,
@@ -164,10 +147,75 @@ class HeadphonesControlsWidget extends StatelessWidget {
       );
     }
 
-    // Si tenemos widgets de contenido, mostrarlos en un ListView
-    return ListView(
-      physics: const BouncingScrollPhysics(),
-      children: contentWidgets,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (hasBatteryFeature)
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: BatteryCard(headphones as LRCBattery)
+                  .animate()
+                  .fadeIn(duration: 500.ms, delay: 200.ms)
+                  .slideX(begin: -0.05, end: 0, duration: 400.ms),
+            ),
+          ),
+        if (hasAncFeature)
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AncCard(headphones as Anc)
+                  .animate()
+                  .fadeIn(duration: 500.ms, delay: 200.ms)
+                  .slideX(begin: 0.05, end: 0, duration: 400.ms),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // Layout for smaller screens - cards stacked with minimized heights
+  Widget _buildCompactLayout(
+      ThemeData theme, AppLocalizations l, double screenWidth, bool isSmallScreen) {
+    final hasAncFeature = headphones is Anc;
+    final hasBatteryFeature = headphones is LRCBattery;
+
+    if (!hasAncFeature && !hasBatteryFeature) {
+      return _buildErrorContent(
+        l.headphonesControlNoFeatures,
+        l.headphonesControlNoFeaturesDesc,
+        l,
+        theme: theme,
+      );
+    }
+
+    return Column(
+      children: [
+        if (hasBatteryFeature)
+          Expanded(
+            flex: isSmallScreen ? 1 : 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: BatteryCard(headphones as LRCBattery)
+                  .animate()
+                  .fadeIn(duration: 500.ms, delay: 200.ms)
+                  .slideY(begin: 0.05, end: 0, duration: 400.ms),
+            ),
+          ),
+        if (hasAncFeature)
+          Expanded(
+            flex: isSmallScreen ? 1 : 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: AncCard(headphones as Anc)
+                  .animate()
+                  .fadeIn(duration: 500.ms, delay: 300.ms)
+                  .slideY(begin: 0.05, end: 0, duration: 400.ms),
+            ),
+          ),
+      ],
     );
   }
 

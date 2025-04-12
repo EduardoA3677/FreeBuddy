@@ -124,20 +124,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Título de bienvenida
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
-                child: Text(
-                  l.headphonesControl,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-                  .animate(controller: _controller)
-                  .fadeIn(duration: 400.ms, curve: Curves.easeOutQuad)
-                  .slideX(begin: -0.1, end: 0, duration: 400.ms, curve: Curves.easeOutQuad),
-
               // Widget principal con los controles
               Expanded(
                 child: BlocBuilder<HeadphonesConnectionCubit, HeadphonesConnectionState>(
