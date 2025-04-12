@@ -176,10 +176,8 @@ class SettingsPage extends StatelessWidget {
   }
 
   Future<String?> _getFileNameAndPath(BuildContext context) async {
-    final initialDirectory = (await getExternalStorageDirectory())?.path ??
-        (await getApplicationDocumentsDirectory()).path;
-
-    if (!context.mounted) return null;
+    final result = await FilePicker.platform.getDirectoryPath();
+    if (result == null || !context.mounted) return null; // User canceled the picker
 
     return showDialog<String>(
       context: context,
@@ -195,7 +193,7 @@ class SettingsPage extends StatelessWidget {
                 decoration: const InputDecoration(hintText: 'log.txt'),
               ),
               const SizedBox(height: 12),
-              Text('Directory: $initialDirectory'),
+              Text('Directory: $result'),
             ],
           ),
           actions: [
@@ -206,7 +204,7 @@ class SettingsPage extends StatelessWidget {
             TextButton(
               onPressed: () {
                 final fileName = controller.text.trim();
-                Navigator.pop(dialogContext, '$initialDirectory/$fileName');
+                Navigator.pop(dialogContext, '$result/$fileName');
               },
               child: Text(AppLocalizations.of(context)!.save),
             ),
