@@ -9,7 +9,7 @@ on:
       build_format:
         description: 'Choose the build format'
         required: false
-        default: 'both'
+        default: 'apk'
         type: choice
         options:
           - 'apk'
