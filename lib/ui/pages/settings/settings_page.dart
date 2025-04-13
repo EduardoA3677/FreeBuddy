@@ -73,8 +73,7 @@ class SettingsPage extends StatelessWidget {
 
     return Card(
       elevation: AppDimensions.elevationSmall,
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMedium)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMedium)),
       child: Padding(
         padding: EdgeInsets.all(AppDimensions.spacing16),
         child: Column(
@@ -152,40 +151,9 @@ class SettingsPage extends StatelessWidget {
   Future<String?> _getFileNameAndPath(BuildContext context) async {
     if (!context.mounted) return null;
 
-    return showDialog<String>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        final controller = TextEditingController();
-
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.exportLogsDialog),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(hintText: 'log.txt'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, null),
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-            TextButton(
-              onPressed: () async {
-                final fileName = controller.text.trim();
-                if (fileName.isNotEmpty) {
-                  final result = await FilePicker.platform.saveFile(
-                    dialogTitle: AppLocalizations.of(context)!.selectSaveLocation,
-                    fileName: fileName,
-                  );
-                  if (dialogContext.mounted) {
-                    Navigator.pop(dialogContext, result);
-                  }
-                }
-              },
-              child: Text(AppLocalizations.of(context)!.save),
-            ),
-          ],
-        );
-      },
+    return await FilePicker.platform.saveFile(
+      dialogTitle: AppLocalizations.of(context)!.selectSaveLocation,
+      fileName: 'log.txt',
     );
   }
 
@@ -194,11 +162,9 @@ class SettingsPage extends StatelessWidget {
     final snackBar = ScaffoldMessenger.of(context);
 
     try {
-      final directoryPath = await _getFileNameAndPath(context);
-      if (directoryPath == null || directoryPath.isEmpty) return; // User canceled the dialog
+      final filePath = await _getFileNameAndPath(context);
+      if (filePath == null || filePath.isEmpty) return; // User canceled the dialog
 
-      final fileName = 'log_${DateTime.now().toIso8601String()}.txt';
-      final filePath = '$directoryPath/$fileName';
       final logContents = AppLogger.getLogContent();
       final file = File(filePath);
       await file.writeAsString(logContents);
