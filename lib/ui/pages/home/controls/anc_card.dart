@@ -24,6 +24,8 @@ class AncCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
       ),
+      // Color más oscuro para mejor contraste
+      color: theme.colorScheme.surfaceContainerHigh,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
@@ -31,8 +33,8 @@ class AncCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              theme.colorScheme.surface,
-              theme.colorScheme.surface.withAlpha(240),
+              theme.colorScheme.surfaceContainerHigh,
+              theme.colorScheme.surfaceContainerHighest,
             ],
           ),
         ),
@@ -114,27 +116,37 @@ class AncCard extends StatelessWidget {
                   builder: (context, constraints) {
                     final useVerticalLayout = isSmallDevice || screenWidth < 400;
 
+                    // Crear los botones de ANC con tamaños iguales
                     final ancButtons = [
-                      AncModeOption(
-                        icon: Symbols.noise_control_on,
-                        label: l.ancNoiseCancel,
-                        description: l.ancNoiseCancelDesc,
-                        isSelected: mode == AncMode.noiseCancelling,
-                        onPressed: () => anc.setAncMode(AncMode.noiseCancelling),
+                      SizedBox(
+                        width: double.infinity,
+                        child: AncModeOption(
+                          icon: Symbols.noise_control_on,
+                          label: l.ancNoiseCancel,
+                          description: l.ancNoiseCancelDesc,
+                          isSelected: mode == AncMode.noiseCancelling,
+                          onPressed: () => anc.setAncMode(AncMode.noiseCancelling),
+                        ),
                       ),
-                      AncModeOption(
-                        icon: Symbols.noise_control_off,
-                        label: l.ancOff,
-                        description: l.ancOffDesc,
-                        isSelected: mode == AncMode.off,
-                        onPressed: () => anc.setAncMode(AncMode.off),
+                      SizedBox(
+                        width: double.infinity,
+                        child: AncModeOption(
+                          icon: Symbols.noise_control_off,
+                          label: l.ancOff,
+                          description: l.ancOffDesc,
+                          isSelected: mode == AncMode.off,
+                          onPressed: () => anc.setAncMode(AncMode.off),
+                        ),
                       ),
-                      AncModeOption(
-                        icon: Symbols.hearing,
-                        label: l.ancAwareness,
-                        description: l.ancAwarenessDesc,
-                        isSelected: mode == AncMode.transparency,
-                        onPressed: () => anc.setAncMode(AncMode.transparency),
+                      SizedBox(
+                        width: double.infinity,
+                        child: AncModeOption(
+                          icon: Symbols.hearing,
+                          label: l.ancAwareness,
+                          description: l.ancAwarenessDesc,
+                          isSelected: mode == AncMode.transparency,
+                          onPressed: () => anc.setAncMode(AncMode.transparency),
+                        ),
                       ),
                     ];
 
@@ -144,25 +156,23 @@ class AncCard extends StatelessWidget {
                             .asMap()
                             .entries
                             .map((entry) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 12.0),
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    child: entry.value
-                                        .animate()
-                                        .fadeIn(
-                                            duration: 400.ms, delay: 150.ms * entry.key.toDouble())
-                                        .slideX(
-                                            begin: 0.05,
-                                            end: 0,
-                                            duration: 400.ms,
-                                            delay: 150.ms * entry.key.toDouble()),
+                                  padding: EdgeInsets.only(
+                                    bottom: entry.key < 2 ? 12.0 : 0.0,
                                   ),
+                                  child: entry.value
+                                      .animate()
+                                      .fadeIn(
+                                          duration: 400.ms, delay: 150.ms * entry.key.toDouble())
+                                      .slideX(
+                                          begin: 0.05,
+                                          end: 0,
+                                          duration: 400.ms,
+                                          delay: 150.ms * entry.key.toDouble()),
                                 ))
                             .toList(),
                       );
                     } else {
                       return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: ancButtons
                             .asMap()
                             .entries

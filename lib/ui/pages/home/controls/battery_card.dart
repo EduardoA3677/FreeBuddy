@@ -33,7 +33,7 @@ class BatteryCard extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
           ),
-          color: theme.colorScheme.surface,
+          color: theme.colorScheme.surfaceContainerHigh, // Color más oscuro para mejor contraste
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
@@ -41,12 +41,13 @@ class BatteryCard extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  theme.colorScheme.surface,
-                  theme.colorScheme.surface.withAlpha(240),
+                  theme.colorScheme.surfaceContainerHigh,
+                  theme.colorScheme.surfaceContainerHighest,
                 ],
               ),
             ),
-            padding: EdgeInsets.all(AppDimensions.spacing20),
+            padding:
+                EdgeInsets.all(isSmallDevice ? AppDimensions.spacing12 : AppDimensions.spacing16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -95,7 +96,7 @@ class BatteryCard extends StatelessWidget {
                   ],
                 ),
                 Divider(
-                  height: AppDimensions.spacing32,
+                  height: AppDimensions.spacing24,
                   indent: AppDimensions.spacing8,
                   endIndent: AppDimensions.spacing8,
                   color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
@@ -103,48 +104,75 @@ class BatteryCard extends StatelessWidget {
                 if (!hasData)
                   _buildLoadingState(theme, isSmallDevice)
                 else
-                  Column(
-                    children: [
-                      BatteryIndicator(
-                        icon: FreebuddyIcons.leftEarbud,
-                        text: 'Left Earbud',
-                        level: levels.levelLeft,
-                        charging: levels.chargingLeft,
-                        fontSize:
-                            isSmallDevice ? AppDimensions.textSmall + 2 : AppDimensions.textMedium,
-                      )
-                          .animate()
-                          .fadeIn(duration: 400.ms, delay: 150.ms)
-                          .slideX(begin: -0.1, end: 0),
-                      SizedBox(
-                          height:
-                              isSmallDevice ? AppDimensions.spacing14 : AppDimensions.spacing18),
-                      BatteryIndicator(
-                        icon: FreebuddyIcons.rightEarbud,
-                        text: 'Right Earbud',
-                        level: levels.levelRight,
-                        charging: levels.chargingRight,
-                        fontSize:
-                            isSmallDevice ? AppDimensions.textSmall + 2 : AppDimensions.textMedium,
-                      )
-                          .animate()
-                          .fadeIn(duration: 400.ms, delay: 250.ms)
-                          .slideX(begin: -0.1, end: 0),
-                      SizedBox(
-                          height:
-                              isSmallDevice ? AppDimensions.spacing14 : AppDimensions.spacing18),
-                      BatteryIndicator(
-                        icon: FreebuddyIcons.earbudsCase,
-                        text: 'Case',
-                        level: levels.levelCase,
-                        charging: levels.chargingCase,
-                        fontSize:
-                            isSmallDevice ? AppDimensions.textSmall + 2 : AppDimensions.textMedium,
-                      )
-                          .animate()
-                          .fadeIn(duration: 400.ms, delay: 350.ms)
-                          .slideX(begin: -0.1, end: 0),
-                    ],
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Calcula si hay suficiente espacio para diseño horizontal o vertical
+                        final hasEnoughHeight = constraints.maxHeight > 200;
+
+                        if (hasEnoughHeight) {
+                          // Diseño vertical tradicional para espacios altos
+                          return Column(
+                            children: [
+                              Expanded(
+                                child: BatteryIndicator(
+                                  icon: FreebuddyIcons.leftEarbud,
+                                  text: 'Left Earbud',
+                                  level: levels.levelLeft,
+                                  charging: levels.chargingLeft,
+                                  fontSize: isSmallDevice
+                                      ? AppDimensions.textSmall + 2
+                                      : AppDimensions.textMedium,
+                                )
+                                    .animate()
+                                    .fadeIn(duration: 400.ms, delay: 150.ms)
+                                    .slideX(begin: -0.1, end: 0),
+                              ),
+                              Expanded(
+                                child: BatteryIndicator(
+                                  icon: FreebuddyIcons.rightEarbud,
+                                  text: 'Right Earbud',
+                                  level: levels.levelRight,
+                                  charging: levels.chargingRight,
+                                  fontSize: isSmallDevice
+                                      ? AppDimensions.textSmall + 2
+                                      : AppDimensions.textMedium,
+                                )
+                                    .animate()
+                                    .fadeIn(duration: 400.ms, delay: 250.ms)
+                                    .slideX(begin: -0.1, end: 0),
+                              ),
+                              Expanded(
+                                child: BatteryIndicator(
+                                  icon: FreebuddyIcons.earbudsCase,
+                                  text: 'Case',
+                                  level: levels.levelCase,
+                                  charging: levels.chargingCase,
+                                  fontSize: isSmallDevice
+                                      ? AppDimensions.textSmall + 2
+                                      : AppDimensions.textMedium,
+                                )
+                                    .animate()
+                                    .fadeIn(duration: 400.ms, delay: 350.ms)
+                                    .slideX(begin: -0.1, end: 0),
+                              ),
+                            ],
+                          );
+                        } else {
+                          // Diseño compacto para espacios reducidos
+                          return Column(
+                            children: [
+                              _buildCompactBatteryRow(
+                                context,
+                                levels,
+                                isSmallDevice,
+                                theme,
+                              ),
+                            ],
+                          );
+                        }
+                      },
+                    ),
                   ),
               ],
             ),
@@ -154,32 +182,161 @@ class BatteryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingState(ThemeData theme, bool isSmall) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildCompactBatteryRow(
+    BuildContext context,
+    LRCBatteryLevels levels,
+    bool isSmallDevice,
+    ThemeData theme,
+  ) {
+    // No necesitamos screenWidth aquí
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          SizedBox(
-            width: isSmall ? AppDimensions.spacing30 : AppDimensions.spacing40,
-            height: isSmall ? AppDimensions.spacing30 : AppDimensions.spacing40,
-            child: CircularProgressIndicator(
-              strokeWidth: 3,
-              color: theme.colorScheme.primary.withValues(alpha: 0.7),
+          Expanded(
+            child: _buildCompactBatteryIndicator(
+              icon: FreebuddyIcons.leftEarbud,
+              label: 'Left',
+              level: levels.levelLeft,
+              charging: levels.chargingLeft,
+              theme: theme,
+              delay: 150,
             ),
           ),
-          SizedBox(height: AppDimensions.spacing16),
-          Text(
-            'Loading battery information...',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontSize: isSmall ? AppDimensions.textSmall : AppDimensions.textMedium - 2,
+          VerticalDivider(
+            width: 1,
+            thickness: 1,
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
+          Expanded(
+            child: _buildCompactBatteryIndicator(
+              icon: FreebuddyIcons.rightEarbud,
+              label: 'Right',
+              level: levels.levelRight,
+              charging: levels.chargingRight,
+              theme: theme,
+              delay: 250,
+            ),
+          ),
+          VerticalDivider(
+            width: 1,
+            thickness: 1,
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
+          Expanded(
+            child: _buildCompactBatteryIndicator(
+              icon: FreebuddyIcons.earbudsCase,
+              label: 'Case',
+              level: levels.levelCase,
+              charging: levels.chargingCase,
+              theme: theme,
+              delay: 350,
             ),
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 600.ms);
+    );
   }
+
+  Widget _buildCompactBatteryIndicator({
+    required IconData icon,
+    required String label,
+    required int? level,
+    required bool charging,
+    required ThemeData theme,
+    required int delay,
+  }) {
+    Color getBatteryColor() {
+      if (level == null || level == 0) return theme.colorScheme.error;
+      if (level < 20) return theme.colorScheme.error.withValues(alpha: 0.85);
+      if (level < 40) return theme.colorScheme.tertiary;
+      if (level < 70) return theme.colorScheme.primary.withValues(alpha: 0.85);
+      return theme.colorScheme.primary;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 24,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: getBatteryColor().withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              level != null ? '$level%' : '--%',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: getBatteryColor(),
+              ),
+            ),
+          ),
+          if (charging)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Symbols.bolt,
+                    size: 12,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                    'Charging',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 10,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ).animate().fadeIn(duration: 400.ms, delay: delay.ms),
+    );
+  }
+}
+
+Widget _buildLoadingState(ThemeData theme, bool isSmall) {
+  return Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: isSmall ? AppDimensions.spacing30 : AppDimensions.spacing40,
+          height: isSmall ? AppDimensions.spacing30 : AppDimensions.spacing40,
+          child: CircularProgressIndicator(
+            strokeWidth: 3,
+            color: theme.colorScheme.primary.withValues(alpha: 0.7),
+          ),
+        ),
+        SizedBox(height: AppDimensions.spacing16),
+        Text(
+          'Loading battery information...',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontSize: isSmall ? AppDimensions.textSmall : AppDimensions.textMedium - 2,
+          ),
+        ),
+      ],
+    ),
+  ).animate().fadeIn(duration: 600.ms);
 }
 
 class BatteryIndicator extends StatelessWidget {
