@@ -203,12 +203,7 @@ class _LoadingWidget extends StatelessWidget {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                    const SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: CircularProgressIndicator(strokeWidth: 3),
-                    ),
-                    const SizedBox(height: 24),
+                    const CircularProgressIndicator(strokeWidth: 3),
                     Text(
                         l.connectingToHeadphones,
                         style: theme.textTheme.bodyLarge?.copyWith(
@@ -249,7 +244,6 @@ class _StateMessageCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                         Icon(icon, size: 60, weight: 300, color: iconColor),
-                        const SizedBox(height: 20),
                         Text(
                             title,
                             style: theme.textTheme.titleLarge?.copyWith(
@@ -259,7 +253,6 @@ class _StateMessageCard extends StatelessWidget {
                             ),
                             textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 16),
                         action,
                     ],
                 ),
