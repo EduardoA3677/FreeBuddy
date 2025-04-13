@@ -241,36 +241,72 @@ class HeadphonesControlsWidget extends StatelessWidget {
       );
     }
 
-    // Para pantallas anchas, mantener la disposición en fila pero con menos padding
-    return Row(
+    // Para pantallas anchas, usamos un layout más optimizado
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (hasBatteryFeature)
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+        if (hasBatteryFeature) ...[
+          // Botón de configuración integrado arriba del BatteryCard
+          if (onSettingsTap != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Material(
+                borderRadius: BorderRadius.circular(12),
+                color: theme.colorScheme.secondary,
+                elevation: 2,
+                child: InkWell(
+                  onTap: onSettingsTap,
                   borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    height: 36,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Symbols.settings,
+                          size: 18,
+                          color: theme.colorScheme.onSecondary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l.pageHeadphonesSettingsTitle,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSecondary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                child: BatteryCard(headphones as LRCBattery),
               ),
             ),
-          ),
-        if (hasAncFeature)
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: AncCard(headphones as Anc),
+          // Contenedor de batería optimizado (25% del espacio)
+          SizedBox(
+            height: 180, // Altura fija para el contenedor de batería
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                borderRadius: BorderRadius.circular(12),
               ),
+              child: BatteryCard(headphones as LRCBattery),
+            ),
+          ),
+        ],
+
+        const SizedBox(height: 12), // Espaciado entre cards
+
+        if (hasAncFeature)
+          // Contenedor de ANC (ocupa el resto del espacio)
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: AncCard(headphones as Anc),
             ),
           ),
       ],
@@ -296,9 +332,47 @@ class HeadphonesControlsWidget extends StatelessWidget {
 
     return Column(
       children: [
-        if (hasBatteryFeature)
-          Expanded(
-            flex: hasBatteryFeature && hasAncFeature ? 1 : 2,
+        if (hasBatteryFeature) ...[
+          // Botón de configuración integrado arriba del BatteryCard
+          if (onSettingsTap != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Material(
+                borderRadius: BorderRadius.circular(10),
+                color: theme.colorScheme.secondary,
+                elevation: 2,
+                child: InkWell(
+                  onTap: onSettingsTap,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    height: 32,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Symbols.settings,
+                          size: 16,
+                          color: theme.colorScheme.onSecondary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          l.pageHeadphonesSettingsTitle,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSecondary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          // Contenedor de batería con altura fija para que no ocupe tanto espacio
+          SizedBox(
+            height: isSmallScreen ? 130 : 150, // Altura fija más pequeña
             child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
@@ -307,10 +381,12 @@ class HeadphonesControlsWidget extends StatelessWidget {
               child: BatteryCard(headphones as LRCBattery),
             ),
           ),
+        ],
+
         if (hasAncFeature && hasBatteryFeature) SizedBox(height: verticalSpacing),
+
         if (hasAncFeature)
           Expanded(
-            flex: hasBatteryFeature && hasAncFeature ? 1 : 2,
             child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),

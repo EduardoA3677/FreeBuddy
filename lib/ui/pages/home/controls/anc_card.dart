@@ -331,7 +331,7 @@ class AncModeOption extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -348,36 +348,45 @@ class AncModeOption extends StatelessWidget {
                   child: Icon(
                     icon,
                     color: isSelected ? theme.colorScheme.primary : foregroundColor,
-                    size: 24,
+                    size: 22,
                   ),
                 )
                     .animate(target: isSelected ? 1 : 0)
                     .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.1, 1.1)),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
 
-                // Label con tamaño fijo para todos los botones
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: foregroundColor,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                    fontSize: 14, // Tamaño de texto fijo para todos los botones
+                // Contenedor de altura fija para el label
+                SizedBox(
+                  height: 20, // Altura fija para todos los textos
+                  child: Center(
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        color: foregroundColor,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
 
-                // Descripción con tamaño fijo para todos los botones
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 10, // Tamaño de texto fijo para todas las descripciones
+                // Contenedor de altura fija para la descripción
+                SizedBox(
+                  height: 30, // Altura fija para todos los textos de descripción
+                  child: Center(
+                    child: Text(
+                      description,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 10,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
                 ),
               ],
             ),
