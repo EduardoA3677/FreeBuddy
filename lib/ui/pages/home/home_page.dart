@@ -10,6 +10,7 @@ import '../../../headphones/cubit/headphones_cubit_objects.dart';
 import '../../app_settings.dart';
 import 'controls/headphones_controls_widget.dart';
 import 'no_permission_info_widget.dart';
+import 'package:freebuddy/headphones/framework/bluetooth_headphones.dart'; // Import agregado
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surfaceContainerHighest, // Fondo ligeramente más oscuro
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
       appBar: AppBar(
         title: Text(
           l.appTitle,
@@ -118,19 +119,19 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/headphones_settings'),
         tooltip: l.pageHeadphonesSettingsTitle,
-        elevation: 6, // Mayor elevación para un efecto más prominente
+        elevation: 6,
         backgroundColor: theme.colorScheme.secondary,
         foregroundColor: theme.colorScheme.onSecondary,
-        extendedIconLabelSpacing: 16, // Mayor espacio entre el ícono y el texto
+        extendedIconLabelSpacing: 16,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12), // Bordes más redondeados
+          borderRadius: BorderRadius.circular(12),
         ),
         label: Text(
           l.pageHeadphonesSettingsTitle,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
-            fontSize: 16, // Ajuste en el tamaño del texto
+            fontSize: 16,
           ),
         ),
         icon: const Icon(Symbols.settings, weight: 300),
@@ -140,7 +141,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class _StaticHeadphonesControlsWidget extends StatelessWidget {
-  final BluetoothHeadphones headphones;
+  final BluetoothHeadphones headphones; // Ajuste de tipo
 
   const _StaticHeadphonesControlsWidget({super.key, required this.headphones});
 
@@ -150,116 +151,6 @@ class _StaticHeadphonesControlsWidget extends StatelessWidget {
       alignment: Alignment.center,
       padding: const EdgeInsets.all(16),
       child: HeadphonesControlsWidget(headphones: headphones),
-    );
-  }
-}
-
-class _DisconnectedWidget extends StatelessWidget {
-  const _DisconnectedWidget({required this.theme, required this.l});
-
-  final ThemeData theme;
-  final AppLocalizations l;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Symbols.headset_off, size: 60, weight: 300, color: theme.colorScheme.error),
-          const SizedBox(height: 16),
-          Text(
-            l.headphonesDisconnected,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: theme.colorScheme.onSurface,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: () => context.read<HeadphonesConnectionCubit>().connect(),
-            icon: const Icon(Symbols.bluetooth_searching),
-            label: Text(l.connect),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NotPairedWidget extends StatelessWidget {
-  const _NotPairedWidget({required this.theme, required this.l});
-
-  final ThemeData theme;
-  final AppLocalizations l;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Symbols.bluetooth_disabled,
-            size: 60,
-            weight: 300,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            l.headphonesNotPaired,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: theme.colorScheme.onSurface,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: () => context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
-            icon: const Icon(Symbols.settings_bluetooth),
-            label: Text(l.configureBluetooth),
-            style: FilledButton.styleFrom(
-              backgroundColor: theme.colorScheme.secondary,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context)!;
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(strokeWidth: 3),
-          const SizedBox(height: 24),
-          Text(
-            l.connectingToHeadphones,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
