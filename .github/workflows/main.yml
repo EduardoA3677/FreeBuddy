@@ -1,9 +1,5 @@
 name: Build FreeBuddy
-
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
     inputs:
       tag:
@@ -48,7 +44,7 @@ jobs:
           java -version
 
       - name: Build APK & AAB with signing
-        uses: NiklasLehnfeld/flutter-android-build-action@v2
+        uses: EduardoA3677/flutter-android-build-action@v2
         id: android-build
         with:
           release: true
