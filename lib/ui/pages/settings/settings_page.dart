@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -149,11 +149,43 @@ class SettingsPage extends StatelessWidget {
   }
 
   Future<String?> _getFileNameAndPath(BuildContext context) async {
+    final initialDirectory = (await getDownloadsDirectory())?.path ??
+        (await getDownloadsDirectory()).path;
+
     if (!context.mounted) return null;
 
-    return await FilePicker.platform.saveFile(
-      dialogTitle: AppLocalizations.of(context)!.selectSaveLocation,
-      fileName: 'log.txt',
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.exportLogsDialog),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(hintText: 'log.txt'),
+              ),
+              const SizedBox(height: 12),
+              Text('Directory: $initialDirectory'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, null),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                final fileName = controller.text.trim();
+                Navigator.pop(dialogContext, '$initialDirectory/$fileName');
+              },
+              child: Text(AppLocalizations.of(context)!.save),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -168,14 +200,14 @@ class SettingsPage extends StatelessWidget {
       final logContents = AppLogger.getLogContent();
       final file = File(filePath);
       await file.writeAsString(logContents);
-
+ 
       if (!context.mounted) return;
-      snackBar.showSnackBar(SnackBar(
-        content: Text('${l.exportLogsSuccess}: $filePath'),
-        backgroundColor: Colors.green,
-      ));
-    } catch (e) {
-      if (!context.mounted) return;
+       snackBar.showSnackBar(SnackBar(
+         content: Text('${l.exportLogsSuccess}: $filePath'),
+         backgroundColor: Colors.green,
+       ));
+     } catch (e) {
+    if (!context.mounted) return;
       snackBar.showSnackBar(SnackBar(
         content: Text('${l.exportLogsError}: $e'),
         backgroundColor: Colors.red,
