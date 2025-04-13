@@ -70,6 +70,7 @@ class _HomePageState extends State<HomePage> {
         final theme = Theme.of(context);
 
         return Scaffold(
+            backgroundColor: theme.colorScheme.surfaceContainerHighest, // Fondo ligeramente más oscuro
             appBar: AppBar(
                 title: Text(
                     l.appTitle,
