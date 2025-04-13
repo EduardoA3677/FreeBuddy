@@ -29,26 +29,22 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final l = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Builder(
-          builder: (context) {
-            try {
-              return _buildMainContent(windowSize, theme, l, screenWidth, screenHeight);
-            } catch (e, stackTrace) {
-              log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
-                  error: e, stackTrace: stackTrace);
-              return _buildErrorContent(
-                l.headphonesControlError,
-                l.headphonesControlErrorDesc,
-                l,
-                onRetry: () => (context as Element).markNeedsBuild(),
-                theme: theme,
-              );
-            }
-          },
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        try {
+          return _buildMainContent(windowSize, theme, l, screenWidth, screenHeight);
+        } catch (e, stackTrace) {
+          log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
+              error: e, stackTrace: stackTrace);
+          return _buildErrorContent(
+            l.headphonesControlError,
+            l.headphonesControlErrorDesc,
+            l,
+            onRetry: () => (context as Element).markNeedsBuild(),
+            theme: theme,
+          );
+        }
+      },
     );
   }
 
@@ -70,84 +66,97 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final isSmallScreen = screenWidth < 400;
     final isWideScreen = screenWidth >= 600;
 
-    final imageHeightRatio = isSmallScreen ? 0.18 : (isWideScreen ? 0.24 : 0.2);
+    // Calcular altura para imagen con proporción menor para evitar scroll
+    final imageHeightRatio = isSmallScreen ? 0.14 : (isWideScreen ? 0.18 : 0.15);
     final imageMaxHeight = screenHeight * imageHeightRatio;
 
+    final cardBackgroundColor = theme.colorScheme.surfaceContainerHighest;
+    final deviceNameBackgroundColor = theme.colorScheme.primaryContainer.withValues(alpha: 0.9);
+
     try {
-      return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
-              child: Card(
-                elevation: 2,
-                color: theme.colorScheme.primaryContainer,
-                surfaceTintColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Título del dispositivo como sección principal
+          Container(
+            margin: const EdgeInsets.only(bottom: 12, top: 4),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            decoration: BoxDecoration(
+              color: deviceNameBackgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: Text(
-                    deviceName,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onPrimaryContainer,
-                      fontSize: isExtraSmallScreen ? 18 : (isSmallScreen ? 20 : 22),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
+              ],
             ),
-            const SizedBox(height: 16),
-            if (headphones is HeadphonesModelInfo)
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
-                child: Card(
-                  elevation: 3,
-                  surfaceTintColor: Colors.transparent,
-                  color: theme.colorScheme.surface,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: imageMaxHeight,
-                    ),
-                    child: SizedBox(
-                      height: isExtraSmallScreen ? 90 : (isSmallScreen ? 120 : (isWideScreen ? 160 : 140)),
+            child: Text(
+              deviceName,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onPrimaryContainer,
+                fontSize: isExtraSmallScreen ? 18 : (isSmallScreen ? 19 : 20),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+          // Contenedor principal - balance entre imagen y controles
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Column(
+                children: [
+                  // Sección de imagen más compacta
+                  if (headphones is HeadphonesModelInfo)
+                    Container(
+                      height: imageMaxHeight,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: cardBackgroundColor,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
                         child: HeadphonesImage(headphones as HeadphonesModelInfo),
                       ),
                     ),
+
+                  // Sección de controles - ocupa el resto del espacio disponible
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: cardBackgroundColor,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: isWideScreen
+                          ? _buildWideLayout(theme, l, screenWidth)
+                          : _buildCompactLayout(theme, l, screenWidth, isSmallScreen),
+                    ),
                   ),
-                ),
-              ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
-              child: Card(
-                elevation: 2,
-                surfaceTintColor: Colors.transparent,
-                color: theme.colorScheme.surfaceContainerLow,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-                  child: isWideScreen
-                      ? _buildWideLayout(theme, l, screenWidth)
-                      : _buildCompactLayout(theme, l, screenWidth, isSmallScreen),
-                ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-          ],
-        ),
+          ),
+        ],
       );
     } catch (e, stackTrace) {
       log(LogLevel.error, "Error building content layout", error: e, stackTrace: stackTrace);
@@ -173,23 +182,36 @@ class HeadphonesControlsWidget extends StatelessWidget {
       );
     }
 
+    // Para pantallas anchas, mantener la disposición en fila pero con menos padding
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (hasBatteryFeature)
           Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: BatteryCard(headphones as LRCBattery),
+              padding: const EdgeInsets.only(right: 6),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: BatteryCard(headphones as LRCBattery),
+              ),
             ),
           ),
         if (hasAncFeature)
           Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: AncCard(headphones as Anc),
+              padding: const EdgeInsets.only(left: 6),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: AncCard(headphones as Anc),
+              ),
             ),
           ),
       ],
@@ -210,11 +232,34 @@ class HeadphonesControlsWidget extends StatelessWidget {
       );
     }
 
+    // Ajuste de espaciado para diseño compacto
+    final verticalSpacing = isSmallScreen ? 8.0 : 10.0;
+
     return Column(
       children: [
-        if (hasBatteryFeature) BatteryCard(headphones as LRCBattery),
-        if (hasAncFeature && hasBatteryFeature) const SizedBox(height: 12),
-        if (hasAncFeature) AncCard(headphones as Anc),
+        if (hasBatteryFeature)
+          Expanded(
+            flex: hasBatteryFeature && hasAncFeature ? 1 : 2,
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: BatteryCard(headphones as LRCBattery),
+            ),
+          ),
+        if (hasAncFeature && hasBatteryFeature) SizedBox(height: verticalSpacing),
+        if (hasAncFeature)
+          Expanded(
+            flex: hasBatteryFeature && hasAncFeature ? 1 : 2,
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: AncCard(headphones as Anc),
+            ),
+          ),
       ],
     );
   }
@@ -243,7 +288,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
             SizedBox(height: AppDimensions.spacing8),
             Text(
               description,
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style:
+                  theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: AppDimensions.spacing12),
