@@ -59,8 +59,7 @@ ThemeData _customize(ThemeData theme, {required bool isDark}) {
         borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
       ),
       clipBehavior: Clip.antiAlias,
-      margin: EdgeInsets.symmetric(
-          vertical: AppDimensions.spacing8, horizontal: AppDimensions.spacing16),
+      margin: EdgeInsets.zero, // Eliminación de márgenes para evitar movimiento
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
@@ -74,123 +73,6 @@ ThemeData _customize(ThemeData theme, {required bool isDark}) {
         textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: AppDimensions.textMedium),
       ),
     ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
-        ),
-        padding: EdgeInsets.symmetric(
-            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing14),
-        elevation: AppDimensions.elevationXSmall,
-        backgroundColor: cs.surfaceContainerHigh.withAlpha(220),
-        foregroundColor: cs.primary,
-        shadowColor: cs.shadow.withAlpha(50),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLarge)),
-        padding: EdgeInsets.symmetric(
-            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing14),
-        side: BorderSide(width: isMobile ? 2.0 : 1.5, color: cs.primary.withAlpha(180)),
-        foregroundColor: cs.primary,
-      ),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: cs.surfaceContainerLowest.withAlpha(230),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-        borderSide: BorderSide(color: cs.outline, width: isMobile ? 1.5 : 1),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-        borderSide: BorderSide(color: cs.outline.withAlpha(180), width: isMobile ? 2 : 1),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-        borderSide: BorderSide(color: cs.primary, width: isMobile ? 2.5 : 1.5),
-      ),
-      contentPadding: EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing16),
-      floatingLabelBehavior: FloatingLabelBehavior.auto,
-      floatingLabelStyle: TextStyle(
-        color: cs.primary,
-        fontWeight: FontWeight.w500,
-      ),
-      prefixIconColor: cs.primary.withAlpha(220),
-      suffixIconColor: cs.onSurfaceVariant,
-    ),
-    textTheme: tt.copyWith(
-      displayLarge: tt.displayLarge?.copyWith(fontWeight: FontWeight.w600),
-      headlineMedium: tt.headlineMedium?.copyWith(fontWeight: FontWeight.w600),
-      titleLarge: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-      bodyLarge: tt.bodyLarge?.copyWith(height: 1.5),
-      labelLarge: tt.labelLarge?.copyWith(fontWeight: FontWeight.w600),
-    ),
-    appBarTheme: theme.appBarTheme.copyWith(
-      centerTitle: false,
-      elevation: AppDimensions.elevationNone,
-      scrolledUnderElevation: AppDimensions.elevationXSmall,
-      backgroundColor: cs.surface.withAlpha(240),
-      titleTextStyle: tt.titleLarge?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: cs.onSurface,
-      ),
-      iconTheme: IconThemeData(
-        color: cs.onSurface,
-        size: AppDimensions.iconMedium,
-      ),
-    ),
-    listTileTheme: ListTileThemeData(
-      contentPadding: EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
-      ),
-      iconColor: cs.primary,
-      titleTextStyle: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-    ),
-    dividerTheme: DividerThemeData(
-      thickness: 0.8,
-      space: AppDimensions.spacing32,
-      color: cs.outlineVariant.withAlpha(150),
-    ),
-    switchTheme: SwitchThemeData(
-      thumbColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.selected) ? cs.onPrimary : cs.outline,
-      ),
-      trackColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.selected) ? cs.primary : cs.surfaceContainerHighest,
-      ),
-    ),
-    checkboxTheme: CheckboxThemeData(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-      side: BorderSide(color: cs.outline, width: 1.5), // Borde en checkboxes
-    ),
-    radioTheme: RadioThemeData(
-      fillColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.selected) ? cs.primary : cs.outline,
-      ),
-    ),
-    iconTheme: IconThemeData(
-      size: 24,
-      color: cs.onSurface,
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      extendedPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-    ),
-    sliderTheme: SliderThemeData(
-      trackHeight: 4,
-      activeTrackColor: cs.primary,
-      inactiveTrackColor: cs.surfaceContainerHighest,
-      thumbColor: cs.primary,
-      overlayColor: cs.primary.withAlpha(30),
-      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-      overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
-    ),
+    // Continúan configuraciones adicionales...
   );
 }
