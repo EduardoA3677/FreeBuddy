@@ -149,46 +149,46 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Future<String?> _getFileNameAndPath(BuildContext context) async {
-    final initialDirectory = (await getDownloadsDirectory())?.path ??
-        (await getDownloadsDirectory()).path;
+Future<String?> _getFileNameAndPath(BuildContext context) async {
+  final downloadsDirectory = await getDownloadsDirectory();
+  final initialDirectory = downloadsDirectory?.path ?? '/storage/emulated/0/Download'; // Fallback to default path
 
-    if (!context.mounted) return null;
+  if (!context.mounted) return null;
 
-    return showDialog<String>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        final controller = TextEditingController();
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.exportLogsDialog),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: controller,
-                decoration: const InputDecoration(hintText: 'log.txt'),
-              ),
-              const SizedBox(height: 12),
-              Text('Directory: $initialDirectory'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, null),
-              child: Text(AppLocalizations.of(context)!.cancel),
+  return showDialog<String>(
+    context: context,
+    builder: (BuildContext dialogContext) {
+      final controller = TextEditingController();
+      return AlertDialog(
+        title: Text(AppLocalizations.of(context)!.exportLogsDialog),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(hintText: 'log.txt'),
             ),
-            TextButton(
-              onPressed: () {
-                final fileName = controller.text.trim();
-                Navigator.pop(dialogContext, '$initialDirectory/$fileName');
-              },
-              child: Text(AppLocalizations.of(context)!.save),
-            ),
+            const SizedBox(height: 12),
+            Text('Directory: $initialDirectory'),
           ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, null),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              final fileName = controller.text.trim();
+              Navigator.pop(dialogContext, '$initialDirectory/$fileName');
+            },
+            child: Text(AppLocalizations.of(context)!.save),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   Future<void> _exportLogs(BuildContext context) async {
     final l = AppLocalizations.of(context)!;
