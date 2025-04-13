@@ -5,19 +5,25 @@
 version: 2
 
 enable-beta-ecosystems: true
+
 registries:
  maven-google:
     type: maven-repository
     url: https://maven.google.com
     username: ""
     password: ""
+    
 updates:
   - package-ecosystem: "gradle"
-    directory: "/android/"
+    directories:
+      - "/android/"
+      - "/android/app/"
+      - "/android/gradle/wrapper/"
     registries:
       - maven-google
     schedule:
       interval: "daily"
+      
   - package-ecosystem: "pub"
     directory: "/"
     schedule:
