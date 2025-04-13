@@ -1,11 +1,8 @@
 name: Build FreeBuddy
+
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Version tag'
-        required: false
-        default: 'v0.2.0'
       build_format:
         description: 'Choose the build format'
         required: false
@@ -21,6 +18,10 @@ jobs:
     runs-on: self-hosted
     container: ghcr.io/cirruslabs/flutter:stable
     steps:
+      - name: Set timestamp
+        id: set_timestamp
+        run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> "$GITHUB_OUTPUT"
+
       - name: Install Java JDK 17
         run: |
           sudo apt-get update
@@ -44,24 +45,24 @@ jobs:
         if: ${{ github.event.inputs.build_format == 'apk' || github.event.inputs.build_format == 'both' || github.event_name == 'push' }}
         run: |
           mkdir -p output-apk
-          mv "${{ steps.android-build.outputs.apk-path }}" "output-apk/FreeBuddy-${{ steps.set_tag.outputs.tag }}.apk"
+          mv "${{ steps.android-build.outputs.apk-path }}" "output-apk/FreeBuddy-${{ steps.set_timestamp.outputs.timestamp }}.apk"
 
       - name: Prepare AAB artifact
         if: ${{ github.event.inputs.build_format == 'aab' || github.event.inputs.build_format == 'both' || github.event_name == 'push' }}
         run: |
           mkdir -p output-aab
-          mv "${{ steps.android-build.outputs.aab-path }}" "output-aab/FreeBuddy-${{ steps.set_tag.outputs.tag }}.aab"
+          mv "${{ steps.android-build.outputs.aab-path }}" "output-aab/FreeBuddy-${{ steps.set_timestamp.outputs.timestamp }}.aab"
 
       - name: Upload APK artifact
         if: ${{ github.event.inputs.build_format == 'apk' || github.event.inputs.build_format == 'both' || github.event_name == 'push' }}
         uses: actions/upload-artifact@v4
         with:
-          name: FreeBuddy-APK-${{ steps.set_tag.outputs.tag }}
+          name: FreeBuddy-APK-${{ steps.set_timestamp.outputs.timestamp }}
           path: output-apk/
 
       - name: Upload AAB artifact
         if: ${{ github.event.inputs.build_format == 'aab' || github.event.inputs.build_format == 'both' || github.event_name == 'push' }}
         uses: actions/upload-artifact@v4
         with:
-          name: FreeBuddy-AAB-${{ steps.set_tag.outputs.tag }}
+          name: FreeBuddy-AAB-${{ steps.set_timestamp.outputs.timestamp }}
           path: output-aab/
