@@ -18,8 +18,13 @@ import 'headphones_image.dart';
 
 class HeadphonesControlsWidget extends StatelessWidget {
   final BluetoothHeadphones headphones;
+  final VoidCallback? onSettingsTap;
 
-  const HeadphonesControlsWidget({super.key, required this.headphones});
+  const HeadphonesControlsWidget({
+    super.key,
+    required this.headphones,
+    this.onSettingsTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -112,24 +117,78 @@ class HeadphonesControlsWidget extends StatelessWidget {
                 children: [
                   // Sección de imagen más compacta
                   if (headphones is HeadphonesModelInfo)
-                    Container(
-                      height: imageMaxHeight,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: cardBackgroundColor,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                    Column(
+                      children: [
+                        Container(
+                          height: imageMaxHeight,
+                          decoration: BoxDecoration(
+                            color: cardBackgroundColor,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: HeadphonesImage(headphones as HeadphonesModelInfo),
-                      ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: HeadphonesImage(headphones as HeadphonesModelInfo),
+                          ),
+                        ),
+
+                        // Botón de configuración como barra debajo de la imagen
+                        if (onSettingsTap != null)
+                          Container(
+                            margin: const EdgeInsets.only(top: 6, bottom: 12),
+                            width: double.infinity,
+                            height: 40,
+                            child: InkWell(
+                              onTap: onSettingsTap,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      theme.colorScheme.secondary.withValues(alpha: 0.9),
+                                      theme.colorScheme.secondary,
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: theme.colorScheme.shadow.withValues(alpha: 0.2),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Symbols.settings,
+                                      size: 20,
+                                      color: theme.colorScheme.onSecondary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      l.pageHeadphonesSettingsTitle,
+                                      style: TextStyle(
+                                        color: theme.colorScheme.onSecondary,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
 
                   // Sección de controles - ocupa el resto del espacio disponible

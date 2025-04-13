@@ -331,60 +331,56 @@ class AncModeOption extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing16),
-            child: LayoutBuilder(builder: (context, constraints) {
-              final isSmallWidth = constraints.maxWidth < 120;
-
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Animated icon container
-                  Container(
-                    padding: EdgeInsets.all(AppDimensions.spacing8),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? theme.colorScheme.primary.withValues(alpha: 0.2)
-                          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      icon,
-                      color: isSelected ? theme.colorScheme.primary : foregroundColor,
-                      size: AppDimensions.iconMedium + 2,
-                    ),
-                  )
-                      .animate(target: isSelected ? 1 : 0)
-                      .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.1, 1.1)),
-
-                  SizedBox(height: AppDimensions.spacing12),
-
-                  // Label with adaptive size
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: foregroundColor,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      fontSize:
-                          isSmallWidth ? AppDimensions.textSmall + 2 : AppDimensions.textMedium,
-                    ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Animated icon container
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? theme.colorScheme.primary.withValues(alpha: 0.2)
+                        : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
+                    shape: BoxShape.circle,
                   ),
+                  child: Icon(
+                    icon,
+                    color: isSelected ? theme.colorScheme.primary : foregroundColor,
+                    size: 24,
+                  ),
+                )
+                    .animate(target: isSelected ? 1 : 0)
+                    .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.1, 1.1)),
 
-                  // Description for clarity
-                  if (!isSmallWidth) ...[
-                    SizedBox(height: AppDimensions.spacing4),
-                    Text(
-                      description,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontSize: AppDimensions.textXSmall,
-                      ),
-                    ),
-                  ]
-                ],
-              );
-            }),
+                const SizedBox(height: 12),
+
+                // Label con tamaño fijo para todos los botones
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: foregroundColor,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontSize: 14, // Tamaño de texto fijo para todos los botones
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                // Descripción con tamaño fijo para todos los botones
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 10, // Tamaño de texto fijo para todas las descripciones
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              ],
+            ),
           ),
         ),
       ),
