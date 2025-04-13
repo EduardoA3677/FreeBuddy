@@ -10,7 +10,17 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+registries:
+ maven-google:
+    type: maven-repository
+    url: https://maven.google.com
+    username: ""
+    password: ""
+updates:
   - package-ecosystem: "gradle"
-    directory: "/"
+    directory: "/android/"
+    registries:
+      - maven-google
     schedule:
       interval: "daily"
+
