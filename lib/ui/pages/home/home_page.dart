@@ -242,17 +242,8 @@ class _StateMessageCard extends StatelessWidget {
 
         return Center(
             child: Container(
-                padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                        BoxShadow(
-                            color: theme.colorScheme.shadow.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                        ),
-                    ],
                 ),
                 child: Column(
                     mainAxisSize: MainAxisSize.min,
