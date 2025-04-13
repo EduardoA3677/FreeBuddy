@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -201,7 +200,7 @@ Future<String?> _getFileNameAndPath(BuildContext context) async {
       final logContents = AppLogger.getLogContent();
       final file = File(filePath);
       await file.writeAsString(logContents);
- 
+
       if (!context.mounted) return;
        snackBar.showSnackBar(SnackBar(
          content: Text('${l.exportLogsSuccess}: $filePath'),
