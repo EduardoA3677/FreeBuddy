@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../headphones/cubit/headphones_connection_cubit.dart';
+import '../../theme/dimensions.dart';
 
 class NotPairedInfoWidget extends StatelessWidget {
   const NotPairedInfoWidget({super.key});
@@ -12,77 +13,79 @@ class NotPairedInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    final t = Theme.of(context);
-    final tt = t.textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return Card(
-      elevation: 2,
+      elevation: AppDimensions.elevationSmall,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              t.colorScheme.secondaryContainer.withValues(alpha: 0.9),
-              t.colorScheme.secondaryContainer.withValues(alpha: 0.6),
+              theme.colorScheme.secondaryContainer.withValues(alpha: 0.9),
+              theme.colorScheme.secondaryContainer.withValues(alpha: 0.6),
             ],
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        padding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppDimensions.spacing16),
               decoration: BoxDecoration(
-                color: t.colorScheme.secondary.withValues(alpha: 0.15),
+                color: theme.colorScheme.secondary.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Symbols.headphones,
-                size: 56,
+                size: AppDimensions.iconXLarge + 8,
                 weight: 300,
-                color: t.colorScheme.secondary,
+                color: theme.colorScheme.secondary,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimensions.spacing24),
             Text(
               l.pageHomeNotPaired,
-              style: tt.titleLarge?.copyWith(
+              style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                fontSize: 22,
+                fontSize: AppDimensions.textXXLarge - 2,
                 letterSpacing: -0.3,
-                color: t.colorScheme.onSecondaryContainer,
+                color: theme.colorScheme.onSecondaryContainer,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             Text(
               'Empareja tus auriculares para usarlos con FreeBuddy',
-              style: tt.bodyMedium?.copyWith(
-                color: t.colorScheme.onSecondaryContainer.withValues(alpha: 0.8),
+              style: textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSecondaryContainer.withValues(alpha: 0.8),
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimensions.spacing24),
             FilledButton.icon(
               onPressed: () => context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
               icon: const Icon(Symbols.settings_bluetooth),
               label: Text(l.pageHomeNotPairedPairOpenSettings),
               style: FilledButton.styleFrom(
-                backgroundColor: t.colorScheme.secondary,
-                foregroundColor: t.colorScheme.onSecondary,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                backgroundColor: theme.colorScheme.secondary,
+                foregroundColor: theme.colorScheme.onSecondary,
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppDimensions.spacing16),
             OutlinedButton.icon(
               onPressed: () => launchUrlString(
                 'https://freebuddy-web-demo.netlify.app/',
@@ -91,11 +94,12 @@ class NotPairedInfoWidget extends StatelessWidget {
               icon: const Icon(Symbols.open_in_new),
               label: Text(l.pageHomeNotPairedPairOpenDemo),
               style: OutlinedButton.styleFrom(
-                foregroundColor: t.colorScheme.secondary,
-                side: BorderSide(color: t.colorScheme.secondary.withValues(alpha: 0.5), width: 1.5),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                foregroundColor: theme.colorScheme.secondary,
+                side: BorderSide(color: theme.colorScheme.secondary.withValues(alpha: 0.5), width: 1.5),
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                 ),
               ),
             ),

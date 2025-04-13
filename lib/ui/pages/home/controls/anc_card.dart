@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../headphones/framework/anc.dart';
+import '../../../theme/dimensions.dart';
 
 /// Card with modern ANC controls
 class AncCard extends StatelessWidget {
@@ -19,13 +20,13 @@ class AncCard extends StatelessWidget {
     final isSmallDevice = screenWidth < 360;
 
     return Card(
-      elevation: 2,
+      elevation: AppDimensions.elevationSmall,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -35,7 +36,7 @@ class AncCard extends StatelessWidget {
             ],
           ),
         ),
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(AppDimensions.spacing16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -43,18 +44,19 @@ class AncCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(AppDimensions.spacing8),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
                   ),
                   child: Icon(
                     Symbols.noise_aware,
                     color: theme.colorScheme.secondary,
-                    size: isSmallDevice ? 22 : 28,
+                    size:
+                        isSmallDevice ? AppDimensions.iconSmall + 6 : AppDimensions.iconMedium + 4,
                   ),
                 ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack, delay: 100.ms),
-                const SizedBox(width: 12),
+                SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,15 +66,17 @@ class AncCard extends StatelessWidget {
                         style: theme.textTheme.titleLarge?.copyWith(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
-                          fontSize: isSmallDevice ? 18 : 20,
+                          fontSize:
+                              isSmallDevice ? AppDimensions.textMedium : AppDimensions.textLarge,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: AppDimensions.spacing2),
                       Text(
                         'Adjust noise cancellation settings',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
-                          fontSize: isSmallDevice ? 12 : 14,
+                          fontSize:
+                              isSmallDevice ? AppDimensions.textXSmall : AppDimensions.textSmall,
                         ),
                       ),
                     ],
@@ -82,9 +86,9 @@ class AncCard extends StatelessWidget {
             ),
 
             Divider(
-              height: 32,
-              indent: 8,
-              endIndent: 8,
+              height: AppDimensions.spacing32,
+              indent: AppDimensions.spacing8,
+              endIndent: AppDimensions.spacing8,
               color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             ),
 
@@ -198,20 +202,20 @@ class AncCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: isSmall ? 30 : 40,
-            height: isSmall ? 30 : 40,
+            width: isSmall ? AppDimensions.spacing30 : AppDimensions.spacing40,
+            height: isSmall ? AppDimensions.spacing30 : AppDimensions.spacing40,
             child: CircularProgressIndicator(
               strokeWidth: 3,
               color: theme.colorScheme.secondary.withValues(alpha: 0.7),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           Text(
             'Loading noise control settings...',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
-              fontSize: isSmall ? 13 : 14,
+              fontSize: isSmall ? AppDimensions.textSmall : AppDimensions.textMedium - 2,
             ),
           ),
         ],
@@ -222,19 +226,19 @@ class AncCard extends StatelessWidget {
   // Error state widget
   Widget _buildErrorState(ThemeData theme, AppLocalizations l, BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(AppDimensions.spacing16),
       decoration: BoxDecoration(
         color: theme.colorScheme.errorContainer.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
       ),
       child: Column(
         children: [
           Icon(
             Symbols.error_outline,
             color: theme.colorScheme.error,
-            size: 32,
+            size: AppDimensions.iconLarge,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           Text(
             l.ancControlError,
             style: TextStyle(
@@ -243,13 +247,15 @@ class AncCard extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           OutlinedButton.icon(
             icon: const Icon(Symbols.refresh),
             onPressed: () => anc.setAncMode(AncMode.off),
             style: OutlinedButton.styleFrom(
               foregroundColor: theme.colorScheme.error,
               side: BorderSide(color: theme.colorScheme.error),
+              padding: EdgeInsets.symmetric(
+                  horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing8),
             ),
             label: Text(l.headphonesControlRetry),
           ),
@@ -283,19 +289,19 @@ class AncModeOption extends StatelessWidget {
     // Colors for selected/unselected state with modern look
     final backgroundColor = isSelected
         ? theme.colorScheme.primaryContainer
-        : theme.colorScheme.surfaceContainerHighest.withAlpha(180);
+        : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8);
 
     final foregroundColor =
         isSelected ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface;
 
     // Elevation effect for selected item
-    final elevation = isSelected ? 3.0 : 0.0;
+    final elevation = isSelected ? AppDimensions.elevationSmall : 0.0;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         boxShadow: [
           if (elevation > 0)
             BoxShadow(
@@ -313,9 +319,10 @@ class AncModeOption extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            padding: EdgeInsets.symmetric(
+                horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing16),
             child: LayoutBuilder(builder: (context, constraints) {
               final isSmallWidth = constraints.maxWidth < 120;
 
@@ -324,7 +331,7 @@ class AncModeOption extends StatelessWidget {
                 children: [
                   // Animated icon container
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(AppDimensions.spacing8),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? theme.colorScheme.primary.withValues(alpha: 0.2)
@@ -334,13 +341,13 @@ class AncModeOption extends StatelessWidget {
                     child: Icon(
                       icon,
                       color: isSelected ? theme.colorScheme.primary : foregroundColor,
-                      size: 26,
+                      size: AppDimensions.iconMedium + 2,
                     ),
                   )
                       .animate(target: isSelected ? 1 : 0)
                       .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.1, 1.1)),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppDimensions.spacing12),
 
                   // Label with adaptive size
                   Text(
@@ -348,19 +355,20 @@ class AncModeOption extends StatelessWidget {
                     style: TextStyle(
                       color: foregroundColor,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      fontSize: isSmallWidth ? 14 : 16,
+                      fontSize:
+                          isSmallWidth ? AppDimensions.textSmall + 2 : AppDimensions.textMedium,
                     ),
                   ),
 
                   // Description for clarity
                   if (!isSmallWidth) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: AppDimensions.spacing4),
                     Text(
                       description,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: theme.colorScheme.onSurfaceVariant,
-                        fontSize: 12,
+                        fontSize: AppDimensions.textXSmall,
                       ),
                     ),
                   ]

@@ -6,6 +6,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../../gen/freebuddy_icons.dart';
 import '../../../../headphones/framework/lrc_battery.dart';
 import '../../../../headphones/huawei/features/battery_feature.dart';
+import '../../../theme/dimensions.dart';
 
 class BatteryCard extends StatelessWidget {
   final LRCBattery lrcBattery;
@@ -28,14 +29,14 @@ class BatteryCard extends StatelessWidget {
         final hasData = levels != null;
 
         return Card(
-          elevation: hasData ? 4 : 2,
+          elevation: hasData ? AppDimensions.elevationMedium : AppDimensions.elevationSmall,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
           ),
           color: theme.colorScheme.surface,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -45,25 +46,25 @@ class BatteryCard extends StatelessWidget {
                 ],
               ),
             ),
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(AppDimensions.spacing20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: EdgeInsets.all(AppDimensions.spacing8),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer.withAlpha(180),
-                        borderRadius: BorderRadius.circular(12),
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
                       ),
                       child: Icon(
                         Symbols.battery_horiz_075,
                         color: theme.colorScheme.primary,
-                        size: isSmallDevice ? 20 : 24,
+                        size: isSmallDevice ? AppDimensions.iconSmall : AppDimensions.iconMedium,
                       ),
                     ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack, delay: 100.ms),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppDimensions.spacing12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,15 +74,19 @@ class BatteryCard extends StatelessWidget {
                             style: textTheme.titleLarge?.copyWith(
                               color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w600,
-                              fontSize: isSmallDevice ? 18 : 20,
+                              fontSize: isSmallDevice
+                                  ? AppDimensions.textMedium
+                                  : AppDimensions.textLarge - 2,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: AppDimensions.spacing2),
                           Text(
                             'Levels and charging status',
                             style: textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: isSmallDevice ? 12 : 13,
+                              fontSize: isSmallDevice
+                                  ? AppDimensions.textXSmall
+                                  : AppDimensions.textSmall,
                             ),
                           ),
                         ],
@@ -90,10 +95,10 @@ class BatteryCard extends StatelessWidget {
                   ],
                 ),
                 Divider(
-                  height: 32,
-                  indent: 8,
-                  endIndent: 8,
-                  color: theme.colorScheme.outlineVariant.withAlpha(128),
+                  height: AppDimensions.spacing32,
+                  indent: AppDimensions.spacing8,
+                  endIndent: AppDimensions.spacing8,
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                 ),
                 if (!hasData)
                   _buildLoadingState(theme, isSmallDevice)
@@ -105,29 +110,36 @@ class BatteryCard extends StatelessWidget {
                         text: 'Left Earbud',
                         level: levels.levelLeft,
                         charging: levels.chargingLeft,
-                        fontSize: isSmallDevice ? 14 : 16,
+                        fontSize:
+                            isSmallDevice ? AppDimensions.textSmall + 2 : AppDimensions.textMedium,
                       )
                           .animate()
                           .fadeIn(duration: 400.ms, delay: 150.ms)
                           .slideX(begin: -0.1, end: 0),
-                      SizedBox(height: isSmallDevice ? 14 : 18),
+                      SizedBox(
+                          height:
+                              isSmallDevice ? AppDimensions.spacing14 : AppDimensions.spacing18),
                       BatteryIndicator(
                         icon: FreebuddyIcons.rightEarbud,
                         text: 'Right Earbud',
                         level: levels.levelRight,
                         charging: levels.chargingRight,
-                        fontSize: isSmallDevice ? 14 : 16,
+                        fontSize:
+                            isSmallDevice ? AppDimensions.textSmall + 2 : AppDimensions.textMedium,
                       )
                           .animate()
                           .fadeIn(duration: 400.ms, delay: 250.ms)
                           .slideX(begin: -0.1, end: 0),
-                      SizedBox(height: isSmallDevice ? 14 : 18),
+                      SizedBox(
+                          height:
+                              isSmallDevice ? AppDimensions.spacing14 : AppDimensions.spacing18),
                       BatteryIndicator(
                         icon: FreebuddyIcons.earbudsCase,
                         text: 'Case',
                         level: levels.levelCase,
                         charging: levels.chargingCase,
-                        fontSize: isSmallDevice ? 14 : 16,
+                        fontSize:
+                            isSmallDevice ? AppDimensions.textSmall + 2 : AppDimensions.textMedium,
                       )
                           .animate()
                           .fadeIn(duration: 400.ms, delay: 350.ms)
@@ -148,20 +160,20 @@ class BatteryCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: isSmall ? 30 : 40,
-            height: isSmall ? 30 : 40,
+            width: isSmall ? AppDimensions.spacing30 : AppDimensions.spacing40,
+            height: isSmall ? AppDimensions.spacing30 : AppDimensions.spacing40,
             child: CircularProgressIndicator(
               strokeWidth: 3,
-              color: theme.colorScheme.primary.withAlpha(180),
+              color: theme.colorScheme.primary.withValues(alpha: 0.7),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           Text(
             'Loading battery information...',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
-              fontSize: isSmall ? 13 : 14,
+              fontSize: isSmall ? AppDimensions.textSmall : AppDimensions.textMedium - 2,
             ),
           ),
         ],
@@ -192,9 +204,9 @@ class BatteryIndicator extends StatelessWidget {
 
     Color getBatteryColor() {
       if (level == null || level == 0) return theme.colorScheme.error;
-      if (level! < 20) return theme.colorScheme.error.withAlpha(180);
+      if (level! < 20) return theme.colorScheme.error.withValues(alpha: 0.85);
       if (level! < 40) return theme.colorScheme.tertiary;
-      if (level! < 70) return theme.colorScheme.primary.withAlpha(180);
+      if (level! < 70) return theme.colorScheme.primary.withValues(alpha: 0.85);
       return theme.colorScheme.primary;
     }
 
@@ -206,10 +218,10 @@ class BatteryIndicator extends StatelessWidget {
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: EdgeInsets.all(AppDimensions.spacing6),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
               ),
               child: Icon(
                 icon,
@@ -217,7 +229,7 @@ class BatteryIndicator extends StatelessWidget {
                 size: fontSize + 2,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: AppDimensions.spacing12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,7 +242,7 @@ class BatteryIndicator extends StatelessWidget {
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: AppDimensions.spacing4),
                   Row(
                     children: [
                       Expanded(
@@ -245,10 +257,11 @@ class BatteryIndicator extends StatelessWidget {
                       ),
                       if (charging)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing3),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withAlpha(40),
-                            borderRadius: BorderRadius.circular(12),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -258,7 +271,7 @@ class BatteryIndicator extends StatelessWidget {
                                 size: fontSize - 2,
                                 color: theme.colorScheme.primary,
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(width: AppDimensions.spacing4),
                               Text(
                                 'Charging',
                                 style: theme.textTheme.labelSmall?.copyWith(
@@ -276,12 +289,12 @@ class BatteryIndicator extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: AppDimensions.spacing8),
         Container(
-          height: 8,
+          height: AppDimensions.spacing8,
           width: double.infinity,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXSmall),
             color: theme.colorScheme.surfaceContainerHighest,
           ),
           child: Stack(
@@ -291,7 +304,7 @@ class BatteryIndicator extends StatelessWidget {
                 curve: Curves.easeOutCubic,
                 width: MediaQuery.of(context).size.width * 0.6 * barFill,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXSmall),
                   color: getBatteryColor(),
                 ),
               ),

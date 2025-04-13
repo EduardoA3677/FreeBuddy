@@ -9,6 +9,7 @@ import '../../../headphones/huawei/huawei_headphones_base.dart';
 import '../../../headphones/huawei/huawei_headphones_impl.dart';
 import '../../../headphones/model_definition/huawei_models_definition.dart';
 import '../../common/headphones_connection_ensuring_overlay.dart';
+import '../../theme/dimensions.dart';
 import '../home/controls/headphones_image.dart';
 import 'huawei/auto_pause_section.dart';
 import 'huawei/double_tap_section.dart';
@@ -29,12 +30,12 @@ class HeadphonesSettingsPage extends StatelessWidget {
           l.pageHeadphonesSettingsTitle,
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 20,
+            fontSize: AppDimensions.textLarge,
             letterSpacing: -0.3,
           ),
         ),
         elevation: 0,
-        scrolledUnderElevation: 1.0,
+        scrolledUnderElevation: AppDimensions.elevationXSmall,
         centerTitle: false,
         backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.9),
         actions: [

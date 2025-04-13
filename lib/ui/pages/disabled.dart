@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/dimensions.dart';
 
 /// Wrap this in a widget that you want to disable
 /// It will make it half-opaque and stop pointer events 👍
@@ -13,11 +14,7 @@ class Disabled extends StatelessWidget {
   final bool disabled;
   final Widget? coveringWidget;
 
-  const Disabled(
-      {super.key,
-      required this.child,
-      this.disabled = false,
-      this.coveringWidget});
+  const Disabled({super.key, required this.child, this.disabled = false, this.coveringWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +38,8 @@ class Disabled extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: t.colorScheme.surface,
-                      spreadRadius: 14,
-                      blurRadius: 22,
+                      spreadRadius: AppDimensions.spacing14,
+                      blurRadius: AppDimensions.spacing24,
                     ),
                   ],
                 ),

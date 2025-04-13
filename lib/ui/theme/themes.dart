@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/foundation.dart';
 
-bool get useMaterial3 => true;
+import 'dimensions.dart';
 
+// Siempre usamos Material 3
+const bool useMaterial3 = true;
+
+// Comprueba si estamos en una plataforma móvil
 bool get isMobile =>
     defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS;
 
@@ -49,32 +53,35 @@ ThemeData _customize(ThemeData theme, {required bool isDark}) {
     splashFactory: InkSparkle.splashFactory,
     cardTheme: CardTheme(
       color: isDark ? cs.surfaceContainerHighest : cs.surfaceContainerHighest, // Ajuste de colores
-      elevation: isDark ? 3.0 : 2.0,
+      elevation: isDark ? AppDimensions.elevationMedium : AppDimensions.elevationSmall,
       shadowColor: cs.shadow.withAlpha(isDark ? 120 : 80),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
       ),
       clipBehavior: Clip.antiAlias,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      margin: EdgeInsets.symmetric(
+          vertical: AppDimensions.spacing8, horizontal: AppDimensions.spacing16),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-        elevation: 2,
+        padding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing28, vertical: AppDimensions.spacing16),
+        elevation: AppDimensions.elevationSmall,
         shadowColor: cs.primary.withAlpha(100),
-        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: AppDimensions.textMedium),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        elevation: 1.5,
+        padding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing14),
+        elevation: AppDimensions.elevationXSmall,
         backgroundColor: cs.surfaceContainerHigh.withAlpha(220),
         foregroundColor: cs.primary,
         shadowColor: cs.shadow.withAlpha(50),
@@ -82,8 +89,10 @@ ThemeData _customize(ThemeData theme, {required bool isDark}) {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLarge)),
+        padding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing14),
         side: BorderSide(width: isMobile ? 2.0 : 1.5, color: cs.primary.withAlpha(180)),
         foregroundColor: cs.primary,
       ),
@@ -92,18 +101,19 @@ ThemeData _customize(ThemeData theme, {required bool isDark}) {
       filled: true,
       fillColor: cs.surfaceContainerLowest.withAlpha(230),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         borderSide: BorderSide(color: cs.outline, width: isMobile ? 1.5 : 1),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         borderSide: BorderSide(color: cs.outline.withAlpha(180), width: isMobile ? 2 : 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         borderSide: BorderSide(color: cs.primary, width: isMobile ? 2.5 : 1.5),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      contentPadding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing16),
       floatingLabelBehavior: FloatingLabelBehavior.auto,
       floatingLabelStyle: TextStyle(
         color: cs.primary,
@@ -121,8 +131,8 @@ ThemeData _customize(ThemeData theme, {required bool isDark}) {
     ),
     appBarTheme: theme.appBarTheme.copyWith(
       centerTitle: false,
-      elevation: 0,
-      scrolledUnderElevation: 1.5,
+      elevation: AppDimensions.elevationNone,
+      scrolledUnderElevation: AppDimensions.elevationXSmall,
       backgroundColor: cs.surface.withAlpha(240),
       titleTextStyle: tt.titleLarge?.copyWith(
         fontWeight: FontWeight.w600,
@@ -130,20 +140,21 @@ ThemeData _customize(ThemeData theme, {required bool isDark}) {
       ),
       iconTheme: IconThemeData(
         color: cs.onSurface,
-        size: 24,
+        size: AppDimensions.iconMedium,
       ),
     ),
     listTileTheme: ListTileThemeData(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      contentPadding: EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
       ),
       iconColor: cs.primary,
       titleTextStyle: tt.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
     ),
     dividerTheme: DividerThemeData(
       thickness: 0.8,
-      space: 32,
+      space: AppDimensions.spacing32,
       color: cs.outlineVariant.withAlpha(150),
     ),
     switchTheme: SwitchThemeData(

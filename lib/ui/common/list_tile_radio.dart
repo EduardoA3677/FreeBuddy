@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/dimensions.dart';
 
 class ListTileRadio<T> extends StatelessWidget {
   final Widget? title;
@@ -20,10 +21,16 @@ class ListTileRadio<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ListTile(
       title: title,
       subtitle: subtitle,
       dense: dense,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+      ),
+      contentPadding: AppDimensions.listTilePadding,
       onTap: onChanged != null
           ? () {
               onChanged!(value);
@@ -34,6 +41,11 @@ class ListTileRadio<T> extends StatelessWidget {
           value: value,
           groupValue: groupValue,
           onChanged: onChanged != null ? (_) {} : null,
+          fillColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline,
+          ),
         ),
       ),
     );

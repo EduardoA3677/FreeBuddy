@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 
 import '../../../logger.dart';
 import '../../app_settings.dart';
+import '../../theme/dimensions.dart';
+import '../../theme/theme_selector.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -17,29 +19,34 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final settings = context.read<AppSettings>();
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           l.settings,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontSize: AppDimensions.textXXLarge - 2,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         centerTitle: true,
-        elevation: 2,
+        elevation: 0,
+        scrolledUnderElevation: AppDimensions.elevationXSmall,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(AppDimensions.spacing16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionHeader(context, l.themeSettingsTitle),
-            const SizedBox(height: 12),
-            _buildThemeSettings(context, settings),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimensions.spacing12),
+            const ThemeSelector(),
+            SizedBox(height: AppDimensions.spacing24),
             _buildSectionHeader(context, l.debugSettingsTitle),
-            const SizedBox(height: 12),
+            SizedBox(height: AppDimensions.spacing12),
             _buildDebugSettings(context, settings),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimensions.spacing24),
             _buildAboutButton(context, l),
           ],
         ),
@@ -50,69 +57,14 @@ class SettingsPage extends StatelessWidget {
   Widget _buildSectionHeader(BuildContext context, String title) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: AppDimensions.spacing8),
       child: Text(
         title,
         style: theme.textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
-          fontSize: 18,
+          fontSize: AppDimensions.textLarge,
         ),
       ),
-    );
-  }
-
-  Widget _buildThemeSettings(BuildContext context, AppSettings settings) {
-    final l = AppLocalizations.of(context)!;
-
-    return StreamBuilder<ThemeMode>(
-      stream: settings.themeMode,
-      initialData: ThemeMode.system,
-      builder: (context, snapshot) {
-        final currentTheme = snapshot.data ?? ThemeMode.system;
-
-        return Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RadioListTile<ThemeMode>(
-                  title: Text(l.themeSettingsSystem),
-                  value: ThemeMode.system,
-                  groupValue: currentTheme,
-                  onChanged: (value) {
-                    if (value != null) {
-                      settings.setThemeMode(value);
-                    }
-                  },
-                ),
-                RadioListTile<ThemeMode>(
-                  title: Text(l.themeSettingsLight),
-                  value: ThemeMode.light,
-                  groupValue: currentTheme,
-                  onChanged: (value) {
-                    if (value != null) {
-                      settings.setThemeMode(value);
-                    }
-                  },
-                ),
-                RadioListTile<ThemeMode>(
-                  title: Text(l.themeSettingsDark),
-                  value: ThemeMode.dark,
-                  groupValue: currentTheme,
-                  onChanged: (value) {
-                    if (value != null) {
-                      settings.setThemeMode(value);
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -120,10 +72,11 @@ class SettingsPage extends StatelessWidget {
     final l = AppLocalizations.of(context)!;
 
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: AppDimensions.elevationSmall,
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMedium)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(AppDimensions.spacing16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -138,15 +91,28 @@ class SettingsPage extends StatelessWidget {
                   subtitle: Text(l.debugModeDescription),
                   value: isDebugEnabled,
                   onChanged: (value) => settings.setDebugMode(value),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                  ),
+                  contentPadding: AppDimensions.listTilePadding,
                 );
               },
             ),
-            const Divider(),
+            Divider(
+              thickness: 0.8,
+              height: AppDimensions.spacing32,
+              indent: AppDimensions.spacing8,
+              endIndent: AppDimensions.spacing8,
+            ),
             ListTile(
               title: Text(l.exportLogs),
               subtitle: Text(l.exportLogsDescription),
-              trailing: const Icon(Symbols.download),
+              trailing: Icon(Symbols.download, size: AppDimensions.iconMedium),
               onTap: () => _exportLogs(context),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+              ),
+              contentPadding: AppDimensions.listTilePadding,
             ),
           ],
         ),
@@ -155,20 +121,29 @@ class SettingsPage extends StatelessWidget {
   }
 
   Widget _buildAboutButton(BuildContext context, AppLocalizations l) {
+    final theme = Theme.of(context);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: EdgeInsets.symmetric(vertical: AppDimensions.spacing16),
       child: ElevatedButton.icon(
         onPressed: () => GoRouter.of(context).push('/settings/about'),
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor:
-              Theme.of(context).colorScheme.onPrimary, // Ensures text and icon are visible
+          padding: EdgeInsets.symmetric(
+              vertical: AppDimensions.spacing12, horizontal: AppDimensions.spacing24),
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          elevation: AppDimensions.elevationSmall,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+          ),
         ),
-        icon: const Icon(Symbols.info), // Updated to use Symbols for the icon
+        icon: Icon(Symbols.info, size: AppDimensions.iconMedium),
         label: Text(
           l.pageAboutTitle,
-          style: const TextStyle(fontSize: 18),
+          style: TextStyle(
+            fontSize: AppDimensions.textLarge,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

@@ -5,11 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../../theme/dimensions.dart';
+
 class FreebuddyIntroduction extends StatelessWidget {
   const FreebuddyIntroduction({super.key});
 
-  // I wanted to add "copy on long press" here, but recognizer can detect only
-  // one :sob:
+  // Para abrir enlaces externos
   TextSpan _link(String text, [String? url]) {
     return TextSpan(
       text: text,
@@ -46,7 +47,7 @@ class FreebuddyIntroduction extends StatelessWidget {
           child: Center(
             child: Container(
               constraints: const BoxConstraints(maxWidth: 600),
-              margin: const EdgeInsets.all(24),
+              margin: EdgeInsets.all(AppDimensions.spacing24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -54,10 +55,10 @@ class FreebuddyIntroduction extends StatelessWidget {
 
                   // Logo y título con animación
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(AppDimensions.spacing24),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(32),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
                       boxShadow: [
                         BoxShadow(
                           color: theme.colorScheme.shadow.withValues(alpha: 0.1),
@@ -70,10 +71,10 @@ class FreebuddyIntroduction extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.headphones,
-                          size: 72,
+                          size: AppDimensions.iconXLarge + 24,
                           color: theme.colorScheme.primary,
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: AppDimensions.spacing16),
                         Text(
                           l.pageIntroTitle,
                           style: tt.displayMedium?.copyWith(
@@ -95,10 +96,11 @@ class FreebuddyIntroduction extends StatelessWidget {
 
                   // Tarjeta con información principal
                   Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    elevation: AppDimensions.elevationSmall,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge)),
                     child: Padding(
-                      padding: const EdgeInsets.all(24),
+                      padding: EdgeInsets.all(AppDimensions.spacing24),
                       child: Column(
                         children: [
                           // Título de la sección
@@ -110,7 +112,7 @@ class FreebuddyIntroduction extends StatelessWidget {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: AppDimensions.spacing16),
 
                           // Contenido principal con mejor formato
                           RichText(

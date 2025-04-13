@@ -12,6 +12,7 @@ import '../../../../headphones/huawei/huawei_headphones_impl.dart';
 import '../../../../headphones/model_definition/huawei_models_definition.dart';
 import '../../../../logger.dart';
 import '../../../theme/layouts.dart';
+import '../../../theme/dimensions.dart';
 import 'anc_card.dart';
 import 'battery_card.dart';
 import 'headphones_image.dart';
@@ -38,7 +39,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeOutCubic,
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0) +
+                padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.spacing8, vertical: AppDimensions.spacing10) +
                     EdgeInsets.only(bottom: bottomPadding),
                 child: _buildMainContent(windowSize, theme, l, screenWidth, screenHeight),
               );
@@ -92,11 +94,11 @@ class HeadphonesControlsWidget extends StatelessWidget {
             ],
             stops: const [0.0, 1.0],
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
           boxShadow: [
             BoxShadow(
-              color: theme.colorScheme.shadow.withAlpha(100),
-              blurRadius: 12,
+              color: theme.colorScheme.shadow.withValues(alpha: 0.4),
+              blurRadius: AppDimensions.spacing12,
               offset: const Offset(0, 6),
             ),
           ],
@@ -285,10 +287,10 @@ class HeadphonesControlsWidget extends StatelessWidget {
         children: [
           Icon(
             Symbols.error_outline,
-            size: 56,
+            size: AppDimensions.iconXLarge + 8,
             color: theme.colorScheme.error,
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: AppDimensions.spacing20),
           Text(
             title,
             style: theme.textTheme.titleLarge?.copyWith(
@@ -296,18 +298,25 @@ class HeadphonesControlsWidget extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppDimensions.spacing12),
           Text(
             description,
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppDimensions.spacing16),
           if (onRetry != null)
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: Text(l.headphonesControlRetry),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+                ),
+              ),
             ),
         ],
       ),

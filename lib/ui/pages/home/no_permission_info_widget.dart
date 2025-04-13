@@ -7,6 +7,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../headphones/cubit/headphones_connection_cubit.dart';
 import '../../../logger.dart';
+import '../../theme/dimensions.dart';
 
 class NoPermissionInfoWidget extends StatefulWidget {
   const NoPermissionInfoWidget({super.key});
@@ -146,13 +147,13 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
     final tt = t.textTheme;
 
     return Card(
-      elevation: 2,
+      elevation: AppDimensions.elevationSmall,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -162,24 +163,25 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
             ],
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        padding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppDimensions.spacing16),
               decoration: BoxDecoration(
                 color: t.colorScheme.tertiary.withAlpha(38),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Symbols.security,
-                size: 56,
+                size: AppDimensions.iconXLarge + 8,
                 weight: 300,
                 color: t.colorScheme.tertiary,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimensions.spacing24),
             Text(
               l.pageHomeNoPermission,
               style: tt.titleLarge?.copyWith(

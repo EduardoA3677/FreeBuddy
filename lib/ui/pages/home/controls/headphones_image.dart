@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../headphones/framework/headphones_info.dart';
+import '../../../theme/dimensions.dart';
 
 class HeadphonesImage extends StatelessWidget {
   final HeadphonesModelInfo modelInfo;
@@ -23,11 +24,11 @@ class HeadphonesImage extends StatelessWidget {
             ),
             padding: EdgeInsets.all(padding),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 12,
+                  blurRadius: AppDimensions.spacing12,
                   offset: const Offset(0, 4),
                 ),
               ],
@@ -57,17 +58,19 @@ class HeadphonesImage extends StatelessWidget {
   }
 
   Widget _buildPlaceholder(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       key: const ValueKey('placeholder'),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withAlpha((0.3 * 255).round()),
-        borderRadius: BorderRadius.circular(16),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
       ),
       child: Center(
         child: Icon(
           Icons.headphones, // Placeholder icon for image
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-          size: 48,
+          color: theme.colorScheme.onSurfaceVariant,
+          size: AppDimensions.iconXLarge,
         ),
       ),
     );

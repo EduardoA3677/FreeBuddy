@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../headphones/cubit/headphones_connection_cubit.dart';
+import '../../theme/dimensions.dart';
 
 class BluetoothDisabledInfoWidget extends StatelessWidget {
   const BluetoothDisabledInfoWidget({super.key});
@@ -11,79 +12,77 @@ class BluetoothDisabledInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    final t = Theme.of(context);
-    final tt = t.textTheme;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     return Card(
-      elevation: 2,
+      elevation: AppDimensions.elevationSmall,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              t.colorScheme.errorContainer.withValues(alpha: 0.7),
-              t.colorScheme.errorContainer.withValues(alpha: 0.5),
+              theme.colorScheme.errorContainer.withValues(alpha: 0.7),
+              theme.colorScheme.errorContainer.withValues(alpha: 0.5),
             ],
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        padding: EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppDimensions.spacing16),
               decoration: BoxDecoration(
-                color: t.colorScheme.error.withValues(alpha: 0.15),
+                color: theme.colorScheme.error.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Symbols.bluetooth_disabled,
-                size: 56,
+                size: AppDimensions.iconXLarge + 8,
                 weight: 300,
-                color: t.colorScheme.error,
+                color: theme.colorScheme.error,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppDimensions.spacing24),
             Text(
               l.pageHomeBluetoothDisabled,
-              style: tt.titleLarge?.copyWith(
+              style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                fontSize: 22,
+                fontSize: AppDimensions.textXXLarge - 2,
                 letterSpacing: -0.3,
-                color: t.colorScheme.onErrorContainer,
+                color: theme.colorScheme.onErrorContainer,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: AppDimensions.spacing8),
             Text(
               'Activa el Bluetooth para conectar tus auriculares',
-              style: tt.bodyMedium?.copyWith(
-                color: t.colorScheme.onErrorContainer.withValues(alpha: 0.8),
+              style: textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onErrorContainer.withValues(alpha: 0.8),
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
-            // the_last_bluetooth plugin doesn't support this for now
-            // TextButton(
-            //   onPressed: onEnable,
-            //   child: Text(l.pageHomeBluetoothDisabledEnable),
-            // ),
+            SizedBox(height: AppDimensions.spacing24),
             FilledButton.icon(
               onPressed: () => context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
               icon: const Icon(Symbols.settings_bluetooth),
               label: Text(l.pageHomeBluetoothDisabledOpenSettings),
               style: FilledButton.styleFrom(
-                backgroundColor: t.colorScheme.primary,
-                foregroundColor: t.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                 ),
+                elevation: AppDimensions.elevationSmall,
               ),
             ),
           ],
