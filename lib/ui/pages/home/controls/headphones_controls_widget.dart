@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../../../headphones/framework/anc.dart';
+import '../../../../headphones/framework/headphones_info.dart';
+import '../../../../headphones/framework/lrc_battery.dart';
+import '../../../../headphones/model_definition/huawei_models_definition.dart';
+import '../../../../logger.dart';
+import '../../../theme/layouts.dart';
+import '../../../theme/dimensions.dart';
 import '../../../../headphones/framework/bluetooth_headphones.dart';
 import '../../../../headphones/huawei/huawei_headphones_base.dart';
 import '../../../../headphones/huawei/huawei_headphones_impl.dart';
-import '../../../../headphones/framework/lrc_battery.dart';
 import '../../../../logger.dart';
 import 'anc_card.dart';
 import 'battery_card.dart';
