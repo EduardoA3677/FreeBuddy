@@ -45,7 +45,6 @@ ThemeData get dynamicTheme {
 
 /// Aplica personalizaciones al tema
 ThemeData _customize(ThemeData theme, {required bool isDark}) {
-  final tt = theme.textTheme;
   final cs = theme.colorScheme;
 
   return theme.copyWith(

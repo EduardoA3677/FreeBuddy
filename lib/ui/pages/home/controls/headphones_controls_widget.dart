@@ -113,14 +113,16 @@ class HeadphonesControlsWidget extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: SizedBox(
-                    height: isExtraSmallScreen ? 90 : (isSmallScreen ? 120 : (isWideScreen ? 160 : 140)),
+                  child: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxHeight: imageMaxHeight,
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: HeadphonesImage(headphones as HeadphonesModelInfo),
+                    child: SizedBox(
+                      height: isExtraSmallScreen ? 90 : (isSmallScreen ? 120 : (isWideScreen ? 160 : 140)),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: HeadphonesImage(headphones as HeadphonesModelInfo),
+                      ),
                     ),
                   ),
                 ),
