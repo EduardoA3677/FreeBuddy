@@ -72,9 +72,21 @@ android {
         }
     }
 
+
     buildTypes {
         release {
+            if (keystorePropertiesFile.exists()) {
             signingConfig signingConfigs.release
+            } else {
+                println "No key.properties found - Signing with debug keys"
+                signingConfig signingConfigs.debug
+            }
+        }
+        debug {
+            applicationIdSuffix ".debug"
+        }
+        profile {
+            applicationIdSuffix ".profile"
         }
     }
 }
