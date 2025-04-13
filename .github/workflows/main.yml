@@ -21,18 +21,6 @@ jobs:
     runs-on: self-hosted
     container: ghcr.io/cirruslabs/flutter:stable
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set tag
-        id: set_tag
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            TAG="${{ github.event.inputs.tag }}"
-          else
-            TAG=$(date +'%Y%m%d%H%M%S')  # Usar timestamp como tag si no viene de dispatch
-          fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-
       - name: Install Java JDK 17
         run: |
           sudo apt-get update
