@@ -69,7 +69,7 @@ class MbbCommand {
   @override
   int get hashCode => serviceId.hashCode ^ commandId.hashCode ^ args.hashCode;
 
-  Uint8List toPayload() {
+  Uint8List toPayload({String? featureId}) {
     final data = <int>[];
     args.forEach((key, value) {
       data.add(key);
@@ -90,10 +90,12 @@ class MbbCommand {
     ];
 
     try {
-      log(LogLevel.info,
-          'MBB Command SENT: serviceId=$serviceId, commandId=$commandId, args=$args');
+      AppLogger.log(LogLevel.info,
+          'MBB Command SENT: serviceId=$serviceId, commandId=$commandId, args=$args',
+          tag: featureId != null ? 'MBB:$featureId' : 'MBB');
     } catch (e) {
-      log(LogLevel.error, 'Error logging MBB command', error: e);
+      AppLogger.log(LogLevel.error, 'Error logging MBB command', error: e,
+          tag: featureId != null ? 'MBB:$featureId' : 'MBB');
     }
 
     return Uint8List.fromList(bytesList..addAll(MbbUtils.checksum(bytesList)));
@@ -140,12 +142,12 @@ class MbbCommand {
       final cmd = MbbCommand(serviceId, commandId, args);
 
       try {
-        log(LogLevel.info,
-            'MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=$args');
+        AppLogger.log(LogLevel.info,
+            'MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=$args',
+            tag: 'MBB');
       } catch (e) {
-        log(LogLevel.error, 'Error logging MBB received command', error: e);
+        AppLogger.log(LogLevel.error, 'Error logging MBB received command', error: e, tag: 'MBB');
       }
-
       cmds.add(cmd);
     }
     return cmds;

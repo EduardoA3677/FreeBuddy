@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 
+import '../../../logger.dart';
 import '../../framework/anc.dart';
 import '../mbb.dart';
 import 'base/feature_base.dart';
@@ -40,19 +41,17 @@ class AncFeature extends MbbFeature {
   void requestInitialData(StreamChannel<MbbCommand> mbb) {
     // Request current ANC mode
     mbb.sink.add(getAncCommand);
+    AppLogger.log(LogLevel.debug, "Requested ANC mode", tag: "MBB:$featureId");
   }
 
   @override
   bool handleMbbCommand(MbbCommand cmd) {
-    if (!cmd.isAbout(getAncCommand) ||
-        !cmd.args.containsKey(1) ||
-        cmd.args[1]!.length < 2) {
+    if (!cmd.isAbout(getAncCommand) || !cmd.args.containsKey(1) || cmd.args[1]!.length < 2) {
       return false;
     }
 
     final ancModeCode = cmd.args[1]![1];
-    final mode =
-        AncMode.values.firstWhereOrNull((e) => e.mbbCode == ancModeCode);
+    final mode = AncMode.values.firstWhereOrNull((e) => e.mbbCode == ancModeCode);
 
     if (mode != null) {
       _ancModeCtrl.add(mode);
@@ -64,6 +63,7 @@ class AncFeature extends MbbFeature {
 
   /// Set ANC mode
   Future<void> setMode(AncMode mode, StreamChannel<MbbCommand> mbb) async {
+    AppLogger.log(LogLevel.debug, "Setting ANC mode to $mode", tag: "MBB:$featureId");
     mbb.sink.add(setAncCommand(mode));
     // Request updated status after setting
     mbb.sink.add(getAncCommand);

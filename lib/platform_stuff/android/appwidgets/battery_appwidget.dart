@@ -24,7 +24,7 @@ void batteryHomeWidgetHearBloc(BuildContext context,
             .throttleTime(const Duration(seconds: 1),
                 trailing: true, leading: false)
             .listen((event) async {
-      log(LogLevel.debug, "Updating widget from UI listener: $event");
+      AppLogger.log(LogLevel.debug, "Updating widget from UI listener: $event");
       await updateBatteryHomeWidget(event);
     });
   }

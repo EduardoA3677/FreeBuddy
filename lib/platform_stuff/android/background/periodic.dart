@@ -30,7 +30,7 @@ Future<bool> routineUpdateCallback() async {
     // i think this function is still "dependency injection" safe
     // ...but it's not wise to keep remembering what is and what isn't, is it?
     if (await HeadphonesConnectionCubit.cubitAlreadyRunningSomewhere()) {
-      log(
+      AppLogger.log(
           LogLevel.debug,
           "Not updating stuff from ROUTINE_UPDATE "
           "because cubit is already running");
@@ -42,14 +42,14 @@ Future<bool> routineUpdateCallback() async {
         .firstWhere((e) => e is! HeadphonesConnecting)
         .timeout(commonTimeout);
     if (headphones is! HeadphonesConnectedOpen) {
-      log(
+      AppLogger.log(
           LogLevel.debug,
           "Not updating stuff from ROUTINE_UPDATE because: "
           "${headphones.toString()}");
       return true;
     }
     if (headphones.headphones is! LRCBattery) {
-      log(
+      AppLogger.log(
           LogLevel.debug,
           "Not updating stuff from ROUTINE_UPDATE because connected "
           "headphones don't support LRCBattery");
@@ -59,7 +59,7 @@ Future<bool> routineUpdateCallback() async {
         .lrcBattery
         .first
         .timeout(commonTimeout);
-    log(LogLevel.debug, "udpating widget from bgn: $batteryData");
+    AppLogger.log(LogLevel.debug, "udpating widget from bgn: $batteryData");
     await updateBatteryHomeWidget(batteryData);
     await cubit.close(); // remember to close cubit to deregister port name
     return true;
@@ -76,7 +76,7 @@ void callbackDispatcher() {
 
   // this $task is a name, not id?? wtf??
   Workmanager().executeTask((task, inputData) {
-    log(
+    AppLogger.log(
         LogLevel.debug,
         "Running periodic task $task"
         "${inputData != null ? " - input data: $inputData" : ""}");
@@ -86,7 +86,7 @@ void callbackDispatcher() {
         String() => throw Exception("No such task named $task"),
       };
     } catch (e, s) {
-      log(LogLevel.error, "Periodic task $task failed",
+      AppLogger.log(LogLevel.error, "Periodic task $task failed",
           error: e, stackTrace: s);
       return Future.value(false);
     }

@@ -123,7 +123,7 @@ class HoldFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
     }
 
     if (mbbValue == null) {
-      log(
+      AppLogger.log(
           LogLevel.warning,
           "Unknown mbbValue for $toggledModes"
           " - setting as 2 for 'all of them' as a recovery");

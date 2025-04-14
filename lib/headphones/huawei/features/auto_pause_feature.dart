@@ -1,6 +1,7 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 
+import '../../../logger.dart';
 import '../mbb.dart';
 import 'base/feature_base.dart';
 import 'settings.dart';
@@ -8,8 +9,8 @@ import 'settings.dart';
 /// Implementation for auto-pause functionality
 class AutoPauseFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
   static const featureId = 'auto_pause';
-  final _settingsCtrl = BehaviorSubject<HuaweiHeadphonesSettings>.seeded(
-      const HuaweiHeadphonesSettings());
+  final _settingsCtrl =
+      BehaviorSubject<HuaweiHeadphonesSettings>.seeded(const HuaweiHeadphonesSettings());
 
   @override
   ValueStream<HuaweiHeadphonesSettings> get settings => _settingsCtrl.stream;
@@ -36,6 +37,7 @@ class AutoPauseFeature extends MbbSettingsFeature<HuaweiHeadphonesSettings> {
 
   @override
   void requestInitialData(StreamChannel<MbbCommand> mbb) {
+    AppLogger.log(LogLevel.debug, "Requesting auto pause settings", tag: "MBB:$featureId");
     mbb.sink.add(getAutoPauseCommand);
   }
 

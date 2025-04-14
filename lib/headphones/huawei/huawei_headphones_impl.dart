@@ -68,7 +68,7 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
     // Listen to MBB commands
     _mbb.stream.listen(
       _handleMbbCommand,
-      onError: (error, stackTrace) => log(LogLevel.error, "MBB Stream Error",
+      onError: (error, stackTrace) => AppLogger.log(LogLevel.error, "MBB Stream Error",
           error: error, stackTrace: stackTrace),
       onDone: () {
         _watchdogStreamSub.cancel();
@@ -147,7 +147,7 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
         _settingsCtrl.add(updatedSettings);
       }
     } catch (e, s) {
-      log(LogLevel.error, "Error handling MBB command",
+      AppLogger.log(LogLevel.error, "Error handling MBB command",
           error: e, stackTrace: s);
     }
   }

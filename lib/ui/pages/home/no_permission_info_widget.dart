@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -56,8 +58,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
 
     try {
       if (await Permission.bluetoothScan.status != PermissionStatus.granted &&
-          await Permission.location.status !=
-              PermissionStatus.permanentlyDenied) {
+          await Permission.location.status != PermissionStatus.permanentlyDenied) {
         permissions.add(Permission.location);
       }
     } catch (_) {}
@@ -116,8 +117,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
         if (mounted) {
           context.read<HeadphonesConnectionCubit>().requestPermission();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Todos los permisos fueron concedidos')),
+            const SnackBar(content: Text('Todos los permisos fueron concedidos')),
           );
         }
       } else {
@@ -132,8 +132,8 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
 
       await _checkPendingPermissions();
     } catch (e, stackTrace) {
-      log(LogLevel.error, 'Error al solicitar permisos',
-          error: e, stackTrace: stackTrace);
+      log(LogLevel.error as String,
+          name: 'Error al solicitar permisos', error: e, stackTrace: stackTrace);
     } finally {
       if (mounted) {
         setState(() {
@@ -167,8 +167,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
           ),
         ),
         padding: EdgeInsets.symmetric(
-            horizontal: AppDimensions.spacing24,
-            vertical: AppDimensions.spacing32),
+            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -225,8 +224,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
                 style: FilledButton.styleFrom(
                   backgroundColor: t.colorScheme.tertiary,
                   foregroundColor: t.colorScheme.onTertiary,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -243,8 +241,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
               style: ElevatedButton.styleFrom(
                 foregroundColor: t.colorScheme.tertiary,
                 backgroundColor: t.colorScheme.surface.withAlpha(230),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

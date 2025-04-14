@@ -1,6 +1,7 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:stream_channel/stream_channel.dart';
 
+import '../../../logger.dart';
 import '../../framework/lrc_battery.dart';
 import '../mbb.dart';
 import 'base/feature_base.dart';
@@ -9,8 +10,7 @@ import 'base/feature_base.dart';
 class BatteryFeature extends MbbFeature {
   static const featureId = 'battery';
 
-  final BehaviorSubject<LRCBatteryLevels> _batteryCtrl =
-      BehaviorSubject<LRCBatteryLevels>();
+  final BehaviorSubject<LRCBatteryLevels> _batteryCtrl = BehaviorSubject<LRCBatteryLevels>();
 
   /// Command to get battery information
   static final getBatteryCommand = MbbCommand(1, 8);
@@ -36,6 +36,7 @@ class BatteryFeature extends MbbFeature {
   @override
   void requestInitialData(StreamChannel<MbbCommand> mbb) {
     // Request battery info
+    AppLogger.log(LogLevel.debug, "Requesting battery info", tag: "MBB:$featureId");
     mbb.sink.add(getBatteryCommand);
   }
 
@@ -60,6 +61,9 @@ class BatteryFeature extends MbbFeature {
         status[1] == 1,
         status[2] == 1,
       ));
+      AppLogger.log(
+          LogLevel.debug, "Received battery levels: L=${level[0]}, R=${level[1]}, C=${level[2]}",
+          tag: "MBB:$featureId");
       return true;
     }
 

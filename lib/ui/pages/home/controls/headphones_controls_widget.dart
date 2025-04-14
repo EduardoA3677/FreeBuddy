@@ -41,7 +41,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
           return _buildMainContent(
               context, windowSize, theme, l, screenWidth, screenHeight);
         } catch (e, stackTrace) {
-          log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
+          AppLogger.log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
               error: e, stackTrace: stackTrace);
           return _buildErrorContent(
             l.headphonesControlError,
@@ -62,7 +62,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
       AppLocalizations l,
       double screenWidth,
       double screenHeight) {
-    log(LogLevel.debug,
+    AppLogger.log(LogLevel.debug,
         "Building main content for headphones: ${headphones.runtimeType}");
 
     HuaweiModelDefinition? modelDef;
@@ -232,7 +232,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
         ],
       );
     } catch (e, stackTrace) {
-      log(LogLevel.error, "Error building content layout",
+      AppLogger.log(LogLevel.error, "Error building content layout",
           error: e, stackTrace: stackTrace);
       return _buildErrorContent(
         l.headphonesControlNoFeatures,
