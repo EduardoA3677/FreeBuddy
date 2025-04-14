@@ -91,7 +91,8 @@ class MbbCommand {
           LogLevel.info, 'MBB Command SENT: serviceId=$serviceId, commandId=$commandId, args=$args',
           tag: featureId != null ? 'MBB:$featureId' : 'MBB');
     } catch (e) {
-      AppLogger.log(LogLevel.error, 'Error logging MBB command', error: e, tag: featureId != null ? 'MBB:$featureId' : 'MBB');
+      AppLogger.log(LogLevel.error, 'Error logging MBB command',
+          error: e, tag: featureId != null ? 'MBB:$featureId' : 'MBB');
     }
 
     return Uint8List.fromList(bytesList..addAll(MbbUtils.checksum(bytesList)));
@@ -101,6 +102,7 @@ class MbbCommand {
     Uint8List payload, {
     bool verify = true,
     bool smartDivide = true,
+    String? featureId, // Añadido parámetro featureId para mostrar en los logs
   }) {
     final divided = <Uint8List>[];
     if (smartDivide) {
@@ -119,6 +121,9 @@ class MbbCommand {
       }
     }
     final cmds = <MbbCommand>[];
+    // Definir el tag con el featureId si existe
+    final tag = featureId != null ? 'MBB:$featureId' : 'MBB';
+
     for (final divPay in divided) {
       if (verify) MbbUtils.verifyIntegrity(divPay);
       final serviceId = divPay[4];
@@ -139,9 +144,9 @@ class MbbCommand {
       try {
         AppLogger.log(LogLevel.info,
             'MBB Command RECEIVED: serviceId=$serviceId, commandId=$commandId, args=$args',
-            tag: 'MBB');
+            tag: tag);
       } catch (e) {
-        AppLogger.log(LogLevel.error, 'Error logging MBB received command', error: e, tag: 'MBB');
+        AppLogger.log(LogLevel.error, 'Error logging MBB received command', error: e, tag: tag);
       }
       cmds.add(cmd);
     }
@@ -149,11 +154,15 @@ class MbbCommand {
   }
 }
 
-StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) => rfcomm.transform(
+StreamChannel<MbbCommand> mbbChannel(
+  StreamChannel<Uint8List> rfcomm, {
+  String? featureId,
+}) =>
+    rfcomm.transform(
       StreamChannelTransformer(
         StreamTransformer.fromHandlers(
           handleData: (data, stream) {
-            for (final cmd in MbbCommand.fromPayload(data)) {
+            for (final cmd in MbbCommand.fromPayload(data, featureId: featureId)) {
               // FILTER THE SHIT OUT
               if (cmd.serviceId == 10 && cmd.commandId == 13) continue;
               stream.add(cmd);
@@ -161,7 +170,7 @@ StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) => rfcomm.
           },
         ),
         StreamSinkTransformer.fromHandlers(
-          handleData: (data, sink) => rfcomm.sink.add(data.toPayload()),
+          handleData: (data, sink) => rfcomm.sink.add(data.toPayload(featureId: featureId)),
         ),
       ),
     );
