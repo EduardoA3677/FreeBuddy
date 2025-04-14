@@ -22,7 +22,8 @@ class MbbUtils {
 
   static bool verifyChecksum(Uint8List payload) {
     final sum = checksum(payload.sublist(0, payload.length - 2));
-    return sum[0] == payload[payload.length - 2] && sum[1] == payload[payload.length - 1];
+    return sum[0] == payload[payload.length - 2] &&
+        sum[1] == payload[payload.length - 1];
   }
 
   static void verifyIntegrity(Uint8List payload) {
@@ -49,10 +50,12 @@ class MbbCommand {
 
   const MbbCommand(this.serviceId, this.commandId, [this.args = const {}]);
 
-  bool isAbout(MbbCommand other) => serviceId == other.serviceId && commandId == other.commandId;
+  bool isAbout(MbbCommand other) =>
+      serviceId == other.serviceId && commandId == other.commandId;
 
   @override
-  String toString() => 'MbbCommand(serviceId: $serviceId, commandId: $commandId, dataArgs: $args)';
+  String toString() =>
+      'MbbCommand(serviceId: $serviceId, commandId: $commandId, dataArgs: $args)';
 
   @override
   bool operator ==(Object other) =>
@@ -104,7 +107,8 @@ class MbbCommand {
     final divided = <Uint8List>[];
     if (smartDivide) {
       while (payload.length >= 8) {
-        divided.add(payload.sublist(0, MbbUtils.getLengthFromLengthByte(payload[2])));
+        divided.add(
+            payload.sublist(0, MbbUtils.getLengthFromLengthByte(payload[2])));
         payload = payload.sublist(MbbUtils.getLengthFromLengthByte(payload[2]));
       }
     } else {
@@ -148,7 +152,8 @@ class MbbCommand {
   }
 }
 
-StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) => rfcomm.transform(
+StreamChannel<MbbCommand> mbbChannel(StreamChannel<Uint8List> rfcomm) =>
+    rfcomm.transform(
       StreamChannelTransformer(
         StreamTransformer.fromHandlers(
           handleData: (data, stream) {

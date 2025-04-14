@@ -1,11 +1,11 @@
 import 'package:rxdart/rxdart.dart';
 
+import '../model_definition/huawei_models_definition.dart';
 import '../simulators/anc_sim.dart';
 import '../simulators/bluetooth_headphones_sim.dart';
 import '../simulators/lrc_battery_sim.dart';
 import 'features/settings.dart';
 import 'huawei_headphones_base.dart';
-import '../model_definition/huawei_models_definition.dart';
 
 /// Simulator for Huawei headphones
 class HuaweiHeadphonesSim extends HuaweiHeadphonesBase

@@ -33,7 +33,8 @@ class BluetoothDisabledInfoWidget extends StatelessWidget {
           ),
         ),
         padding: EdgeInsets.symmetric(
-            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing32),
+            horizontal: AppDimensions.spacing24,
+            vertical: AppDimensions.spacing32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -65,22 +66,27 @@ class BluetoothDisabledInfoWidget extends StatelessWidget {
             Text(
               'Activa el Bluetooth para conectar tus auriculares',
               style: textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onErrorContainer.withValues(alpha: 0.8),
+                color:
+                    theme.colorScheme.onErrorContainer.withValues(alpha: 0.8),
               ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: AppDimensions.spacing24),
             FilledButton.icon(
-              onPressed: () => context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
+              onPressed: () => context
+                  .read<HeadphonesConnectionCubit>()
+                  .openBluetoothSettings(),
               icon: const Icon(Symbols.settings_bluetooth),
               label: Text(l.pageHomeBluetoothDisabledOpenSettings),
               style: FilledButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
                 padding: EdgeInsets.symmetric(
-                    horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing16),
+                    horizontal: AppDimensions.spacing24,
+                    vertical: AppDimensions.spacing16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusMedium),
                 ),
                 elevation: AppDimensions.elevationSmall,
               ),

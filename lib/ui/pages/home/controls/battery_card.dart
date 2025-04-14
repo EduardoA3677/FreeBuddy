@@ -29,7 +29,9 @@ class BatteryCard extends StatelessWidget {
 
         return Card(
           margin: EdgeInsets.zero,
-          elevation: hasData ? AppDimensions.elevationSmall + 1 : AppDimensions.elevationSmall,
+          elevation: hasData
+              ? AppDimensions.elevationSmall + 1
+              : AppDimensions.elevationSmall,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
           ),
@@ -74,7 +76,8 @@ class BatteryCard extends StatelessWidget {
                 Divider(
                   height: 12,
                   thickness: 1,
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                  color:
+                      theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
                 ),
 
                 if (!hasData)
@@ -89,7 +92,8 @@ class BatteryCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           // Seleccionamos el diseño según el espacio disponible
                           child: isCompactHeight
-                              ? _buildCompactBatteryRow(context, levels, isSmallDevice, theme)
+                              ? _buildCompactBatteryRow(
+                                  context, levels, isSmallDevice, theme)
                               : _buildSimpleBatteryRow(context, levels, theme),
                         );
                       },
@@ -246,7 +250,8 @@ class BatteryCard extends StatelessWidget {
           ),
           const SizedBox(height: 2), // Reducido
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), // Reducido
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            // Reducido
             decoration: BoxDecoration(
               color: getBatteryColor().withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8), // Reducido
@@ -283,7 +288,9 @@ class BatteryCard extends StatelessWidget {
               ),
             ),
         ],
-      ).animate().fadeIn(duration: 250.ms, delay: delay.ms), // Animación más rápida
+      )
+          .animate()
+          .fadeIn(duration: 250.ms, delay: delay.ms), // Animación más rápida
     );
   }
 
@@ -294,8 +301,10 @@ class BatteryCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: isSmall ? AppDimensions.spacing24 : AppDimensions.spacing30, // Reducido
-            height: isSmall ? AppDimensions.spacing24 : AppDimensions.spacing30, // Reducido
+            width: isSmall ? AppDimensions.spacing24 : AppDimensions.spacing30,
+            // Reducido
+            height: isSmall ? AppDimensions.spacing24 : AppDimensions.spacing30,
+            // Reducido
             child: CircularProgressIndicator(
               strokeWidth: 2, // Reducido
               color: theme.colorScheme.primary.withValues(alpha: 0.7),

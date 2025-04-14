@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../../headphones/cubit/headphones_connection_cubit.dart';
 import '../../theme/dimensions.dart';
@@ -34,7 +34,8 @@ class NotPairedInfoWidget extends StatelessWidget {
           ),
         ),
         padding: EdgeInsets.symmetric(
-            horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing32),
+            horizontal: AppDimensions.spacing24,
+            vertical: AppDimensions.spacing32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -66,22 +67,27 @@ class NotPairedInfoWidget extends StatelessWidget {
             Text(
               'Empareja tus auriculares para usarlos con FreeBuddy',
               style: textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSecondaryContainer.withValues(alpha: 0.8),
+                color: theme.colorScheme.onSecondaryContainer
+                    .withValues(alpha: 0.8),
               ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: AppDimensions.spacing24),
             FilledButton.icon(
-              onPressed: () => context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
+              onPressed: () => context
+                  .read<HeadphonesConnectionCubit>()
+                  .openBluetoothSettings(),
               icon: const Icon(Symbols.settings_bluetooth),
               label: Text(l.pageHomeNotPairedPairOpenSettings),
               style: FilledButton.styleFrom(
                 backgroundColor: theme.colorScheme.secondary,
                 foregroundColor: theme.colorScheme.onSecondary,
                 padding: EdgeInsets.symmetric(
-                    horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing16),
+                    horizontal: AppDimensions.spacing24,
+                    vertical: AppDimensions.spacing16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusMedium),
                 ),
               ),
             ),
@@ -95,11 +101,15 @@ class NotPairedInfoWidget extends StatelessWidget {
               label: Text(l.pageHomeNotPairedPairOpenDemo),
               style: OutlinedButton.styleFrom(
                 foregroundColor: theme.colorScheme.secondary,
-                side: BorderSide(color: theme.colorScheme.secondary.withValues(alpha: 0.5), width: 1.5),
+                side: BorderSide(
+                    color: theme.colorScheme.secondary.withValues(alpha: 0.5),
+                    width: 1.5),
                 padding: EdgeInsets.symmetric(
-                    horizontal: AppDimensions.spacing20, vertical: AppDimensions.spacing12),
+                    horizontal: AppDimensions.spacing20,
+                    vertical: AppDimensions.spacing12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusMedium),
                 ),
               ),
             ),

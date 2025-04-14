@@ -48,16 +48,20 @@ class AncCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(AppDimensions.spacing8),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                    color: theme.colorScheme.secondaryContainer
+                        .withValues(alpha: 0.7),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusSmall),
                   ),
                   child: Icon(
                     Symbols.noise_aware,
                     color: theme.colorScheme.secondary,
-                    size:
-                        isSmallDevice ? AppDimensions.iconSmall + 6 : AppDimensions.iconMedium + 4,
+                    size: isSmallDevice
+                        ? AppDimensions.iconSmall + 6
+                        : AppDimensions.iconMedium + 4,
                   ),
-                ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack, delay: 100.ms),
+                ).animate().scale(
+                    duration: 400.ms, curve: Curves.easeOutBack, delay: 100.ms),
                 SizedBox(width: AppDimensions.spacing12),
                 Expanded(
                   child: Column(
@@ -68,8 +72,9 @@ class AncCard extends StatelessWidget {
                         style: theme.textTheme.titleLarge?.copyWith(
                           color: theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
-                          fontSize:
-                              isSmallDevice ? AppDimensions.textMedium : AppDimensions.textLarge,
+                          fontSize: isSmallDevice
+                              ? AppDimensions.textMedium
+                              : AppDimensions.textLarge,
                         ),
                       ),
                       SizedBox(height: AppDimensions.spacing2),
@@ -77,8 +82,9 @@ class AncCard extends StatelessWidget {
                         'Adjust noise cancellation settings',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
-                          fontSize:
-                              isSmallDevice ? AppDimensions.textXSmall : AppDimensions.textSmall,
+                          fontSize: isSmallDevice
+                              ? AppDimensions.textXSmall
+                              : AppDimensions.textSmall,
                         ),
                       ),
                     ],
@@ -114,7 +120,8 @@ class AncCard extends StatelessWidget {
                 // Responsive layout based on screen width
                 return LayoutBuilder(
                   builder: (context, constraints) {
-                    final useVerticalLayout = isSmallDevice || screenWidth < 400;
+                    final useVerticalLayout =
+                        isSmallDevice || screenWidth < 400;
 
                     // Crear los botones de ANC con tamaños iguales
                     final ancButtons = [
@@ -125,7 +132,8 @@ class AncCard extends StatelessWidget {
                           label: l.ancNoiseCancel,
                           description: l.ancNoiseCancelDesc,
                           isSelected: mode == AncMode.noiseCancelling,
-                          onPressed: () => anc.setAncMode(AncMode.noiseCancelling),
+                          onPressed: () =>
+                              anc.setAncMode(AncMode.noiseCancelling),
                         ),
                       ),
                       SizedBox(
@@ -162,7 +170,8 @@ class AncCard extends StatelessWidget {
                                   child: entry.value
                                       .animate()
                                       .fadeIn(
-                                          duration: 400.ms, delay: 150.ms * entry.key.toDouble())
+                                          duration: 400.ms,
+                                          delay: 150.ms * entry.key.toDouble())
                                       .slideX(
                                           begin: 0.05,
                                           end: 0,
@@ -184,12 +193,15 @@ class AncCard extends StatelessWidget {
                                     child: entry.value
                                         .animate()
                                         .fadeIn(
-                                            duration: 400.ms, delay: 150.ms * entry.key.toDouble())
+                                            duration: 400.ms,
+                                            delay:
+                                                150.ms * entry.key.toDouble())
                                         .slideY(
                                             begin: 0.05,
                                             end: 0,
                                             duration: 400.ms,
-                                            delay: 150.ms * entry.key.toDouble()),
+                                            delay:
+                                                150.ms * entry.key.toDouble()),
                                   ),
                                 ))
                             .toList(),
@@ -225,7 +237,9 @@ class AncCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
-              fontSize: isSmall ? AppDimensions.textSmall : AppDimensions.textMedium - 2,
+              fontSize: isSmall
+                  ? AppDimensions.textSmall
+                  : AppDimensions.textMedium - 2,
             ),
           ),
         ],
@@ -234,7 +248,8 @@ class AncCard extends StatelessWidget {
   }
 
   // Error state widget
-  Widget _buildErrorState(ThemeData theme, AppLocalizations l, BuildContext context) {
+  Widget _buildErrorState(
+      ThemeData theme, AppLocalizations l, BuildContext context) {
     return Container(
       padding: EdgeInsets.all(AppDimensions.spacing16),
       decoration: BoxDecoration(
@@ -265,7 +280,8 @@ class AncCard extends StatelessWidget {
               foregroundColor: theme.colorScheme.error,
               side: BorderSide(color: theme.colorScheme.error),
               padding: EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing8),
+                  horizontal: AppDimensions.spacing16,
+                  vertical: AppDimensions.spacing8),
             ),
             label: Text(l.headphonesControlRetry),
           ),
@@ -301,8 +317,9 @@ class AncModeOption extends StatelessWidget {
         ? theme.colorScheme.primaryContainer
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8);
 
-    final foregroundColor =
-        isSelected ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurface;
+    final foregroundColor = isSelected
+        ? theme.colorScheme.onPrimaryContainer
+        : theme.colorScheme.onSurface;
 
     // Elevation effect for selected item
     final elevation = isSelected ? AppDimensions.elevationSmall : 0.0;
@@ -342,17 +359,19 @@ class AncModeOption extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? theme.colorScheme.primary.withValues(alpha: 0.2)
-                        : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
+                        : theme.colorScheme.surfaceContainerHighest
+                            .withValues(alpha: 0.7),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     icon,
-                    color: isSelected ? theme.colorScheme.primary : foregroundColor,
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : foregroundColor,
                     size: 22,
                   ),
-                )
-                    .animate(target: isSelected ? 1 : 0)
-                    .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.1, 1.1)),
+                ).animate(target: isSelected ? 1 : 0).scale(
+                    begin: const Offset(1.0, 1.0), end: const Offset(1.1, 1.1)),
 
                 const SizedBox(height: 8),
 
@@ -364,7 +383,8 @@ class AncModeOption extends StatelessWidget {
                       label,
                       style: TextStyle(
                         color: foregroundColor,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.w500,
                         fontSize: 14,
                       ),
                       textAlign: TextAlign.center,
@@ -374,7 +394,8 @@ class AncModeOption extends StatelessWidget {
 
                 // Contenedor de altura fija para la descripción
                 SizedBox(
-                  height: 30, // Altura fija para todos los textos de descripción
+                  height: 30,
+                  // Altura fija para todos los textos de descripción
                   child: Center(
                     child: Text(
                       description,

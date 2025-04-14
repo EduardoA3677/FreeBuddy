@@ -39,7 +39,8 @@ class ConnectedClosedWidget extends StatelessWidget {
           onPressed: () => context.read<HeadphonesConnectionCubit>().connect(),
           style: FilledButton.styleFrom(
             padding: EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacing28, vertical: AppDimensions.spacing16),
+                horizontal: AppDimensions.spacing28,
+                vertical: AppDimensions.spacing16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
             ),

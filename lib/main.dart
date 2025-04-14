@@ -33,16 +33,19 @@ void main() async {
 
     runApp(
       Provider<AppSettings>(
-        create: (context) => SharedPreferencesAppSettings(Future.value(_preferences)),
+        create: (context) =>
+            SharedPreferencesAppSettings(Future.value(_preferences)),
         child: const MyAppWrapper(),
       ),
     );
   } catch (e, stackTrace) {
-    log(LogLevel.critical, "Error al iniciar la aplicación", error: e, stackTrace: stackTrace);
+    log(LogLevel.critical, "Error al iniciar la aplicación",
+        error: e, stackTrace: stackTrace);
     runApp(const MaterialApp(
       home: Scaffold(
         body: Center(
-          child: Text("Error al iniciar FreeBuddy. Por favor reinicia la aplicación."),
+          child: Text(
+              "Error al iniciar FreeBuddy. Por favor reinicia la aplicación."),
         ),
       ),
     ));
@@ -56,7 +59,8 @@ class MyAppWrapper extends StatefulWidget {
   State<MyAppWrapper> createState() => _MyAppWrapperState();
 }
 
-class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver {
+class _MyAppWrapperState extends State<MyAppWrapper>
+    with WidgetsBindingObserver {
   final _btBlock = di.getHeadphonesCubit();
   bool _isPrefsInitialized = false;
 
@@ -117,10 +121,12 @@ class _MyAppWrapperState extends State<MyAppWrapper> with WidgetsBindingObserver
     }
 
     return Provider<AppSettings>(
-      create: (context) => SharedPreferencesAppSettings(Future.value(_preferences)),
+      create: (context) =>
+          SharedPreferencesAppSettings(Future.value(_preferences)),
       child: MultiBlocProvider(
         providers: [BlocProvider.value(value: _btBlock)],
-        child: BlocListener<HeadphonesConnectionCubit, HeadphonesConnectionState>(
+        child:
+            BlocListener<HeadphonesConnectionCubit, HeadphonesConnectionState>(
           listener: batteryHomeWidgetHearBloc,
           listenWhen: (p, c) => !kIsWeb && Platform.isAndroid,
           child: const MyApp(),
@@ -158,7 +164,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             routerConfig: router,
-            onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+            onGenerateTitle: (context) =>
+                AppLocalizations.of(context)!.appTitle,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: lightTheme(dynamicScheme: lightDynamic),
@@ -171,7 +178,11 @@ class MyApp extends StatelessWidget {
               return child
                   .animate()
                   .fadeIn(duration: 300.ms, curve: Curves.easeOutCubic)
-                  .slideY(begin: 0.05, end: 0, duration: 300.ms, curve: Curves.easeOutCubic);
+                  .slideY(
+                      begin: 0.05,
+                      end: 0,
+                      duration: 300.ms,
+                      curve: Curves.easeOutCubic);
             },
           );
         },

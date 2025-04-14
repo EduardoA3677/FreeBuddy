@@ -11,17 +11,19 @@ import '../../../logger.dart';
 // no better idea for this yet - that's fine
 StreamSubscription<LRCBatteryLevels>? _headphonesBatteryStreamSub;
 
-void batteryHomeWidgetHearBloc(
-    BuildContext context, HeadphonesConnectionState headphonesConnectionState) async {
+void batteryHomeWidgetHearBloc(BuildContext context,
+    HeadphonesConnectionState headphonesConnectionState) async {
   if (headphonesConnectionState is! HeadphonesConnectedOpen) {
     await _headphonesBatteryStreamSub?.cancel();
     _headphonesBatteryStreamSub = null;
   } else if (headphonesConnectionState.headphones is LRCBattery) {
-    _headphonesBatteryStreamSub = (headphonesConnectionState.headphones as LRCBattery)
-        .lrcBattery
-        .distinct()
-        .throttleTime(const Duration(seconds: 1), trailing: true, leading: false)
-        .listen((event) async {
+    _headphonesBatteryStreamSub =
+        (headphonesConnectionState.headphones as LRCBattery)
+            .lrcBattery
+            .distinct()
+            .throttleTime(const Duration(seconds: 1),
+                trailing: true, leading: false)
+            .listen((event) async {
       log(LogLevel.debug, "Updating widget from UI listener: $event");
       await updateBatteryHomeWidget(event);
     });

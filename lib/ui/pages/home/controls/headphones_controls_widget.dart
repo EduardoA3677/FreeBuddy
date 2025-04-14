@@ -11,8 +11,8 @@ import '../../../../headphones/huawei/huawei_headphones_base.dart';
 import '../../../../headphones/huawei/huawei_headphones_impl.dart';
 import '../../../../headphones/model_definition/huawei_models_definition.dart';
 import '../../../../logger.dart';
-import '../../../theme/layouts.dart';
 import '../../../theme/dimensions.dart';
+import '../../../theme/layouts.dart';
 import 'anc_card.dart';
 import 'battery_card.dart';
 import 'headphones_image.dart';
@@ -38,7 +38,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
     return Builder(
       builder: (context) {
         try {
-          return _buildMainContent(context, windowSize, theme, l, screenWidth, screenHeight);
+          return _buildMainContent(
+              context, windowSize, theme, l, screenWidth, screenHeight);
         } catch (e, stackTrace) {
           log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
               error: e, stackTrace: stackTrace);
@@ -54,9 +55,15 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, WindowSizeClass windowSize, ThemeData theme, AppLocalizations l,
-      double screenWidth, double screenHeight) {
-    log(LogLevel.debug, "Building main content for headphones: ${headphones.runtimeType}");
+  Widget _buildMainContent(
+      BuildContext context,
+      WindowSizeClass windowSize,
+      ThemeData theme,
+      AppLocalizations l,
+      double screenWidth,
+      double screenHeight) {
+    log(LogLevel.debug,
+        "Building main content for headphones: ${headphones.runtimeType}");
 
     HuaweiModelDefinition? modelDef;
     String deviceName = "";
@@ -73,11 +80,13 @@ class HeadphonesControlsWidget extends StatelessWidget {
     final isWideScreen = screenWidth >= 600;
 
     // Calcular altura para imagen con proporción menor para evitar scroll
-    final imageHeightRatio = isSmallScreen ? 0.14 : (isWideScreen ? 0.18 : 0.15);
+    final imageHeightRatio =
+        isSmallScreen ? 0.14 : (isWideScreen ? 0.18 : 0.15);
     final imageMaxHeight = screenHeight * imageHeightRatio;
 
     final cardBackgroundColor = theme.colorScheme.surfaceContainerHighest;
-    final deviceNameBackgroundColor = theme.colorScheme.primaryContainer.withValues(alpha: 0.9);
+    final deviceNameBackgroundColor =
+        theme.colorScheme.primaryContainer.withValues(alpha: 0.9);
 
     try {
       return Column(
@@ -135,7 +144,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(16),
-                            child: HeadphonesImage(headphones as HeadphonesModelInfo),
+                            child: HeadphonesImage(
+                                headphones as HeadphonesModelInfo),
                           ),
                         ),
 
@@ -152,7 +162,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      theme.colorScheme.secondary.withValues(alpha: 0.9),
+                                      theme.colorScheme.secondary
+                                          .withValues(alpha: 0.9),
                                       theme.colorScheme.secondary,
                                     ],
                                     begin: Alignment.topLeft,
@@ -161,7 +172,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: theme.colorScheme.shadow.withValues(alpha: 0.2),
+                                      color: theme.colorScheme.shadow
+                                          .withValues(alpha: 0.2),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -209,7 +221,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
                       padding: const EdgeInsets.all(12),
                       child: isWideScreen
                           ? _buildWideLayout(theme, l, screenWidth)
-                          : _buildCompactLayout(context, theme, l, screenWidth, isSmallScreen),
+                          : _buildCompactLayout(
+                              context, theme, l, screenWidth, isSmallScreen),
                     ),
                   ),
                 ],
@@ -219,7 +232,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
         ],
       );
     } catch (e, stackTrace) {
-      log(LogLevel.error, "Error building content layout", error: e, stackTrace: stackTrace);
+      log(LogLevel.error, "Error building content layout",
+          error: e, stackTrace: stackTrace);
       return _buildErrorContent(
         l.headphonesControlNoFeatures,
         l.headphonesControlNoFeaturesDesc,
@@ -229,7 +243,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
     }
   }
 
-  Widget _buildWideLayout(ThemeData theme, AppLocalizations l, double screenWidth) {
+  Widget _buildWideLayout(
+      ThemeData theme, AppLocalizations l, double screenWidth) {
     final hasAncFeature = headphones is Anc;
     final hasBatteryFeature = headphones is LRCBattery;
 
@@ -289,7 +304,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
             height: 180, // Altura fija para el contenedor de batería
             child: Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: BatteryCard(headphones as LRCBattery),
@@ -304,7 +320,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: AncCard(headphones as Anc),
@@ -314,8 +331,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactLayout(
-      BuildContext context, ThemeData theme, AppLocalizations l, double screenWidth, bool isSmallScreen) {
+  Widget _buildCompactLayout(BuildContext context, ThemeData theme,
+      AppLocalizations l, double screenWidth, bool isSmallScreen) {
     final hasAncFeature = headphones is Anc;
     final hasBatteryFeature = headphones is LRCBattery;
 
@@ -371,21 +388,22 @@ class HeadphonesControlsWidget extends StatelessWidget {
             height: isSmallScreen ? 130 : 150, // Altura fija más pequeña
             child: Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: BatteryCard(headphones as LRCBattery),
             ),
           ),
         ],
-
-        if (hasAncFeature && hasBatteryFeature) SizedBox(height: verticalSpacing),
-
+        if (hasAncFeature && hasBatteryFeature)
+          SizedBox(height: verticalSpacing),
         if (hasAncFeature)
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: AncCard(headphones as Anc),
@@ -395,7 +413,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorContent(String title, String description, AppLocalizations l,
+  Widget _buildErrorContent(
+      String title, String description, AppLocalizations l,
       {required ThemeData theme, Function()? onRetry}) {
     return Center(
       child: Padding(
@@ -419,8 +438,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
             SizedBox(height: AppDimensions.spacing8),
             Text(
               description,
-              style:
-                  theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: AppDimensions.spacing12),
@@ -431,7 +450,8 @@ class HeadphonesControlsWidget extends StatelessWidget {
                 label: Text(l.headphonesControlRetry),
                 style: FilledButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusMedium),
                   ),
                 ),
               ),

@@ -50,7 +50,9 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
   static Future<bool> _checkUntilNoPort(Duration timeout) async {
     // do this one time already bc stream will start only after first period
     noPort() =>
-        IsolateNameServer.lookupPortByName(HeadphonesConnectionCubit.pingReceivePortName) == null;
+        IsolateNameServer.lookupPortByName(
+            HeadphonesConnectionCubit.pingReceivePortName) ==
+        null;
     if (noPort()) return true;
     return await Stream.periodic(
       Duration(milliseconds: 50),
@@ -65,7 +67,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
   /// to de-register the port
   static Future<bool> cubitAlreadyRunningSomewhere(
       {Duration responseTimeout = const Duration(seconds: 1)}) async {
-    final ping = IsolateNameServer.lookupPortByName(HeadphonesConnectionCubit.pingReceivePortName);
+    final ping = IsolateNameServer.lookupPortByName(
+        HeadphonesConnectionCubit.pingReceivePortName);
     if (ping == null) return false;
     final pong = ReceivePort(); // this is not right naming, i know
     ping.send(pong.sendPort);
@@ -77,7 +80,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
   //(that is, port is still present - it **may** happen that it just forgot
   // to close it, but we have no way to know)
   static Future<bool> killOtherCubit() async {
-    final ping = IsolateNameServer.lookupPortByName(HeadphonesConnectionCubit.pingReceivePortName);
+    final ping = IsolateNameServer.lookupPortByName(
+        HeadphonesConnectionCubit.pingReceivePortName);
     if (ping == null) {
       log(LogLevel.error,
           "No cubit to kill :( (this probably means you're using an outdated version of the app)");
@@ -98,8 +102,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
 
   Future<void> connect() async {
     if (_connection != null) return;
-    final connected =
-        _watchedKnownDevices.keys.firstWhereOrNull((dev) => dev.isConnected.valueOrNull ?? false);
+    final connected = _watchedKnownDevices.keys
+        .firstWhereOrNull((dev) => dev.isConnected.valueOrNull ?? false);
     if (connected != null) {
       _connect(connected, matchModel(connected)!);
     }
@@ -116,7 +120,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
           _connection = _bluetooth.connectRfcomm(dev, sppUuid);
           break;
         } catch (_) {
-          log(LogLevel.warning, 'Error when connecting socket: ${i + 1}/$connectTries tries');
+          log(LogLevel.warning,
+              'Error when connecting socket: ${i + 1}/$connectTries tries');
           if (!(dev.isConnected.valueOrNull ?? false)) {
             // this may happen because connecting may take some time
             // ...which is, well, not indicated by connectRfcomm being async...
@@ -124,7 +129,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
             // ...
             // how am i even supposed to? do this on another isolate??
             // well, maybe... 🙄 ehhh
-            log(LogLevel.warning, "...i's because device is not connected, dummy 😌");
+            log(LogLevel.warning,
+                "...i's because device is not connected, dummy 😌");
             rethrow;
           }
           if (i + 1 >= connectTries) rethrow;
@@ -141,7 +147,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       // hopefully this happens *before* next stream event with data 🤷
       // so that it nicely goes again and we emit HeadphonesDisconnected()
     } catch (e, s) {
-      log(LogLevel.error, "Error while connecting to socket", error: e, stackTrace: s);
+      log(LogLevel.error, "Error while connecting to socket",
+          error: e, stackTrace: s);
     }
     await _connection?.sink.close();
     _connection = null;
@@ -161,8 +168,9 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
       return;
     }
 
-    final knownHeadphones =
-        devices.map((dev) => (device: dev, match: matchModel(dev))).where((m) => m.match != null);
+    final knownHeadphones = devices
+        .map((dev) => (device: dev, match: matchModel(dev)))
+        .where((m) => m.match != null);
 
     if (knownHeadphones.isEmpty) {
       emit(const HeadphonesNotPaired());
@@ -172,7 +180,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
     // "Add all devices that are in knownHp but not in _watched
     for (final hp in knownHeadphones) {
       if (!_watchedKnownDevices.containsKey(hp.device)) {
-        _watchedKnownDevices[hp.device] = hp.device.isConnected.listen((connected) {
+        _watchedKnownDevices[hp.device] =
+            hp.device.isConnected.listen((connected) {
           if (connected) {
             if (_connection != null) return; // already connected, skip
             _connect(hp.device, hp.match!);
@@ -198,7 +207,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
         super(const HeadphonesNotPaired()) {
     final rolex = Stopwatch()..start();
     _initInit().then(
-      (_) => log(LogLevel.debug, "_initInit() took ${rolex.elapsedMilliseconds}ms"),
+      (_) => log(
+          LogLevel.debug, "_initInit() took ${rolex.elapsedMilliseconds}ms"),
     );
   }
 
@@ -224,7 +234,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
         //
         // But, leaving those notes here, in case, some day, they don't.
         if (!await killOtherCubit()) {
-          log(LogLevel.fatal, "Failed to kill other cubit 😵... well, anyway...");
+          log(LogLevel.fatal,
+              "Failed to kill other cubit 😵... well, anyway...");
         }
       }
     }
@@ -232,7 +243,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
     // And *NOW* we can talk...
     // a deep un-fixable-for-now fault of jni :///
     IsolateNameServer.removePortNameMapping(pingReceivePortName);
-    IsolateNameServer.registerPortWithName(_pingReceivePort.sendPort, pingReceivePortName);
+    IsolateNameServer.registerPortWithName(
+        _pingReceivePort.sendPort, pingReceivePortName);
     _pingReceivePortSS = _pingReceivePort.listen((message) {
       // ping back
       if (message is SendPort) message.send(true);
@@ -283,8 +295,8 @@ class HeadphonesConnectionCubit extends Cubit<HeadphonesConnectionState> {
 
   Future<bool> enableBluetooth() async => false;
 
-  Future<void> openBluetoothSettings() =>
-      AppSettings.openAppSettings(type: AppSettingsType.bluetooth, asAnotherTask: true);
+  Future<void> openBluetoothSettings() => AppSettings.openAppSettings(
+      type: AppSettingsType.bluetooth, asAnotherTask: true);
 
   Future<void> requestPermission() async {
     await Permission.bluetoothConnect.request();

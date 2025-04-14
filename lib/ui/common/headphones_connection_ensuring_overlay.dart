@@ -25,7 +25,8 @@ import '../theme/dimensions.dart';
 /// Debe usarse en todas las pantallas que requieran auriculares conectados.
 class HeadphonesConnectionEnsuringOverlay extends StatelessWidget {
   /// Función para construir el widget principal cuando los auriculares están conectados
-  final Widget Function(BuildContext context, BluetoothHeadphones headphones) builder;
+  final Widget Function(BuildContext context, BluetoothHeadphones headphones)
+      builder;
 
   const HeadphonesConnectionEnsuringOverlay({super.key, required this.builder});
 
@@ -42,7 +43,8 @@ class HeadphonesConnectionEnsuringOverlay extends StatelessWidget {
       builder: (context, state) => switch (state) {
         HeadphonesNoPermission() => _padded(const NoPermissionInfoWidget()),
         HeadphonesNotPaired() => _padded(const NotPairedInfoWidget()),
-        HeadphonesBluetoothDisabled() => _padded(const BluetoothDisabledInfoWidget()),
+        HeadphonesBluetoothDisabled() =>
+          _padded(const BluetoothDisabledInfoWidget()),
         // Sabemos que tenemos los auriculares, pero no necesariamente conectados
         HeadphonesDisconnected() ||
         HeadphonesConnecting() ||
@@ -57,7 +59,8 @@ class HeadphonesConnectionEnsuringOverlay extends StatelessWidget {
                   children: [
                     Text(l.pageHomeConnecting,
                         style: textTheme.displaySmall?.copyWith(
-                            color: theme.colorScheme.onSurface, fontWeight: FontWeight.w500)),
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w500)),
                     SizedBox(height: AppDimensions.spacing16),
                     CircularProgressIndicator(
                       color: theme.colorScheme.primary,
@@ -70,7 +73,8 @@ class HeadphonesConnectionEnsuringOverlay extends StatelessWidget {
               // el overlay incluso cuando está conectado
               HeadphonesConnectedOpen() => const SizedBox(),
               _ => Text(l.pageHomeUnknown,
-                  style: textTheme.titleLarge?.copyWith(color: theme.colorScheme.error)),
+                  style: textTheme.titleLarge
+                      ?.copyWith(color: theme.colorScheme.error)),
             },
             child: builder(
               context,
@@ -85,7 +89,8 @@ class HeadphonesConnectionEnsuringOverlay extends StatelessWidget {
             ),
           ),
         _ => Text(l.pageHomeUnknown,
-            style: textTheme.titleLarge?.copyWith(color: theme.colorScheme.error)),
+            style:
+                textTheme.titleLarge?.copyWith(color: theme.colorScheme.error)),
       },
     );
   }

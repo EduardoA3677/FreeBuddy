@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../../logger.dart';
@@ -73,7 +73,8 @@ class SettingsPage extends StatelessWidget {
 
     return Card(
       elevation: AppDimensions.elevationSmall,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMedium)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium)),
       child: Padding(
         padding: EdgeInsets.all(AppDimensions.spacing16),
         child: Column(
@@ -91,7 +92,8 @@ class SettingsPage extends StatelessWidget {
                   value: isDebugEnabled,
                   onChanged: (value) => settings.setDebugMode(value),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusSmall),
                   ),
                   contentPadding: AppDimensions.listTilePadding,
                 );
@@ -128,7 +130,8 @@ class SettingsPage extends StatelessWidget {
         onPressed: () => GoRouter.of(context).push('/settings/about'),
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.symmetric(
-              vertical: AppDimensions.spacing12, horizontal: AppDimensions.spacing24),
+              vertical: AppDimensions.spacing12,
+              horizontal: AppDimensions.spacing24),
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
           elevation: AppDimensions.elevationSmall,
@@ -148,46 +151,47 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-Future<String?> _getFileNameAndPath(BuildContext context) async {
-  final downloadsDirectory = await getDownloadsDirectory();
-  final initialDirectory = downloadsDirectory?.path ?? '/storage/emulated/0/Download'; // Fallback to default path
+  Future<String?> _getFileNameAndPath(BuildContext context) async {
+    final downloadsDirectory = await getDownloadsDirectory();
+    final initialDirectory = downloadsDirectory?.path ??
+        '/storage/emulated/0/Download'; // Fallback to default path
 
-  if (!context.mounted) return null;
+    if (!context.mounted) return null;
 
-  return showDialog<String>(
-    context: context,
-    builder: (BuildContext dialogContext) {
-      final controller = TextEditingController();
-      return AlertDialog(
-        title: Text(AppLocalizations.of(context)!.exportLogsDialog),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(hintText: 'log.txt'),
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.exportLogsDialog),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(hintText: 'log.txt'),
+              ),
+              const SizedBox(height: 12),
+              Text('Directory: $initialDirectory'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, null),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
-            const SizedBox(height: 12),
-            Text('Directory: $initialDirectory'),
+            TextButton(
+              onPressed: () {
+                final fileName = controller.text.trim();
+                Navigator.pop(dialogContext, '$initialDirectory/$fileName');
+              },
+              child: Text(AppLocalizations.of(context)!.save),
+            ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, null),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              final fileName = controller.text.trim();
-              Navigator.pop(dialogContext, '$initialDirectory/$fileName');
-            },
-            child: Text(AppLocalizations.of(context)!.save),
-          ),
-        ],
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
   Future<void> _exportLogs(BuildContext context) async {
     final l = AppLocalizations.of(context)!;
@@ -195,19 +199,20 @@ Future<String?> _getFileNameAndPath(BuildContext context) async {
 
     try {
       final filePath = await _getFileNameAndPath(context);
-      if (filePath == null || filePath.isEmpty) return; // User canceled the dialog
+      if (filePath == null || filePath.isEmpty)
+        return; // User canceled the dialog
 
       final logContents = AppLogger.getLogContent();
       final file = File(filePath);
       await file.writeAsString(logContents);
 
       if (!context.mounted) return;
-       snackBar.showSnackBar(SnackBar(
-         content: Text('${l.exportLogsSuccess}: $filePath'),
-         backgroundColor: Colors.green,
-       ));
-     } catch (e) {
-    if (!context.mounted) return;
+      snackBar.showSnackBar(SnackBar(
+        content: Text('${l.exportLogsSuccess}: $filePath'),
+        backgroundColor: Colors.green,
+      ));
+    } catch (e) {
+      if (!context.mounted) return;
       snackBar.showSnackBar(SnackBar(
         content: Text('${l.exportLogsError}: $e'),
         backgroundColor: Colors.red,

@@ -36,11 +36,14 @@ class DisconnectedInfoWidget extends StatelessWidget {
         ),
         SizedBox(height: AppDimensions.spacing16),
         ElevatedButton.icon(
-          onPressed: () => context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
-          icon: Icon(Symbols.settings_bluetooth, size: AppDimensions.iconMedium),
+          onPressed: () =>
+              context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
+          icon:
+              Icon(Symbols.settings_bluetooth, size: AppDimensions.iconMedium),
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.symmetric(
-                horizontal: AppDimensions.spacing24, vertical: AppDimensions.spacing12),
+                horizontal: AppDimensions.spacing24,
+                vertical: AppDimensions.spacing12),
             backgroundColor: theme.colorScheme.surfaceContainerHigh,
             foregroundColor: theme.colorScheme.primary,
             elevation: AppDimensions.elevationSmall,

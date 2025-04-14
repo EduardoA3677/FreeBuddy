@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+
 import '../theme/dimensions.dart';
 
 /// Un espaciador flexible con restricciones que puede ser usado en layouts
@@ -8,7 +9,8 @@ class ConstrainedSpacer extends StatelessWidget {
   final int flex;
 
   /// Crea un espaciador con restricciones predefinidas
-  const ConstrainedSpacer({super.key, required this.constraints, this.flex = 1});
+  const ConstrainedSpacer(
+      {super.key, required this.constraints, this.flex = 1});
 
   /// Crea un espaciador con altura fija
   static ConstrainedSpacer height(double height, {int flex = 1}) {

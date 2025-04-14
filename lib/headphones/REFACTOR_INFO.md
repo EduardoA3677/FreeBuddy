@@ -6,22 +6,22 @@ This module has been refactored to make it easier to add new headphone models in
 
 1. **Modular Feature System**:
 
-   - Each feature (ANC, Double-Tap, Hold gesture, etc.) is now in a separate file
-   - Features are in `huawei/features/` directory
+    - Each feature (ANC, Double-Tap, Hold gesture, etc.) is now in a separate file
+    - Features are in `huawei/features/` directory
 
 2. **Generic Settings Class**:
 
-   - Replaced model-specific settings with generic `HuaweiHeadphonesSettings`
-   - Settings structure can be shared across different models
+    - Replaced model-specific settings with generic `HuaweiHeadphonesSettings`
+    - Settings structure can be shared across different models
 
 3. **Model Definition System**:
 
-   - Created a flexible model definition system in `huawei/model_definition.dart`
-   - Each model specifies which features it supports and default settings
+    - Created a flexible model definition system in `huawei/model_definition.dart`
+    - Each model specifies which features it supports and default settings
 
 4. **Unified Implementation**:
-   - Replaced model-specific implementation with a generic implementation
-   - The same implementation can be used for all Huawei models
+    - Replaced model-specific implementation with a generic implementation
+    - The same implementation can be used for all Huawei models
 
 ## Files to Delete
 

@@ -71,7 +71,8 @@ class _HomePageState extends State<HomePage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surfaceContainerHighest, // Fondo ligeramente más oscuro
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+      // Fondo ligeramente más oscuro
       appBar: AppBar(
         title: Text(
           l.appTitle,
@@ -101,13 +102,16 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: BlocBuilder<HeadphonesConnectionCubit, HeadphonesConnectionState>(
+              child: BlocBuilder<HeadphonesConnectionCubit,
+                  HeadphonesConnectionState>(
                 builder: (context, state) {
                   return switch (state) {
                     HeadphonesConnectedOpen(:final headphones) =>
                       HeadphonesControlsWidget(headphones: headphones),
-                    HeadphonesDisconnected() => _DisconnectedWidget(theme: theme, l: l),
-                    HeadphonesNotPaired() => _NotPairedWidget(theme: theme, l: l),
+                    HeadphonesDisconnected() =>
+                      _DisconnectedWidget(theme: theme, l: l),
+                    HeadphonesNotPaired() =>
+                      _NotPairedWidget(theme: theme, l: l),
                     _ => const _LoadingWidget()
                   };
                 },
@@ -139,7 +143,8 @@ class _DisconnectedWidget extends StatelessWidget {
         label: Text(l.connect),
         style: FilledButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
@@ -157,16 +162,19 @@ class _NotPairedWidget extends StatelessWidget {
     return _StateMessageCard(
       icon: Symbols.bluetooth_disabled,
       iconColor: theme.colorScheme.onSurfaceVariant,
-      backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
+      backgroundColor:
+          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
       title: l.headphonesNotPaired,
       action: FilledButton.icon(
-        onPressed: () => context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
+        onPressed: () =>
+            context.read<HeadphonesConnectionCubit>().openBluetoothSettings(),
         icon: const Icon(Symbols.settings_bluetooth),
         label: Text(l.configureBluetooth),
         style: FilledButton.styleFrom(
           backgroundColor: theme.colorScheme.secondary,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );

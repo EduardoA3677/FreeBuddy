@@ -55,8 +55,10 @@ Future<bool> routineUpdateCallback() async {
           "headphones don't support LRCBattery");
       return true;
     }
-    final batteryData =
-        await (headphones.headphones as LRCBattery).lrcBattery.first.timeout(commonTimeout);
+    final batteryData = await (headphones.headphones as LRCBattery)
+        .lrcBattery
+        .first
+        .timeout(commonTimeout);
     log(LogLevel.debug, "udpating widget from bgn: $batteryData");
     await updateBatteryHomeWidget(batteryData);
     await cubit.close(); // remember to close cubit to deregister port name
@@ -84,7 +86,8 @@ void callbackDispatcher() {
         String() => throw Exception("No such task named $task"),
       };
     } catch (e, s) {
-      log(LogLevel.error, "Periodic task $task failed", error: e, stackTrace: s);
+      log(LogLevel.error, "Periodic task $task failed",
+          error: e, stackTrace: s);
       return Future.value(false);
     }
   });

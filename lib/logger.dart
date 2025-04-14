@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
@@ -14,9 +15,12 @@ class AppLogger {
       methodCount: 2,
       errorMethodCount: 8,
       lineLength: 120,
-      colors: true, // Desactivar colores para Android logcat
-      printEmojis: true, // Los emojis pueden causar problemas en algunos logcat
-      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart, // Usar formato de fecha recomendado
+      colors: true,
+      // Desactivar colores para Android logcat
+      printEmojis: true,
+      // Los emojis pueden causar problemas en algunos logcat
+      dateTimeFormat: DateTimeFormat
+          .onlyTimeAndSinceStart, // Usar formato de fecha recomendado
     ),
     level: Level.trace, // Usar el nivel más detallado
   );
@@ -72,7 +76,8 @@ class AppLogger {
       _addToBuffer("ERROR: $error", level);
       if (stackTrace != null) {
         // Limitar el tamaño del stacktrace para evitar consumo excesivo de memoria
-        final limitedStackTrace = stackTrace.toString().split('\n').take(20).join('\n');
+        final limitedStackTrace =
+            stackTrace.toString().split('\n').take(20).join('\n');
         _addToBuffer("STACKTRACE: $limitedStackTrace", level);
       }
     }
@@ -97,7 +102,8 @@ class AppLogger {
         _logger.f(logMessage, error: error, stackTrace: stackTrace);
         break;
       case LogLevel.fatal:
-        developer.log(logMessage, level: 1000, error: error, stackTrace: stackTrace);
+        developer.log(logMessage,
+            level: 1000, error: error, stackTrace: stackTrace);
         break;
     }
   }
@@ -116,7 +122,8 @@ class AppLogger {
       // Log in better format for Flutter errors
       final errorMsg =
           "FATAL EXCEPTION: ${details.context?.name ?? 'Flutter'}\n${details.exceptionAsString()}";
-      log(LogLevel.error, errorMsg, error: details.exception, stackTrace: details.stack);
+      log(LogLevel.error, errorMsg,
+          error: details.exception, stackTrace: details.stack);
 
       // Make sure it also appears in system logs
       if (Platform.isAndroid) {
@@ -132,7 +139,8 @@ class AppLogger {
 
       // Make sure it also appears in system logs
       if (Platform.isAndroid) {
-        developer.log("FREEBUDDY_FATAL: $errorMsg", name: 'FreeBuddy', error: error, level: 2000);
+        developer.log("FREEBUDDY_FATAL: $errorMsg",
+            name: 'FreeBuddy', error: error, level: 2000);
       }
       return true; // Indicates error has been handled
     };
@@ -141,21 +149,25 @@ class AppLogger {
     runZonedGuarded(() {
       // This function executes automatically in the captured zone
     }, (Object error, StackTrace stack) {
-      final errorMsg = "FATAL EXCEPTION: ${Zone.current.toString()}\n${error.toString()}";
+      final errorMsg =
+          "FATAL EXCEPTION: ${Zone.current.toString()}\n${error.toString()}";
       log(LogLevel.fatal, errorMsg, error: error, stackTrace: stack);
 
       // Make sure it also appears in system logs
       if (Platform.isAndroid) {
-        developer.log("FREEBUDDY_FATAL: $errorMsg", name: 'FreeBuddy', error: error, level: 2000);
+        developer.log("FREEBUDDY_FATAL: $errorMsg",
+            name: 'FreeBuddy', error: error, level: 2000);
       }
     });
   }
 }
 
 // Helper function para simplificar el logging
-void log(LogLevel level, String message, {String? tag, Object? error, StackTrace? stackTrace}) {
+void log(LogLevel level, String message,
+    {String? tag, Object? error, StackTrace? stackTrace}) {
   AppLogger.log(level, message, tag: tag, error: error, stackTrace: stackTrace);
 }
 
 Logger get logg => AppLogger._logger;
+
 Logger get loggI => AppLogger._logger;

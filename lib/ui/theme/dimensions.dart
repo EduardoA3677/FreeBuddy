@@ -76,13 +76,19 @@ class AppDimensions {
   static const EdgeInsets paddingMedium = EdgeInsets.all(spacing16);
   static const EdgeInsets paddingLarge = EdgeInsets.all(spacing24);
 
-  static const EdgeInsets paddingHorizontalSmall = EdgeInsets.symmetric(horizontal: spacing8);
-  static const EdgeInsets paddingHorizontalMedium = EdgeInsets.symmetric(horizontal: spacing16);
-  static const EdgeInsets paddingHorizontalLarge = EdgeInsets.symmetric(horizontal: spacing24);
+  static const EdgeInsets paddingHorizontalSmall =
+      EdgeInsets.symmetric(horizontal: spacing8);
+  static const EdgeInsets paddingHorizontalMedium =
+      EdgeInsets.symmetric(horizontal: spacing16);
+  static const EdgeInsets paddingHorizontalLarge =
+      EdgeInsets.symmetric(horizontal: spacing24);
 
-  static const EdgeInsets paddingVerticalSmall = EdgeInsets.symmetric(vertical: spacing8);
-  static const EdgeInsets paddingVerticalMedium = EdgeInsets.symmetric(vertical: spacing16);
-  static const EdgeInsets paddingVerticalLarge = EdgeInsets.symmetric(vertical: spacing24);
+  static const EdgeInsets paddingVerticalSmall =
+      EdgeInsets.symmetric(vertical: spacing8);
+  static const EdgeInsets paddingVerticalMedium =
+      EdgeInsets.symmetric(vertical: spacing16);
+  static const EdgeInsets paddingVerticalLarge =
+      EdgeInsets.symmetric(vertical: spacing24);
 
   // Paddings específicos para componentes comunes
   static const EdgeInsets cardPadding = EdgeInsets.all(spacing16);

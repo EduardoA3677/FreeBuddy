@@ -60,9 +60,15 @@ final router = GoRouter(
 // Extensiones de navegación para hacer más sencillo navegar
 extension NavigationExtensions on BuildContext {
   void navigateToHome() => GoRouter.of(this).go('/');
-  void navigateToHeadphonesSettings() => GoRouter.of(this).go('/headphones_settings');
+
+  void navigateToHeadphonesSettings() =>
+      GoRouter.of(this).go('/headphones_settings');
+
   void navigateToIntroduction() => GoRouter.of(this).go('/introduction');
+
   void navigateToSettings() => GoRouter.of(this).go('/settings');
+
   void navigateToAbout() => GoRouter.of(this).go('/settings/about');
+
   void navigateToLicenses() => GoRouter.of(this).go('/settings/about/licenses');
 }

@@ -63,7 +63,8 @@ class HuaweiModels {
     supportsAnc: true,
     supportsDoubleTap: true,
     supportsHold: true,
-    supportsAutoPause: false, // 4i doesn't support auto-pause settings
+    supportsAutoPause: false,
+    // 4i doesn't support auto-pause settings
     supportsInEarDetection: true,
     defaultSettings: const HuaweiHeadphonesSettings(
       doubleTapLeft: DoubleTap.playPause,

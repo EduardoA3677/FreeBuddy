@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../theme/dimensions.dart';
 
@@ -16,7 +16,8 @@ class FreebuddyIntroduction extends StatelessWidget {
       text: text,
       style: const TextStyle(color: Colors.blue),
       recognizer: TapGestureRecognizer()
-        ..onTap = () => launchUrlString(url ?? text, mode: LaunchMode.externalApplication),
+        ..onTap = () =>
+            launchUrlString(url ?? text, mode: LaunchMode.externalApplication),
     );
   }
 
@@ -57,11 +58,14 @@ class FreebuddyIntroduction extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(AppDimensions.spacing24),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusExtraLarge),
+                      color: theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.8),
+                      borderRadius:
+                          BorderRadius.circular(AppDimensions.radiusExtraLarge),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                          color:
+                              theme.colorScheme.shadow.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         )
@@ -98,7 +102,8 @@ class FreebuddyIntroduction extends StatelessWidget {
                   Card(
                     elevation: AppDimensions.elevationSmall,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge)),
+                        borderRadius:
+                            BorderRadius.circular(AppDimensions.radiusLarge)),
                     child: Padding(
                       padding: EdgeInsets.all(AppDimensions.spacing24),
                       child: Column(
@@ -168,10 +173,8 @@ class FreebuddyIntroduction extends StatelessWidget {
                         ],
                       ),
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 800.ms, delay: 300.ms)
-                      .slideY(begin: 0.1, end: 0, duration: 600.ms, delay: 300.ms),
+                  ).animate().fadeIn(duration: 800.ms, delay: 300.ms).slideY(
+                      begin: 0.1, end: 0, duration: 600.ms, delay: 300.ms),
 
                   const Spacer(flex: 4),
 

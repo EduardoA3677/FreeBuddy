@@ -35,7 +35,8 @@ class ThemeSelector extends StatelessWidget {
                 margin: EdgeInsets.zero,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                      vertical: AppDimensions.spacing8, horizontal: AppDimensions.spacing4),
+                      vertical: AppDimensions.spacing8,
+                      horizontal: AppDimensions.spacing4),
                   child: Column(
                     children: [
                       _buildThemeOption(
@@ -87,20 +88,26 @@ class ThemeSelector extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
         child: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal: AppDimensions.spacing16, vertical: AppDimensions.spacing12),
+              horizontal: AppDimensions.spacing16,
+              vertical: AppDimensions.spacing12),
           child: Row(
             children: [
               Icon(
                 icon,
-                color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                color: selected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
                 size: AppDimensions.iconMedium,
               ),
               SizedBox(width: AppDimensions.spacing16),
               Text(
                 title,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: selected ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
-                      fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                      color: selected
+                          ? colorScheme.onPrimaryContainer
+                          : colorScheme.onSurface,
+                      fontWeight:
+                          selected ? FontWeight.bold : FontWeight.normal,
                     ),
               ),
               const Spacer(),
