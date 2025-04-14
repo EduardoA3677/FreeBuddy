@@ -115,18 +115,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/headphones_settings'),
-        tooltip: l.pageHeadphonesSettingsTitle,
-        elevation: 6,
-        backgroundColor: theme.colorScheme.secondary,
-        foregroundColor: theme.colorScheme.onSecondary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(Symbols.settings, weight: 300),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
     );
   }
 }

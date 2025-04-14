@@ -37,7 +37,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
     return Builder(
       builder: (context) {
         try {
-          return _buildMainContent(windowSize, theme, l, screenWidth, screenHeight);
+          return _buildMainContent(context, windowSize, theme, l, screenWidth, screenHeight);
         } catch (e, stackTrace) {
           log(LogLevel.error, "Error rendering HeadphonesControlsWidget",
               error: e, stackTrace: stackTrace);
@@ -53,7 +53,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent(WindowSizeClass windowSize, ThemeData theme, AppLocalizations l,
+  Widget _buildMainContent(BuildContext context, WindowSizeClass windowSize, ThemeData theme, AppLocalizations l,
       double screenWidth, double screenHeight) {
     log(LogLevel.debug, "Building main content for headphones: ${headphones.runtimeType}");
 
@@ -208,7 +208,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
                       padding: const EdgeInsets.all(12),
                       child: isWideScreen
                           ? _buildWideLayout(theme, l, screenWidth)
-                          : _buildCompactLayout(theme, l, screenWidth, isSmallScreen),
+                          : _buildCompactLayout(context, theme, l, screenWidth, isSmallScreen),
                     ),
                   ),
                 ],
@@ -314,7 +314,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
   }
 
   Widget _buildCompactLayout(
-      ThemeData theme, AppLocalizations l, double screenWidth, bool isSmallScreen) {
+      BuildContext context, ThemeData theme, AppLocalizations l, double screenWidth, bool isSmallScreen) {
     final hasAncFeature = headphones is Anc;
     final hasBatteryFeature = headphones is LRCBattery;
 
@@ -333,43 +333,38 @@ class HeadphonesControlsWidget extends StatelessWidget {
     return Column(
       children: [
         if (hasBatteryFeature) ...[
-          // Botón de configuración integrado arriba del BatteryCard
-          if (onSettingsTap != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Material(
-                borderRadius: BorderRadius.circular(10),
-                color: theme.colorScheme.secondary,
-                elevation: 2,
-                child: InkWell(
-                  onTap: onSettingsTap,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    height: 32,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Symbols.settings,
-                          size: 16,
-                          color: theme.colorScheme.onSecondary,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          l.pageHeadphonesSettingsTitle,
-                          style: TextStyle(
-                            color: theme.colorScheme.onSecondary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
+          // Botón de configuración integrado encima del BatteryCard
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: SizedBox(
+              width: double.infinity, // Mismo ancho que BatteryCard
+              height: 40,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.of(context).pushNamed('/headphones_settings'),
+                icon: Icon(
+                  Symbols.settings,
+                  size: 20,
+                  color: theme.colorScheme.onSecondary,
+                ),
+                label: Text(
+                  l.pageHeadphonesSettingsTitle,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSecondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.secondary,
+                  foregroundColor: theme.colorScheme.onSecondary,
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               ),
             ),
+          ),
           // Contenedor de batería con altura fija para que no ocupe tanto espacio
           SizedBox(
             height: isSmallScreen ? 130 : 150, // Altura fija más pequeña

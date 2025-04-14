@@ -234,7 +234,7 @@ class BatteryCard extends StatelessWidget {
         children: [
           Icon(
             icon,
-            size: 20, // Reducido
+            size: 24, // Aumentado
             color: theme.colorScheme.primary,
           ),
           const SizedBox(height: 2), // Reducido
