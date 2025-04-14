@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../headphones/framework/anc.dart';
@@ -340,7 +341,7 @@ class HeadphonesControlsWidget extends StatelessWidget {
               width: double.infinity, // Mismo ancho que BatteryCard
               height: 40,
               child: ElevatedButton.icon(
-                onPressed: () => Navigator.of(context).pushNamed('/headphones_settings'),
+                onPressed: () => context.push('/headphones_settings'),
                 icon: Icon(
                   Symbols.settings,
                   size: 20,

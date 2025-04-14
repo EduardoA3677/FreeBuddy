@@ -59,6 +59,7 @@ class _HomePageState extends State<HomePage> {
       Permission.bluetoothConnect,
       Permission.bluetoothScan,
       Permission.location,
+      Permission.storage,
     ];
     return Future.wait(permissions.map((p) => p.isGranted))
         .then((results) => results.every((granted) => granted));
