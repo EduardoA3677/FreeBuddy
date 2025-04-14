@@ -73,8 +73,8 @@ class SettingsPage extends StatelessWidget {
 
     return Card(
       elevation: AppDimensions.elevationSmall,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMedium)),
       child: Padding(
         padding: EdgeInsets.all(AppDimensions.spacing16),
         child: Column(
@@ -92,8 +92,7 @@ class SettingsPage extends StatelessWidget {
                   value: isDebugEnabled,
                   onChanged: (value) => settings.setDebugMode(value),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppDimensions.radiusSmall),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
                   ),
                   contentPadding: AppDimensions.listTilePadding,
                 );
@@ -130,8 +129,7 @@ class SettingsPage extends StatelessWidget {
         onPressed: () => GoRouter.of(context).push('/settings/about'),
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.symmetric(
-              vertical: AppDimensions.spacing12,
-              horizontal: AppDimensions.spacing24),
+              vertical: AppDimensions.spacing12, horizontal: AppDimensions.spacing24),
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
           elevation: AppDimensions.elevationSmall,
@@ -153,8 +151,8 @@ class SettingsPage extends StatelessWidget {
 
   Future<String?> _getFileNameAndPath(BuildContext context) async {
     final downloadsDirectory = await getDownloadsDirectory();
-    final initialDirectory = downloadsDirectory?.path ??
-        '/storage/emulated/0/Download'; // Fallback to default path
+    final initialDirectory =
+        downloadsDirectory?.path ?? '/storage/emulated/0/Download'; // Fallback to default path
 
     if (!context.mounted) return null;
 
@@ -199,8 +197,9 @@ class SettingsPage extends StatelessWidget {
 
     try {
       final filePath = await _getFileNameAndPath(context);
-      if (filePath == null || filePath.isEmpty)
+      if (filePath == null || filePath.isEmpty) {
         return; // User canceled the dialog
+      }
 
       final logContents = AppLogger.getLogContent();
       final file = File(filePath);
