@@ -49,10 +49,37 @@ final router = GoRouter(
   ],
   // Configuración de transiciones personalizadas
   observers: [NavigatorObserver()],
-  // Maneja errores de navegación
+  // Maneja errores de navegación con soporte para Material 3
   errorBuilder: (context, state) => Scaffold(
-    body: Center(
-      child: Text('Error: Ruta ${state.uri.path} no encontrada'),
+    appBar: AppBar(
+      title: const Text('Error de navegación'),
+      elevation: 0,
+      scrolledUnderElevation: 2,
+    ),
+    body: SafeArea(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                'Error: Ruta ${state.uri.path} no encontrada',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: () => context.go('/'),
+                icon: const Icon(Icons.home),
+                label: const Text('Ir al inicio'),
+              ),
+            ],
+          ),
+        ),
+      ),
     ),
   ),
 );
@@ -61,8 +88,7 @@ final router = GoRouter(
 extension NavigationExtensions on BuildContext {
   void navigateToHome() => GoRouter.of(this).go('/');
 
-  void navigateToHeadphonesSettings() =>
-      GoRouter.of(this).go('/headphones_settings');
+  void navigateToHeadphonesSettings() => GoRouter.of(this).go('/headphones_settings');
 
   void navigateToIntroduction() => GoRouter.of(this).go('/introduction');
 

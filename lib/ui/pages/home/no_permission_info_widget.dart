@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -132,8 +130,7 @@ class _NoPermissionInfoWidgetState extends State<NoPermissionInfoWidget>
 
       await _checkPendingPermissions();
     } catch (e, stackTrace) {
-      log(LogLevel.error as String,
-          name: 'Error al solicitar permisos', error: e, stackTrace: stackTrace);
+      AppLogger.log(LogLevel.error, 'Error al solicitar permisos', error: e, stackTrace: stackTrace);
     } finally {
       if (mounted) {
         setState(() {
