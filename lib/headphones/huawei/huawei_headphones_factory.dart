@@ -8,6 +8,7 @@ import 'features/base/feature_registry.dart';
 import 'features/battery_feature.dart' as battery;
 import 'features/double_tap_feature.dart' as double_tap;
 import 'features/hold_feature.dart' as hold;
+import 'features/sound_quality.dart' as sound_quality;
 import 'huawei_headphones_impl.dart';
 import 'mbb.dart';
 
@@ -34,6 +35,7 @@ class HuaweiHeadphonesFactory {
       double_tap.DoubleTapFeature(),
       hold.HoldFeature(),
       auto_pause.AutoPauseFeature(),
+      sound_quality.SoundQualityFeature(),
     ]);
   }
 }

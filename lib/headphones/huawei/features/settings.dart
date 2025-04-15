@@ -1,4 +1,5 @@
 import '../../framework/anc.dart';
+import '../../framework/sound_quality.dart';
 
 /// Common settings for all Huawei headphones models
 class HuaweiHeadphonesSettings {
@@ -7,6 +8,7 @@ class HuaweiHeadphonesSettings {
   final Hold? holdBoth;
   final Set<AncMode>? holdBothToggledAncModes;
   final bool? autoPause;
+  final SoundQualityMode? soundQuality;
 
   const HuaweiHeadphonesSettings({
     this.doubleTapLeft,
@@ -14,6 +16,7 @@ class HuaweiHeadphonesSettings {
     this.holdBoth,
     this.holdBothToggledAncModes,
     this.autoPause,
+    this.soundQuality,
   });
 
   // don't want to use codegen *yet*
@@ -23,14 +26,15 @@ class HuaweiHeadphonesSettings {
     Hold? holdBoth,
     Set<AncMode>? holdBothToggledAncModes,
     bool? autoPause,
+    SoundQualityMode? soundQuality,
   }) =>
       HuaweiHeadphonesSettings(
         doubleTapLeft: doubleTapLeft ?? this.doubleTapLeft,
         doubleTapRight: doubleTapRight ?? this.doubleTapRight,
         holdBoth: holdBoth ?? this.holdBoth,
-        holdBothToggledAncModes:
-            holdBothToggledAncModes ?? this.holdBothToggledAncModes,
+        holdBothToggledAncModes: holdBothToggledAncModes ?? this.holdBothToggledAncModes,
         autoPause: autoPause ?? this.autoPause,
+        soundQuality: soundQuality ?? this.soundQuality,
       );
 }
 

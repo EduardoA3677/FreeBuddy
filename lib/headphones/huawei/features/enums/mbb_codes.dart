@@ -1,4 +1,5 @@
 import '../../../framework/anc.dart';
+import '../../../framework/sound_quality.dart';
 import '../settings.dart';
 
 /// Extension to add MBB code conversion for DoubleTap enum
@@ -14,6 +15,19 @@ extension DoubleTapMbbCode on DoubleTap {
   static DoubleTap? fromMbbCode(int code) {
     if (code < 0 || code > 4) return null;
     return DoubleTap.values[code];
+  }
+}
+
+/// Extension to add MBB code conversion for SoundQualityMode enum
+extension SoundQualityModeMbbCode on SoundQualityMode {
+  int get mbbCode => switch (this) {
+        SoundQualityMode.connectivity => 0,
+        SoundQualityMode.quality => 1,
+      };
+
+  static SoundQualityMode? fromMbbCode(int code) {
+    if (code < 0 || code > 1) return null;
+    return SoundQualityMode.values[code];
   }
 }
 

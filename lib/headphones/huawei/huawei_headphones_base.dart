@@ -3,6 +3,7 @@ import '../framework/bluetooth_headphones.dart';
 import '../framework/headphones_info.dart';
 import '../framework/headphones_settings.dart';
 import '../framework/lrc_battery.dart';
+import '../framework/sound_quality.dart';
 import 'features/settings.dart';
 
 /// Base abstract class for all Huawei headphones.
@@ -13,6 +14,7 @@ abstract class HuaweiHeadphonesBase
         HeadphonesModelInfo,
         LRCBattery,
         Anc,
+        SoundQuality,
         HeadphonesSettings<HuaweiHeadphonesSettings> {
   const HuaweiHeadphonesBase();
 

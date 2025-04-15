@@ -14,6 +14,7 @@ import '../home/controls/headphones_image.dart';
 import 'huawei/auto_pause_section.dart';
 import 'huawei/double_tap_section.dart';
 import 'huawei/hold_section.dart';
+import 'huawei/sound_quality_section.dart';
 
 /// Página mejorada de configuración de auriculares
 class HeadphonesSettingsPage extends StatelessWidget {
@@ -51,16 +52,15 @@ class HeadphonesSettingsPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: HeadphonesConnectionEnsuringOverlay(
-          builder: (_, headphones) =>
-              _buildSettingsContent(headphones, context, theme, l),
+          builder: (_, headphones) => _buildSettingsContent(headphones, context, theme, l),
         ),
       ),
     );
   }
 
   /// Construye el contenido principal de la pantalla de configuración
-  Widget _buildSettingsContent(BluetoothHeadphones headphones,
-      BuildContext context, ThemeData theme, AppLocalizations l) {
+  Widget _buildSettingsContent(
+      BluetoothHeadphones headphones, BuildContext context, ThemeData theme, AppLocalizations l) {
     // Verificar si es un modelo compatible con la configuración detallada
     if (headphones is HuaweiHeadphonesBase) {
       return SingleChildScrollView(
@@ -118,8 +118,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
               Text(
                 'Este dispositivo no es compatible con configuraciones avanzadas.',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color:
-                      theme.colorScheme.onErrorContainer.withValues(alpha: 0.8),
+                  color: theme.colorScheme.onErrorContainer.withValues(alpha: 0.8),
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -130,8 +129,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
                 label: const Text('Volver al inicio'),
                 onPressed: () => Navigator.of(context).pop(),
                 style: FilledButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -163,8 +161,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color:
-                    theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -195,8 +192,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer
-                        .withValues(alpha: 0.5),
+                    color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -212,8 +208,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
                   context,
                   icon: Symbols.play_pause,
                   title: 'Pausa automática',
-                  description:
-                      'Configura si los auriculares pausan la música al quitártelos.',
+                  description: 'Configura si los auriculares pausan la música al quitártelos.',
                 ),
                 const SizedBox(height: 16),
                 _buildHelpItem(
@@ -228,8 +223,15 @@ class HeadphonesSettingsPage extends StatelessWidget {
                   context,
                   icon: Symbols.pan_tool,
                   title: 'Mantener pulsado',
+                  description: 'Configura qué ocurre al mantener pulsado cada auricular.',
+                ),
+                const SizedBox(height: 16),
+                _buildHelpItem(
+                  context,
+                  icon: Symbols.music_note,
+                  title: 'Calidad de sonido',
                   description:
-                      'Configura qué ocurre al mantener pulsado cada auricular.',
+                      'Elige entre priorizar la calidad de audio o la estabilidad de la conexión.',
                 ),
               ],
             ).animate().fadeIn(duration: 400.ms),
@@ -250,8 +252,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
             ),
           ),
         ],
-        actionsPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       ),
     );
   }
@@ -321,8 +322,7 @@ class HeadphonesSettingsPage extends StatelessWidget {
 }
 
 /// Construye los widgets de configuración basados en el modelo de auriculares
-List<Widget> _buildSettingsWidgets(
-    BluetoothHeadphones headphones, BuildContext context) {
+List<Widget> _buildSettingsWidgets(BluetoothHeadphones headphones, BuildContext context) {
   if (headphones is HuaweiHeadphonesBase) {
     final huaweiBase = headphones;
     HuaweiModelDefinition? modelDef;
@@ -356,9 +356,7 @@ List<Widget> _buildSettingsWidgets(
                     child: HeadphonesImage(headphones as HeadphonesModelInfo)
                         .animate()
                         .fadeIn(duration: 500.ms)
-                        .scale(
-                            begin: const Offset(0.95, 0.95),
-                            end: const Offset(1.0, 1.0)),
+                        .scale(begin: const Offset(0.95, 0.95), end: const Offset(1.0, 1.0)),
                   ),
                   const SizedBox(height: 8), // Información del modelo
                   Text(
@@ -427,10 +425,7 @@ List<Widget> _buildSettingsWidgets(
           'Pausa automática',
           Symbols.pause_circle,
           AutoPauseSection(huaweiBase),
-        )
-            .animate()
-            .fadeIn(duration: 400.ms, delay: 100.ms)
-            .slideY(begin: 0.05, end: 0),
+        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.05, end: 0),
       );
     }
 
@@ -441,10 +436,7 @@ List<Widget> _buildSettingsWidgets(
           'Acción de doble toque',
           Symbols.touch_app,
           DoubleTapSection(huaweiBase),
-        )
-            .animate()
-            .fadeIn(duration: 400.ms, delay: 200.ms)
-            .slideY(begin: 0.05, end: 0),
+        ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.05, end: 0),
       );
     }
 
@@ -455,10 +447,18 @@ List<Widget> _buildSettingsWidgets(
           'Acción de mantener pulsado',
           Symbols.pan_tool,
           HoldSection(huaweiBase),
-        )
-            .animate()
-            .fadeIn(duration: 400.ms, delay: 300.ms)
-            .slideY(begin: 0.05, end: 0),
+        ).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.05, end: 0),
+      );
+    }
+
+    // Añadir sección de calidad de sonido si es compatible
+    if (modelDef?.supportsSoundQuality ?? false) {
+      sections.add(
+        buildSection(
+          'Calidad de sonido',
+          Symbols.music_note,
+          SoundQualitySection(huaweiBase),
+        ).animate().fadeIn(duration: 400.ms, delay: 400.ms).slideY(begin: 0.05, end: 0),
       );
     }
 

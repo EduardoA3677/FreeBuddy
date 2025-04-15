@@ -1,4 +1,5 @@
 import '../framework/anc.dart';
+import '../framework/sound_quality.dart';
 import '../huawei/features/settings.dart';
 
 /// Definition of a Huawei headphones model with its capabilities
@@ -8,6 +9,7 @@ class HuaweiModelDefinition {
   final RegExp idNameRegex;
   final String imageAssetPath;
   final bool supportsAnc;
+  final bool supportsSoundQuality;
   final bool supportsDoubleTap;
   final bool supportsHold;
   final bool supportsAutoPause;
@@ -20,6 +22,7 @@ class HuaweiModelDefinition {
     required this.idNameRegex,
     required this.imageAssetPath,
     this.supportsAnc = false,
+    this.supportsSoundQuality = false,
     this.supportsDoubleTap = false,
     this.supportsHold = false,
     this.supportsAutoPause = false,
@@ -37,21 +40,23 @@ class HuaweiModels {
     idNameRegex: RegExp(r'^(?=(HUAWEI FreeBuds Pro 3))', caseSensitive: true),
     imageAssetPath: 'assets/app_icons/ic_launcher.png',
     supportsAnc: true,
+    supportsSoundQuality: true,
     supportsDoubleTap: true,
     supportsHold: true,
     supportsAutoPause: true,
     supportsInEarDetection: true,
     defaultSettings: const HuaweiHeadphonesSettings(
-      doubleTapLeft: DoubleTap.playPause,
-      doubleTapRight: DoubleTap.playPause,
-      holdBoth: Hold.cycleAnc,
-      holdBothToggledAncModes: {
-        AncMode.noiseCancelling,
-        AncMode.off,
-        AncMode.transparency,
-      },
-      autoPause: true,
-    ),
+        doubleTapLeft: DoubleTap.playPause,
+        doubleTapRight: DoubleTap.playPause,
+        holdBoth: Hold.cycleAnc,
+        holdBothToggledAncModes: {
+          AncMode.noiseCancelling,
+          AncMode.off,
+          AncMode.transparency,
+        },
+        autoPause: true,
+        soundQuality: SoundQualityMode.connectivity,
+      ),
   );
 
   /// FreeBuds 4i model definition
@@ -61,6 +66,7 @@ class HuaweiModels {
     idNameRegex: RegExp(r'^(?=(HUAWEI FreeBuds 4i))', caseSensitive: true),
     imageAssetPath: 'assets/app_icons/ic_launcher.png',
     supportsAnc: true,
+    supportsSoundQuality: false,
     supportsDoubleTap: true,
     supportsHold: true,
     supportsAutoPause: false,
@@ -76,6 +82,7 @@ class HuaweiModels {
         AncMode.transparency,
       },
       autoPause: null,
+      soundQuality: null,
     ),
   );
 

@@ -6,6 +6,7 @@ import 'package:the_last_bluetooth/the_last_bluetooth.dart' as tlb;
 
 import '../../logger.dart';
 import '../framework/anc.dart';
+import '../framework/sound_quality.dart';
 import '../framework/lrc_battery.dart';
 import '../model_definition/huawei_models_definition.dart';
 import 'features/anc_feature.dart' as anc;
@@ -14,6 +15,7 @@ import 'features/base/feature_registry.dart';
 import 'features/battery_feature.dart' as battery;
 import 'features/double_tap_feature.dart' as double_tap;
 import 'features/hold_feature.dart' as hold;
+import 'features/sound_quality.dart' as sound_quality;
 import 'features/settings.dart';
 import 'huawei_headphones_base.dart';
 import 'mbb.dart';
@@ -28,12 +30,14 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   final _bluetoothAliasCtrl = BehaviorSubject<String>();
   final _lrcBatteryCtrl = BehaviorSubject<LRCBatteryLevels>();
   final _ancModeCtrl = BehaviorSubject<AncMode>();
+  final _soundQualityModeCtrl = BehaviorSubject<SoundQualityMode>();
   final _settingsCtrl = BehaviorSubject<HuaweiHeadphonesSettings>();
 
   // Features
   late final FeatureRegistry _featureRegistry;
   battery.BatteryFeature? _batteryFeature;
   anc.AncFeature? _ancFeature;
+  sound_quality.SoundQualityFeature? _soundQualityFeature;
 
   /// This watches if we are still missing any info and re-requests it
   late StreamSubscription _watchdogStreamSub;
@@ -49,8 +53,7 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
 
   void _initialize() {
     // Set up alias stream
-    final aliasStreamSub = _bluetoothDevice.alias
-        .listen((alias) => _bluetoothAliasCtrl.add(alias));
+    final aliasStreamSub = _bluetoothDevice.alias.listen((alias) => _bluetoothAliasCtrl.add(alias));
     _bluetoothAliasCtrl.onCancel = () => aliasStreamSub.cancel();
 
     // Initialize settings with default values
@@ -68,8 +71,8 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
     // Listen to MBB commands
     _mbb.stream.listen(
       _handleMbbCommand,
-      onError: (error, stackTrace) => AppLogger.log(LogLevel.error, "MBB Stream Error",
-          error: error, stackTrace: stackTrace),
+      onError: (error, stackTrace) =>
+          AppLogger.log(LogLevel.error, "MBB Stream Error", error: error, stackTrace: stackTrace),
       onDone: () {
         _watchdogStreamSub.cancel();
         _closeAllStreams();
@@ -82,11 +85,10 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   bool _isFeatureSupported(String featureId) {
     return switch (featureId) {
       anc.AncFeature.featureId => modelDefinition.supportsAnc,
-      double_tap.DoubleTapFeature.featureId =>
-        modelDefinition.supportsDoubleTap,
+      double_tap.DoubleTapFeature.featureId => modelDefinition.supportsDoubleTap,
       hold.HoldFeature.featureId => modelDefinition.supportsHold,
-      auto_pause.AutoPauseFeature.featureId =>
-        modelDefinition.supportsAutoPause,
+      auto_pause.AutoPauseFeature.featureId => modelDefinition.supportsAutoPause,
+      sound_quality.SoundQualityFeature.featureId => modelDefinition.supportsSoundQuality,
       battery.BatteryFeature.featureId => true, // Battery is always supported
       _ => false,
     };
@@ -109,6 +111,15 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
       _ancFeature!.ancMode.listen(_ancModeCtrl.add);
     }
 
+    // Create SoundQuality feature if supported
+    if (modelDefinition.supportsSoundQuality) {
+      _soundQualityFeature = sound_quality.SoundQualityFeature();
+      _featureRegistry.registerFeature(_soundQualityFeature!);
+
+      // Link SoundQuality feature to SoundQuality mode stream
+      _soundQualityFeature!.soundQualityMode.listen(_soundQualityModeCtrl.add);
+    }
+
     // Register other features
     if (modelDefinition.supportsDoubleTap) {
       _featureRegistry.registerFeature(double_tap.DoubleTapFeature());
@@ -127,6 +138,7 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
     _bluetoothAliasCtrl.close();
     _lrcBatteryCtrl.close();
     _ancModeCtrl.close();
+    _soundQualityModeCtrl.close();
     _settingsCtrl.close();
 
     _featureRegistry.dispose();
@@ -138,27 +150,24 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
       _featureRegistry.handleMbbCommand(cmd);
 
       // Process settings updates
-      final lastSettings =
-          _settingsCtrl.valueOrNull ?? modelDefinition.defaultSettings;
-      final updatedSettings =
-          _featureRegistry.updateSettings(cmd, lastSettings);
+      final lastSettings = _settingsCtrl.valueOrNull ?? modelDefinition.defaultSettings;
+      final updatedSettings = _featureRegistry.updateSettings(cmd, lastSettings);
 
       if (updatedSettings != null) {
         _settingsCtrl.add(updatedSettings);
       }
     } catch (e, s) {
-      AppLogger.log(LogLevel.error, "Error handling MBB command",
-          error: e, stackTrace: s);
+      AppLogger.log(LogLevel.error, "Error handling MBB command", error: e, stackTrace: s);
     }
   }
 
   void _startWatchdog() {
-    _watchdogStreamSub =
-        Stream.periodic(const Duration(seconds: 3)).listen((_) {
+    _watchdogStreamSub = Stream.periodic(const Duration(seconds: 3)).listen((_) {
       if ([
         batteryLevel.valueOrNull,
         lrcBattery.valueOrNull,
         if (modelDefinition.supportsAnc) ancMode.valueOrNull,
+        if (modelDefinition.supportsSoundQuality) soundQualityMode.valueOrNull,
         settings.valueOrNull,
       ].any((e) => e == null)) {
         // Re-request data through features
@@ -168,6 +177,10 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
 
         if (_ancFeature != null) {
           _ancFeature!.requestInitialData(_mbb);
+        }
+
+        if (_soundQualityFeature != null) {
+          _soundQualityFeature!.requestInitialData(_mbb);
         }
       }
     });
@@ -191,8 +204,7 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   String get name => modelDefinition.name;
 
   @override
-  ValueStream<String> get imageAssetPath =>
-      BehaviorSubject.seeded(modelDefinition.imageAssetPath);
+  ValueStream<String> get imageAssetPath => BehaviorSubject.seeded(modelDefinition.imageAssetPath);
 
   // LRCBattery implementation
   @override
@@ -206,6 +218,17 @@ class HuaweiHeadphonesImpl extends HuaweiHeadphonesBase {
   Future<void> setAncMode(AncMode mode) async {
     if (modelDefinition.supportsAnc && _ancFeature != null) {
       await _ancFeature!.setMode(mode, _mbb);
+    }
+  }
+
+  // SoundQuality implementation
+  @override
+  ValueStream<SoundQualityMode> get soundQualityMode => _soundQualityModeCtrl.stream;
+
+  @override
+  Future<void> setSoundQualityMode(SoundQualityMode mode) async {
+    if (modelDefinition.supportsSoundQuality && _soundQualityFeature != null) {
+      await _soundQualityFeature!.setMode(mode, _mbb);
     }
   }
 
